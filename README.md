@@ -1,6 +1,4 @@
-# kloak
-
-*Keystroke-level online anonymization kernel*
+## kloak: *Keystroke-level online anonymization kernel*
 
 <div align="center">
   <img src="figures/kloak.png"><br><br>
