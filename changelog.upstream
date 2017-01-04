@@ -1,0 +1,17 @@
+commit 24877bac8fdf856f1c7f72a34ff03d45ab872d5f
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 14:37:57 2016 -0500
+
+    Rename LICENSE.txt to LICENSE
+
+commit 521debce06e39083c282f13f165aeef8b081bd16
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 13:17:29 2016 -0500
+
+    Updated readme
+
+commit 28d5f0663fbef868856b7d58a238954ae09f94f5
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 12:59:23 2016 -0500
+
+    Initial commit

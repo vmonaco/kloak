@@ -1,0 +1,17 @@
+## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+[Unit]
+Description=kloak anti keystroke deanonymization tool
+Documentation=https://github.com/vmonaco/kloak
+ConditionPathExists=!/var/run/qubes/this-is-templatevm
+Before=graphical.target
+Before=getty.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/kloak -r /dev/input/event4 -w /dev/uinput
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

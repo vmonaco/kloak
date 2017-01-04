@@ -1,0 +1,6 @@
+## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+version=3
+opts=filenamemangle=s/.+\/v?(.*)\.tar\.gz/<project>-$1.tar.gz/ \
+  https://github.com/vmonaco/kloak/tags .*/v?(\d[\d\.]+)\.tar\.gz

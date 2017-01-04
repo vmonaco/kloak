@@ -1,10 +1,18 @@
-all : kloak eventcap
+#!/usr/bin/make -f
 
-kloak : src/main.c
-	gcc src/main.c -o kloak -lm -lpthread
+## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
 
-eventcap : src/eventcap.c
-	gcc src/eventcap.c -o eventcap
+## genmkfile - Makefile - version 1.5
 
-clean :
-	rm -rf kloak eventcap src/main.o src/eventcap.o
+## This is a copy.
+## master location:
+## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/Makefile
+
+GENMKFILE_PATH ?= /usr/share/genmkfile
+GENMKFILE_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+export GENMKFILE_PATH
+export GENMKFILE_ROOT_DIR
+
+include $(GENMKFILE_PATH)/makefile-full

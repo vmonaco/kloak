@@ -1,0 +1,45 @@
+eventcap(8) -- physical keyboard device detection
+=============================================
+
+<span class="comment">
+# Copyright (C) 2016 - 2016 Patrick Schleizer adrelanos@riseup.net
+# See the file COPYING for copying conditions.
+
+# Not using angle brackets in copyright notice for e-mail address, because
+# angle brackets would result in this file being non-deterministic. (There
+# must be a bug in Debian wheezy in ruby-ronn.)
+
+# Not using "##", because for some reason this comment would be visible in the
+# resulting man page.
+</span>
+
+## SYNOPSIS
+`eventcap` device
+
+## DESCRIPTION
+Determine which device file corresponds to the physical keyboard. Use eventcap
+can be used to look for the device that generates
+events when keys are pressed. This will typically be one of
+/dev/input/event[0-9].
+
+## EXAMPLES
+In this example, it's /dev/input/event4:
+
+`sudo ./eventcap /dev/input/event4`
+
+Reading From : /dev/input/event4 (AT Translated Set 2 keyboard)
+Type:   4    Code:   4    Value:  15
+Type:   1    Code:  15    Value:   0
+Type:   0    Code:   0    Value:   0
+Type:   4    Code:   4    Value:  56
+Type:   1    Code:  56    Value:   0
+Type:   0    Code:   0    Value:   0
+
+## WWW
+https://github.com/vmonaco/kloak
+
+## CREDITS
+eventcap was written by Vinnie Monaco.
+
+## AUTHOR
+This man page has been written by Patrick Schleizer (adrelanos@riseup.net).

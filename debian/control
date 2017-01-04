@@ -1,0 +1,23 @@
+## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+Source: kloak
+Section: misc
+Priority: optional
+Maintainer: Patrick Schleizer <adrelanos@riseup.net>
+Build-Depends: debhelper (>= 9), faketime, genmkfile, ruby-ronn (>= 0.7.3),
+ dh-systemd
+Homepage: https://github.com/vmonaco/kloak
+Vcs-Browser: https://github.com/vmonaco/kloak
+Vcs-Git: https://github.com/vmonaco/kloak.git
+Standards-Version: 3.9.6
+
+Package: kloak
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: anti keystroke deanonymization tool
+ A keystroke-level online anonymization kernel.
+ .
+ A privacy tool that makes keystroke biometrics less effective. This
+ is accomplished by obfuscating the time intervals between key press and
+ release events, which are typically used for identification.

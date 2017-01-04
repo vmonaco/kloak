@@ -1,0 +1,69 @@
+kloak(8) -- anti keystroke deanonymization tool
+=============================================
+
+<span class="comment">
+# Copyright (C) 2016 - 2016 Patrick Schleizer adrelanos@riseup.net
+# See the file COPYING for copying conditions.
+
+# Not using angle brackets in copyright notice for e-mail address, because
+# angle brackets would result in this file being non-deterministic. (There
+# must be a bug in Debian wheezy in ruby-ronn.)
+
+# Not using "##", because for some reason this comment would be visible in the
+# resulting man page.
+</span>
+
+## SYNOPSIS
+`kloak` [options]
+
+## OPTIONS
+  * -h
+
+    print usage message and exit
+
+  * -r
+
+    device file: read given input device (multiple allowed)
+
+  * -w
+
+    device file: write to the given uinput device (mandatory option)
+
+  * -d
+
+    delay: maximum delay (in milliseconds) of released events. Default 100.
+
+  * -s
+
+    startup timeout: time to wait (in milliseconds) before startup. Default 100.
+
+  * -v
+
+    verbose mode
+
+## DESCRIPTION
+kloak is a Keystroke-level online anonymization kernel.
+
+kloak is a privacy tool that makes keystroke biometrics less effective.
+This is accomplished by obfuscating the time intervals between key press
+and release events, which are typically used for identification.
+
+## EXAMPLES
+Use eventcap(8) (or some other event capture tool) and look for the device
+that generates events when keys are pressed.
+
+Start `kloak` by specifying the input and output device files.
+The output device will typically be either `/dev/uinput` or `/dev/input/uinput`.
+Note that since kloak and eventcap require reading from and writing to device
+files, they probably won't work without running as root:
+
+`sudo ./kloak -r /dev/input/event4 -w /dev/uinput`
+
+## WWW
+https://github.com/vmonaco/kloak
+
+## CREDITS
+kloak was written by Vinnie Monaco.
+
+## AUTHOR
+This man page has been written by Patrick Schleizer (adrelanos@riseup.net).
