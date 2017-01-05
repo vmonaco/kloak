@@ -27,7 +27,8 @@
 
 static int rescue_keys[] = {
         KEY_RIGHTSHIFT,
-        KEY_RIGHTCTRL,
+        KEY_LEFTSHIFT,
+        KEY_ESC,
 };
 
 #define rescue_len (sizeof(rescue_keys) / sizeof(int))
