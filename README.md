@@ -56,6 +56,8 @@ The full usage and options are:
       -w device file: write to the given uinput device (mandatory option)
       -d delay: maximum delay (in milliseconds) of released events. Default 100.
       -s startup timeout: time to wait (in milliseconds) before startup. Default 100.
+      -k rescue keys: csv list of rescue key names to exit kloak in case the
+         keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.
       -v: verbose mode
       
 ## Try it out
