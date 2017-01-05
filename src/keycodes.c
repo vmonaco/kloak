@@ -269,7 +269,9 @@ static item_t table[] = {
         {"KEY_WIMAX", KEY_WIMAX},
         {"KEY_RFKILL", KEY_RFKILL},
 
-        {"KEY_MICMUTE", KEY_MICMUTE}
+        {"KEY_MICMUTE", KEY_MICMUTE},
+
+        {NULL, 0}
 };
 
 int lookup_keycode(const char *name) {
@@ -279,4 +281,13 @@ int lookup_keycode(const char *name) {
         }
     }
     return -EINVAL;
+}
+
+const char *lookup_keyname(const int code) {
+    for (item_t *p = table; p->name != NULL; ++p) {
+        if (code == p->value) {
+            return p->name;
+        }
+    }
+    return "KEY_UNKNOWN";
 }
