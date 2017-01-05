@@ -27,7 +27,7 @@ Start `kloak` by specifying the input and output device files. The output device
 
     $ sudo ./kloak -r /dev/input/event4 -w /dev/uinput
     
-`uinput` is the [kernel module](http://thiemonge.org/getting-started-with-uinput) that allows user-land applications to create input devices. **If you start `kloak` and lose control of your keyboard, press the rescue keys: Right Shift + Right Ctrl. This terminates `kloak`.**
+`uinput` is the [kernel module](http://thiemonge.org/getting-started-with-uinput) that allows user-land applications to create input devices. **If you start `kloak` and lose control of your keyboard, the default rescue keys are: Right Shift + Left Shift + Esc. This terminates `kloak`.** You can specify the rescue key combination using the `-k` parameter. 
 
 Verify that it's running successfully by starting in verbose mode and looking for the key received/release events:
 
