@@ -16,6 +16,8 @@
 #include <linux/input.h>
 #include <linux/uinput.h>
 
+#include "keycodes.h"
+
 #define MAX_INPUTS 1  // For now, just one. Future will allow multiple input devices
 #define DEFAULT_MAX_delay_MS 100  // 100 ms is short enough to not greatly affect usability
 #define DEFAULT_STARTUP_MS 500
