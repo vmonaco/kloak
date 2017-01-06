@@ -1,0 +1,12 @@
+#!/bin/bash
+
+## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+make_install_hook_post() {
+   if [ ! -d "$DESTDIR/usr/sbin" ]; then
+      mkdir --parents "$DESTDIR/usr/sbin"
+   fi
+   cp eventcap "$DESTDIR/usr/sbin/"
+   cp kloak "$DESTDIR/usr/sbin/"
+}

@@ -1,0 +1,35 @@
+commit 31a017ab0e70a3a3a77f13ab6b0adee79c758d1c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 4 20:24:04 2017 +0000
+
+    - initial Debian packaging
+    - depends on genmkfile, added genmkfile Makefile
+    - added systemd unit file for auto start before graphical and getty target
+    - for hardening, added `$(CPPFLAGS) $(CFLAGS) $(LDFLAGS)` to original makefile (renamed to Makefile_orig)
+    
+    RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+    Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/kloak
+    
+    RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+    Full RELRO      No canary found   NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/eventcap
+    
+    - added manpages for kloak and eventcap
+    - TODO: somehow auto detect /dev/input/... keyboard device for systemd unit file
+
+commit 24877bac8fdf856f1c7f72a34ff03d45ab872d5f
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 14:37:57 2016 -0500
+
+    Rename LICENSE.txt to LICENSE
+
+commit 521debce06e39083c282f13f165aeef8b081bd16
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 13:17:29 2016 -0500
+
+    Updated readme
+
+commit 28d5f0663fbef868856b7d58a238954ae09f94f5
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Dec 21 12:59:23 2016 -0500
+
+    Initial commit
