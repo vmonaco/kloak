@@ -140,64 +140,6 @@ static item_t table[] = {
         {"KEY_RIGHTMETA", KEY_RIGHTMETA},
         {"KEY_COMPOSE", KEY_COMPOSE},
 
-        {"KEY_STOP", KEY_STOP},
-        {"KEY_AGAIN", KEY_AGAIN},
-        {"KEY_PROPS", KEY_PROPS},
-        {"KEY_UNDO", KEY_UNDO},
-        {"KEY_FRONT", KEY_FRONT},
-        {"KEY_COPY", KEY_COPY},
-        {"KEY_OPEN", KEY_OPEN},
-        {"KEY_PASTE", KEY_PASTE},
-        {"KEY_FIND", KEY_FIND},
-        {"KEY_CUT", KEY_CUT},
-        {"KEY_HELP", KEY_HELP},
-        {"KEY_MENU", KEY_MENU},
-        {"KEY_CALC", KEY_CALC},
-        {"KEY_SETUP", KEY_SETUP},
-        {"KEY_SLEEP", KEY_SLEEP},
-        {"KEY_WAKEUP", KEY_WAKEUP},
-        {"KEY_FILE", KEY_FILE},
-        {"KEY_SENDFILE", KEY_SENDFILE},
-        {"KEY_DELETEFILE", KEY_DELETEFILE},
-        {"KEY_XFER", KEY_XFER},
-        {"KEY_PROG1", KEY_PROG1},
-        {"KEY_PROG2", KEY_PROG2},
-        {"KEY_WWW", KEY_WWW},
-        {"KEY_MSDOS", KEY_MSDOS},
-        {"KEY_COFFEE", KEY_COFFEE},
-        {"KEY_SCREENLOCK", KEY_SCREENLOCK},
-        {"KEY_ROTATE_DISPLAY", KEY_ROTATE_DISPLAY},
-        {"KEY_DIRECTION", KEY_DIRECTION},
-        {"KEY_CYCLEWINDOWS", KEY_CYCLEWINDOWS},
-        {"KEY_MAIL", KEY_MAIL},
-        {"KEY_BOOKMARKS", KEY_BOOKMARKS},
-        {"KEY_COMPUTER", KEY_COMPUTER},
-        {"KEY_BACK", KEY_BACK},
-        {"KEY_FORWARD", KEY_FORWARD},
-        {"KEY_CLOSECD", KEY_CLOSECD},
-        {"KEY_EJECTCD", KEY_EJECTCD},
-        {"KEY_EJECTCLOSECD", KEY_EJECTCLOSECD},
-        {"KEY_NEXTSONG", KEY_NEXTSONG},
-        {"KEY_PLAYPAUSE", KEY_PLAYPAUSE},
-        {"KEY_PREVIOUSSONG", KEY_PREVIOUSSONG},
-        {"KEY_STOPCD", KEY_STOPCD},
-        {"KEY_RECORD", KEY_RECORD},
-        {"KEY_REWIND", KEY_REWIND},
-        {"KEY_PHONE", KEY_PHONE},
-        {"KEY_ISO", KEY_ISO},
-        {"KEY_CONFIG", KEY_CONFIG},
-        {"KEY_HOMEPAGE", KEY_HOMEPAGE},
-        {"KEY_REFRESH", KEY_REFRESH},
-        {"KEY_EXIT", KEY_EXIT},
-        {"KEY_MOVE", KEY_MOVE},
-        {"KEY_EDIT", KEY_EDIT},
-        {"KEY_SCROLLUP", KEY_SCROLLUP},
-        {"KEY_SCROLLDOWN", KEY_SCROLLDOWN},
-        {"KEY_KPLEFTPAREN", KEY_KPLEFTPAREN},
-        {"KEY_KPRIGHTPAREN", KEY_KPRIGHTPAREN},
-        {"KEY_NEW", KEY_NEW},
-        {"KEY_REDO", KEY_REDO},
-
         {"KEY_F13", KEY_F13},
         {"KEY_F14", KEY_F14},
         {"KEY_F15", KEY_F15},
@@ -211,71 +153,14 @@ static item_t table[] = {
         {"KEY_F23", KEY_F23},
         {"KEY_F24", KEY_F24},
 
-        {"KEY_PLAYCD", KEY_PLAYCD},
-        {"KEY_PAUSECD", KEY_PAUSECD},
-        {"KEY_PROG3", KEY_PROG3},
-        {"KEY_PROG4", KEY_PROG4},
-        {"KEY_DASHBOARD", KEY_DASHBOARD},
-        {"KEY_SUSPEND", KEY_SUSPEND},
-        {"KEY_CLOSE", KEY_CLOSE},
-        {"KEY_PLAY", KEY_PLAY},
-        {"KEY_FASTFORWARD", KEY_FASTFORWARD},
-        {"KEY_BASSBOOST", KEY_BASSBOOST},
-        {"KEY_PRINT", KEY_PRINT},
-        {"KEY_HP", KEY_HP},
-        {"KEY_CAMERA", KEY_CAMERA},
-        {"KEY_SOUND", KEY_SOUND},
-        {"KEY_QUESTION", KEY_QUESTION},
-        {"KEY_EMAIL", KEY_EMAIL},
-        {"KEY_CHAT", KEY_CHAT},
-        {"KEY_SEARCH", KEY_SEARCH},
-        {"KEY_CONNECT", KEY_CONNECT},
-        {"KEY_FINANCE", KEY_FINANCE},
-        {"KEY_SPORT", KEY_SPORT},
-        {"KEY_SHOP", KEY_SHOP},
-        {"KEY_ALTERASE", KEY_ALTERASE},
-        {"KEY_CANCEL", KEY_CANCEL},
-        {"KEY_BRIGHTNESSDOWN", KEY_BRIGHTNESSDOWN},
-        {"KEY_BRIGHTNESSUP", KEY_BRIGHTNESSUP},
-        {"KEY_MEDIA", KEY_MEDIA},
-
-        {"KEY_SWITCHVIDEOMODE", KEY_SWITCHVIDEOMODE},
-        {"KEY_KBDILLUMTOGGLE", KEY_KBDILLUMTOGGLE},
-        {"KEY_KBDILLUMDOWN", KEY_KBDILLUMDOWN},
-        {"KEY_KBDILLUMUP", KEY_KBDILLUMUP},
-
-        {"KEY_SEND", KEY_SEND},
-        {"KEY_REPLY", KEY_REPLY},
-        {"KEY_FORWARDMAIL", KEY_FORWARDMAIL},
-        {"KEY_SAVE", KEY_SAVE},
-        {"KEY_DOCUMENTS", KEY_DOCUMENTS},
-
-        {"KEY_BATTERY", KEY_BATTERY},
-
-        {"KEY_BLUETOOTH", KEY_BLUETOOTH},
-        {"KEY_WLAN", KEY_WLAN},
-        {"KEY_UWB", KEY_UWB},
-
         {"KEY_UNKNOWN", KEY_UNKNOWN},
-
-        {"KEY_VIDEO_NEXT", KEY_VIDEO_NEXT},
-        {"KEY_VIDEO_PREV", KEY_VIDEO_PREV},
-        {"KEY_BRIGHTNESS_CYCLE", KEY_BRIGHTNESS_CYCLE},
-        {"KEY_BRIGHTNESS_AUTO", KEY_BRIGHTNESS_AUTO},
-        {"KEY_BRIGHTNESS_ZERO", KEY_BRIGHTNESS_ZERO},
-        {"KEY_DISPLAY_OFF", KEY_DISPLAY_OFF},
-
-        {"KEY_WWAN", KEY_WWAN},
-        {"KEY_WIMAX", KEY_WIMAX},
-        {"KEY_RFKILL", KEY_RFKILL},
-
-        {"KEY_MICMUTE", KEY_MICMUTE},
 
         {NULL, 0}
 };
 
 int lookup_keycode(const char *name) {
-    for (item_t *p = table; p->name != NULL; ++p) {
+    item_t *p;
+    for (p = table; p->name != NULL; ++p) {
         if (strcmp(p->name, name) == 0) {
             return p->value;
         }
@@ -284,7 +169,8 @@ int lookup_keycode(const char *name) {
 }
 
 const char *lookup_keyname(const int code) {
-    for (item_t *p = table; p->name != NULL; ++p) {
+    item_t *p;
+    for (p = table; p->name != NULL; ++p) {
         if (code == p->value) {
             return p->name;
         }
