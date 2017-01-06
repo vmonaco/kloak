@@ -16,7 +16,10 @@
 #include <linux/input.h>
 #include <linux/uinput.h>
 
+#include "keycodes.h"
+
 #define MAX_INPUTS 1  // For now, just one. Future will allow multiple input devices
+#define MAX_RESCUE_KEYS 10  // Maximum number of rescue keys to exit in case of emergency
 #define DEFAULT_MAX_delay_MS 100  // 100 ms is short enough to not greatly affect usability
 #define DEFAULT_STARTUP_MS 500
 #define TIMER_INTERVAL_US (10000000 / 100) // 1/100 sec.
@@ -25,18 +28,15 @@
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-static int rescue_keys[] = {
-        KEY_RIGHTSHIFT,
-        KEY_RIGHTCTRL,
-};
-
-#define rescue_len (sizeof(rescue_keys) / sizeof(int))
+static int rescue_keys[MAX_RESCUE_KEYS];
+static int rescue_len;
 
 static struct option long_options[] = {
-        {"start",   1, 0, 's'},
-        {"delay",   1, 0, 'd'},
         {"read",    1, 0, 'r'},
         {"write",   1, 0, 'w'},
+        {"delay",   1, 0, 'd'},
+        {"start",   1, 0, 's'},
+        {"keys",    1, 0, 'k'},
         {"verbose", 0, 0, 'v'},
         {"help",    0, 0, 'h'},
         {0,         0, 0, 0}
@@ -54,6 +54,8 @@ static int interrupt = 0;
 static char *output_device = NULL;
 static char *input_device = NULL;
 static char input_name[256] = "Unknown";
+static char *rescue_keys_str = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
+static char rescue_key_seps[] = ", ";  // delims to strtok
 
 static struct input_event ev;
 static struct uinput_user_dev dev;
@@ -329,27 +331,33 @@ void usage() {
     fprintf(stderr, "  -w device file: write to the given uinput device (mandatory option)\n");
     fprintf(stderr, "  -d delay: maximum delay (in milliseconds) of released events. Default 100.\n");
     fprintf(stderr, "  -s startup timeout: time to wait (in milliseconds) before startup. Default 100.\n");
+    fprintf(stderr, "  -k rescue keys: csv list of rescue key names to exit kloak in case the\n"
+            "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
     fprintf(stderr, "  -v: verbose mode\n");
 }
 
 void banner() {
+    int i;
+
     printf("********************************************************************************\n"
-                   "* Started kloak: Keystroke-level Online Anonymizing Kernel\n"
+                   "* Started kloak : Keystroke-level Online Anonymizing Kernel\n"
                    "* Reading from  : %s (%s)\n"
                    "* Writing to    : %s\n"
-                   "* Maximum delay : %d ms\n"
-                   "* In case the keyboard becomes unresponsive, the rescue keys to exit are:\n"
-                   "*                           Right Shift + Right Ctrl\n"
-                   "********************************************************************************\n",
+                   "* Maximum delay : %d ms\n",
            input_device, input_name, output_device, max_delay);
+    printf("* Rescue keys   : %s", lookup_keyname(rescue_keys[0]));
+    for (i = 1; i < rescue_len; i++) { printf(" + %s", lookup_keyname(rescue_keys[i])); }
+    printf("\n");
+    printf("********************************************************************************\n");
 }
 
 int main(int argc, char **argv) {
-    int c, i, res;
+    int c, i, res, keycode;
     int option_index = 0;
+    char *token, *_rescue_keys_str;
 
     while (1) {
-        c = getopt_long(argc, argv, "s:d:r:w:vh", long_options, &option_index);
+        c = getopt_long(argc, argv, "r:w:d:s:k:vh", long_options, &option_index);
         if (c == -1)
             break;
         switch (c) {
@@ -387,6 +395,9 @@ int main(int argc, char **argv) {
                     exit(1);
                 }
                 break;
+            case 'k':
+                rescue_keys_str = optarg;
+                break;
 
             case 'v':
                 verbose = 1;
@@ -411,6 +422,24 @@ int main(int argc, char **argv) {
 
     if ((getuid()) != 0)
         printf("You are not root! This may not work...\n");
+
+    // Set the rescue keys
+    strcpy(_rescue_keys_str, rescue_keys_str);
+    token = strtok(_rescue_keys_str, rescue_key_seps);
+    while (token != NULL) {
+        keycode = lookup_keycode(token);
+        if (keycode < 0) {
+            fprintf(stderr, "Invalid key name: '%s'\nSee keycodes.h for valid names.\n", token);
+            exit(1);
+        } else if (rescue_len < MAX_RESCUE_KEYS) {
+            rescue_keys[rescue_len] = keycode;
+            rescue_len++;
+        } else {
+            fprintf(stderr, "Cannot set more than %d rescue keys.\n", MAX_RESCUE_KEYS);
+            exit(1);
+        }
+        token = strtok(NULL, rescue_key_seps);
+    }
 
     // Initialize the output device first, then wait to initialize input
     // This allows any keystroke events (e.g., releasing the Return key)
