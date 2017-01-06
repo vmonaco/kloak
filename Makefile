@@ -8,9 +8,6 @@ kloak : src/main.c src/keycodes.c src/keycodes.h
 eventcap : src/eventcap.c
 	gcc src/eventcap.c -o eventcap $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
 
-clean :
-	rm -rf kloak eventcap src/main.o src/eventcap.o
-
 ## genmkfile - Makefile - version 1.5
 
 ## This is a copy.
