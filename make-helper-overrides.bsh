@@ -10,3 +10,7 @@ make_install_hook_post() {
    cp eventcap "$DESTDIR/usr/sbin/"
    cp kloak "$DESTDIR/usr/sbin/"
 }
+
+make_clean_hook_pre() {
+   rm -rf kloak eventcap src/main.o src/eventcap.o
+}
