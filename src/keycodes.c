@@ -159,7 +159,8 @@ static item_t table[] = {
 };
 
 int lookup_keycode(const char *name) {
-    for (item_t *p = table; p->name != NULL; ++p) {
+    item_t *p;
+    for (p = table; p->name != NULL; ++p) {
         if (strcmp(p->name, name) == 0) {
             return p->value;
         }
@@ -168,7 +169,8 @@ int lookup_keycode(const char *name) {
 }
 
 const char *lookup_keyname(const int code) {
-    for (item_t *p = table; p->name != NULL; ++p) {
+    item_t *p;
+    for (p = table; p->name != NULL; ++p) {
         if (code == p->value) {
             return p->name;
         }
