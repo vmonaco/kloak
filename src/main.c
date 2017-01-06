@@ -424,6 +424,7 @@ int main(int argc, char **argv) {
         printf("You are not root! This may not work...\n");
 
     // Set the rescue keys
+    _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
     strcpy(_rescue_keys_str, rescue_keys_str);
     token = strtok(_rescue_keys_str, rescue_key_seps);
     while (token != NULL) {
@@ -440,6 +441,7 @@ int main(int argc, char **argv) {
         }
         token = strtok(NULL, rescue_key_seps);
     }
+    free(_rescue_keys_str);
 
     // Initialize the output device first, then wait to initialize input
     // This allows any keystroke events (e.g., releasing the Return key)
