@@ -107,7 +107,7 @@ The time between key press and release events are typically used to identify use
 
 `kloak` does not protect against all forms of keystroke biometrics that can be used for identification. Specifically,
 
-* If the delay is to small, it is not effective. Adjust the delay to as high a value that's comfortable.
+* If the delay is too small, it is not effective. Adjust the delay to as high a value that's comfortable.
 * Repeated key presses are not obfuscated. If your system is set to repeat held-down keys at a unique rate, this could leak your identity.
 * Writing style is still apparent, in which [stylometry techniques could be used to determine authorship](http://www.vmonaco.com/publications/An%20investigation%20of%20keystroke%20and%20stylometry%20traits%20for%20authenticating%20online%20test%20takers.pdf).
 * Higher level cognitive behavior, such as editing and application usage, are still apparent. These lower-frequency actions are less understood at this point, but could potentially be used to reveal identity.
