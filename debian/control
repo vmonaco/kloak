@@ -5,7 +5,7 @@ Source: kloak
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 9), faketime, genmkfile, ruby-ronn (>= 0.7.3),
+Build-Depends: debhelper (>= 9), genmkfile, ruby-ronn (>= 0.7.3),
  dh-systemd
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
