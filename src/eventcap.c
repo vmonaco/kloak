@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
     //Open Device
     if ((fd = open(device, O_RDONLY)) == -1) {
-        fprintf(stderr, "%s is not a vaild device\n", device);
+        fprintf(stderr, "%s is not a valid device\n", device);
         exit(1);
     }
 
