@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 9), genmkfile, ruby-ronn (>= 0.7.3),
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 
 Package: kloak
 Architecture: any
