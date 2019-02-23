@@ -18,6 +18,7 @@
 
 #include "keycodes.h"
 
+#define BUFSIZE 256
 #define MAX_INPUTS 1  // For now, just one. Future will allow multiple input devices
 #define MAX_RESCUE_KEYS 10  // Maximum number of rescue keys to exit in case of emergency
 #define DEFAULT_MAX_delay_MS 100  // 100 ms is short enough to not greatly affect usability
@@ -51,10 +52,10 @@ static int output_fd = -1;
 static int input_fd = -1;
 static int interrupt = 0;
 
-static char *output_device = NULL;
-static char *input_device = NULL;
-static char input_name[256] = "Unknown";
-static char *rescue_keys_str = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
+static char output_device[BUFSIZE] = "/dev/uinput";
+static char input_device[BUFSIZE] = "";
+static char input_name[BUFSIZE] = "Unknown";
+static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static char rescue_key_seps[] = ", ";  // delims to strtok
 
 static struct input_event ev;
@@ -102,6 +103,30 @@ unsigned int rand_int(unsigned int min, unsigned int max) {
     } while (r >= limit);
 
     return min + (r / buckets);
+}
+
+int detect_keyboard(char* out) {
+    int i;
+    int fd;
+    char name[256];
+    char device[256];
+
+    // Look for an input device with "keyboard" in the name
+    for (i = 0; i < 8; i++) {
+        sprintf(device, "/dev/input/event%d", i);
+        if ((fd = open(device, O_RDONLY)) == -1) {
+            continue;
+        }
+        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+        close(fd);
+
+        if(strstr(name, "keyboard") != NULL) {
+            printf("Found keyboard at: %s\n", device);
+            snprintf(out, BUFSIZE, "%s", device);
+            return 0;
+        }
+    }
+    return -1;
 }
 
 void init_input(char *file) {
@@ -367,7 +392,7 @@ int main(int argc, char **argv) {
                     usage();
                     exit(1);
                 }
-                input_device = optarg;
+                snprintf(input_device, BUFSIZE, "%s", optarg);
                 break;
             }
 
@@ -377,7 +402,7 @@ int main(int argc, char **argv) {
                     usage();
                     exit(1);
                 }
-                output_device = optarg;
+                snprintf(output_device, BUFSIZE, "%s", optarg);
                 break;
 
             case 'd':
@@ -396,7 +421,7 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 'k':
-                rescue_keys_str = optarg;
+                snprintf(rescue_keys_str, BUFSIZE, "%s", optarg);
                 break;
 
             case 'v':
@@ -422,6 +447,11 @@ int main(int argc, char **argv) {
 
     if ((getuid()) != 0)
         printf("You are not root! This may not work...\n");
+
+    if ((strlen(input_device) == 0) && (detect_keyboard(input_device) == -1)) {
+        fprintf(stderr, "Unable to find a keyboard. Specify which input device to use with the -r parameter");
+        exit(1);
+    }
 
     // Set the rescue keys
     _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
