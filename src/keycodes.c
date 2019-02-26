@@ -1,8 +1,6 @@
-#include <errno.h>
-#include <stdlib.h>
 #include <string.h>
-
 #include <linux/input.h>
+#include "keycodes.h"
 
 typedef struct item_t {
     const char *name;
@@ -165,7 +163,7 @@ int lookup_keycode(const char *name) {
             return p->value;
         }
     }
-    return -EINVAL;
+    return -1;
 }
 
 const char *lookup_keyname(const int code) {

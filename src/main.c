@@ -7,21 +7,18 @@
 #include <getopt.h>
 #include <math.h>
 #include <time.h>
-#include <pthread.h>
 
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
+#include <sys/queue.h>
 
 #include <linux/input.h>
 #include <linux/uinput.h>
 
 #include "keycodes.h"
 
-#define BUFSIZE 256
+#define BUFSIZE 256  // For device names and rescue key sequence
 #define MAX_INPUTS 1  // For now, just one. Future will allow multiple input devices
 #define MAX_RESCUE_KEYS 10  // Maximum number of rescue keys to exit in case of emergency
-#define DEFAULT_MAX_delay_MS 100  // 100 ms is short enough to not greatly affect usability
+#define DEFAULT_MAX_DELAY_MS 100  // 100 ms is short enough to not greatly affect usability
 #define DEFAULT_STARTUP_MS 500
 #define TIMER_INTERVAL_US (10000000 / 100) // 1/100 sec.
 
@@ -43,7 +40,7 @@ static struct option long_options[] = {
         {0,         0, 0, 0}
 };
 
-static int max_delay = DEFAULT_MAX_delay_MS;
+static int max_delay = DEFAULT_MAX_DELAY_MS;
 static int startup_timeout = DEFAULT_STARTUP_MS;
 static int verbose = 0;
 static int input_fds[MAX_INPUTS];
@@ -64,11 +61,14 @@ static long previous_time;
 
 struct input_event syn = {.type = EV_SYN, .code = 0, .value = 0};
 
-// An input event with a timestamp when it should occur
-struct timed_event {
+
+TAILQ_HEAD(tailhead, entry) head;
+struct entry {
     struct input_event iev;
     long time;
-};
+    TAILQ_ENTRY(entry) entries;
+} *n1, *n2, *np;
+
 
 void sleep_ms(long milliseconds) {
     struct timespec ts;
@@ -120,7 +120,7 @@ int detect_keyboard(char* out) {
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
         close(fd);
 
-        if(strcasestr(name, "keyboard") != NULL) {
+        if(strstr(name, "keyboard") != NULL) {
             printf("Found keyboard at: %s\n", device);
             snprintf(out, BUFSIZE, "%s", device);
             return 0;
@@ -196,21 +196,15 @@ void init_output(char *file) {
 
 // Meant to be called with pthread_create,
 // releases an event at some time in the future
-void *emit_event(void *arg) {
+void emit_event(struct entry *e) {
     int res, delay;
-
-    // arg should be a pointer to a timed_event
-    struct timed_event *e = (struct timed_event *) arg;
-
-    // Sleep until the event is ready to be released
-    // unless the scheduled time already passed
-    delay = (int) (e->time - current_time_ms());
-    sleep_ms(delay);
 
     // Don't do anything, waiting to exit
     if (interrupt) {
-        return NULL;
+        return;
     }
+
+    delay = (int) (e->time - current_time_ms());
 
     if ((res = write(output_fd, &(e->iev), sizeof(struct input_event)) < 0)) {
         fprintf(stderr, "write() failed: %s\n", strerror(errno));
@@ -223,14 +217,11 @@ void *emit_event(void *arg) {
         exit(1);
     }
 
-    if (verbose) {
-        printf("-Released event at time: %ld.  Type: %*d,  "
-                       "Code: %*d,  Value: %*d,  Actual delay %*d ms \n",
-               e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
-    }
-
-    free(e); // Done with this event
-    return NULL;
+    // if (verbose) {
+    //     printf("-Released event at time: %ld.  Type: %*d,  "
+    //                    "Code: %*d,  Value: %*d,  Actual delay %*d ms \n",
+    //            e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
+    // }
 }
 
 void main_loop() {
@@ -263,6 +254,13 @@ void main_loop() {
      */
 
     while (!interrupt) {
+        while ((np = TAILQ_FIRST(&head)) && (current_time_ms() >= np->time)) {
+            emit_event(np);
+            TAILQ_REMOVE(&head, np, entries);
+            free(np);
+            printf("Removed event %ld,  Code: %d,  Value: %d\n", np->time, np->iev.code, np->iev.value);
+        }
+
         struct input_event *ptr = &ev;
 
         timeout.tv_sec = 0;
@@ -325,25 +323,42 @@ void main_loop() {
 
                 random_delay = (long) rand_int(lower_bound, max_delay);
 
-                e = malloc(sizeof(struct timed_event));
-                e->time = current_time + (long) random_delay;
-                e->iev = ev;
+                // struct timed_event e;
+                // e.time = current_time + (long) random_delay;
+                // e.iev = ev;
+                n1 = malloc(sizeof(struct entry));	/* Insert at the head. */
+                n1->time = current_time + (long) random_delay;
+                n1->iev = ev;
+                TAILQ_INSERT_TAIL(&head, n1, entries);
 
-                previous_time = e->time;
+                previous_time = n1->time;
 
-                if (verbose) {
-                    printf("+Received event at time: %ld.  Type: %*d,  "
-                                   "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
-                           e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value,
-                           4, previous_time - current_time);
-                    if (lower_bound > 0) {
-                        printf("Lower bound raised to: %*d ms\n", 4, lower_bound);
-                    }
-                }
+                printf("Insert event %ld,  Code: %d,  Value: %d,  Scheduled delay %ld ms\n",
+                           n1->time, n1->iev.code, n1->iev.value, previous_time - current_time);
+                // if (lower_bound > 0) {
+                //     printf("Lower bound raised to: %*d ms\n", 4, lower_bound);
+                // }
 
-                if ((res = pthread_create(&emission_thread, NULL, emit_event, e)) != 0) {
-                    fprintf(stderr, "pthread_create() failed: %s\n", strerror(errno));
-                }
+
+                // Emit keystrokes
+                // dequeue items with emission time past the current time
+
+
+
+
+                // if (verbose) {
+                //     printf("+Received event at time: %ld.  Type: %*d,  "
+                //                    "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
+                //            n1->time, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
+                //            4, previous_time - current_time);
+                //     if (lower_bound > 0) {
+                //         printf("Lower bound raised to: %*d ms\n", 4, lower_bound);
+                //     }
+                // }
+
+                // if ((res = pthread_create(&emission_thread, NULL, emit_event, e)) != 0) {
+                //     fprintf(stderr, "pthread_create() failed: %s\n", strerror(errno));
+                // }
             }
         }
     }
@@ -483,6 +498,8 @@ int main(int argc, char **argv) {
 
     init_input(input_device);
     banner();
+
+    TAILQ_INIT(&head);
     main_loop();
 
     for (i = 0; i < input_count; i++)
