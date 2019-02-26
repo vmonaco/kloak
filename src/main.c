@@ -120,7 +120,7 @@ int detect_keyboard(char* out) {
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
         close(fd);
 
-        if(strstr(name, "keyboard") != NULL) {
+        if(strcasestr(name, "keyboard") != NULL) {
             printf("Found keyboard at: %s\n", device);
             snprintf(out, BUFSIZE, "%s", device);
             return 0;
