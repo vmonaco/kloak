@@ -19,8 +19,9 @@
 #define MAX_INPUTS 1  // For now, just one. Future will allow multiple input devices
 #define MAX_RESCUE_KEYS 10  // Maximum number of rescue keys to exit in case of emergency
 #define DEFAULT_MAX_DELAY_MS 100  // 100 ms is short enough to not greatly affect usability
-#define DEFAULT_STARTUP_MS 500
-#define TIMER_INTERVAL_US (10000000 / 100) // 1/100 sec.
+#define DEFAULT_STARTUP_DELAY_MS 500  // Wait before grabbing the input device
+#define DEFAULT_POLLING_INTERVAL_MS 8  // Polling interval between writing events, quantizes output times
+#define READ_TIMEOUT_US (10000000 / 100) // Timeout to check for new events
 
 #ifndef max
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
@@ -28,6 +29,26 @@
 
 static int rescue_keys[MAX_RESCUE_KEYS];
 static int rescue_len;
+
+static int max_delay = DEFAULT_MAX_DELAY_MS;  // Maximum delay
+static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
+static int polling_interval = DEFAULT_POLLING_INTERVAL_MS;
+static int input_fds[MAX_INPUTS];
+static int input_count = 0;
+static int output_fd = -1;
+static int input_fd = -1;
+static int interrupt = 0;  // Flag to interrupt the main loop and exit
+static int verbose = 0;  // Flag for verbose output
+
+static char input_device[BUFSIZE] = "";
+static char input_name[BUFSIZE] = "Unknown";
+static char output_device[BUFSIZE] = "/dev/uinput";
+static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
+static char rescue_key_seps[] = ", ";  // delims to strtok
+
+static struct input_event ev;
+static struct uinput_user_dev dev;
+static long previous_time;
 
 static struct option long_options[] = {
         {"read",    1, 0, 'r'},
@@ -40,36 +61,18 @@ static struct option long_options[] = {
         {0,         0, 0, 0}
 };
 
-static int max_delay = DEFAULT_MAX_DELAY_MS;
-static int startup_timeout = DEFAULT_STARTUP_MS;
-static int verbose = 0;
-static int input_fds[MAX_INPUTS];
-static int input_count = 0;
-static int output_fd = -1;
-static int input_fd = -1;
-static int interrupt = 0;
+TAILQ_HEAD(tailhead, entry) head;  // Head of the keyboard event buffer
 
-static char output_device[BUFSIZE] = "/dev/uinput";
-static char input_device[BUFSIZE] = "";
-static char input_name[BUFSIZE] = "Unknown";
-static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
-static char rescue_key_seps[] = ", ";  // delims to strtok
-
-static struct input_event ev;
-static struct uinput_user_dev dev;
-static long previous_time;
-
-struct input_event syn = {.type = EV_SYN, .code = 0, .value = 0};
-
-
-TAILQ_HEAD(tailhead, entry) head;
 struct entry {
     struct input_event iev;
     long time;
     TAILQ_ENTRY(entry) entries;
 } *n1, *n2, *np;
 
+struct input_event syn = {.type = EV_SYN, .code = 0, .value = 0};
+struct timeval timeout = {.tv_sec = 0, .tv_usec = READ_TIMEOUT_US};
 
+// Helper function to sleep for a duration given in milliseconds
 void sleep_ms(long milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
@@ -77,6 +80,7 @@ void sleep_ms(long milliseconds) {
     nanosleep(&ts, NULL);
 }
 
+// Helper function to return current time in milliseconds
 long current_time_ms(void) {
     long ms; // Milliseconds
     time_t s;  // Seconds
@@ -89,22 +93,33 @@ long current_time_ms(void) {
     return (spec.tv_sec) * 1000 + (spec.tv_nsec) / 1000000;
 }
 
-unsigned int rand_int(unsigned int min, unsigned int max) {
-    int r;
-    const unsigned int range = 1 + max - min;
-    const unsigned int buckets = RAND_MAX / range;
-    const unsigned int limit = buckets * range;
+// Assumes 0 <= max <= RAND_MAX
+// Returns in the closed interval [0, max]
+// Credits: https://stackoverflow.com/questions/2509679/how-to-generate-a-random-integer-number-from-within-a-range
+long random_at_most(long max) {
+  unsigned long
+    // max <= RAND_MAX < ULONG_MAX, so this is okay.
+    num_bins = (unsigned long) max + 1,
+    num_rand = (unsigned long) RAND_MAX + 1,
+    bin_size = num_rand / num_bins,
+    defect   = num_rand % num_bins;
 
-    /* Create equal size buckets all in a row, then fire randomly towards
-     * the buckets until you land in one of them. All buckets are equally
-     * likely. If you land off the end of the line of buckets, try again. */
-    do {
-        r = rand();
-    } while (r >= limit);
+  long x;
+  do {
+   x = random();
+  }
+  // This is carefully written not to overflow
+  while (num_rand - defect <= (unsigned long)x);
 
-    return min + (r / buckets);
+  // Truncated division is intentional
+  return x/bin_size;
 }
 
+long random_between(long min, long max) {
+    return min + random_at_most(max - min);
+}
+
+// Finds the first device with "keyboard" in the name
 int detect_keyboard(char* out) {
     int i;
     int fd;
@@ -122,7 +137,7 @@ int detect_keyboard(char* out) {
 
         if(strstr(name, "keyboard") != NULL) {
             printf("Found keyboard at: %s\n", device);
-            snprintf(out, BUFSIZE, "%s", device);
+            strncpy(out, device, BUFSIZE-1);
             return 0;
         }
     }
@@ -194,8 +209,7 @@ void init_output(char *file) {
     }
 }
 
-// Meant to be called with pthread_create,
-// releases an event at some time in the future
+// Write an event to the output device
 void emit_event(struct entry *e) {
     int res, delay;
 
@@ -217,23 +231,19 @@ void emit_event(struct entry *e) {
         exit(1);
     }
 
-    // if (verbose) {
-    //     printf("-Released event at time: %ld.  Type: %*d,  "
-    //                    "Code: %*d,  Value: %*d,  Actual delay %*d ms \n",
-    //            e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
-    // }
+    if (verbose) {
+        printf("-Released event at time: %ld.  Type: %*d,  "
+                       "Code: %*d,  Value: %*d,  Missed target %*d ms \n",
+               e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
+    }
 }
 
 void main_loop() {
     int i, res;
     int nfds = -1;
     int rescue_state[rescue_len];
-    long current_time;
-    unsigned int lower_bound, random_delay;
-    struct timeval timeout;
-    struct timed_event *e;
+    long current_time, lower_bound, random_delay;
     fd_set read_fds;
-    pthread_t emission_thread;
 
     // initialize the rescue state
     for (i = 0; i < rescue_len; i++)
@@ -254,17 +264,13 @@ void main_loop() {
      */
 
     while (!interrupt) {
-        while ((np = TAILQ_FIRST(&head)) && (current_time_ms() >= np->time)) {
+        // Emit any events exceeding the current time
+        current_time = current_time_ms();
+        while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
             emit_event(np);
             TAILQ_REMOVE(&head, np, entries);
             free(np);
-            printf("Removed event %ld,  Code: %d,  Value: %d\n", np->time, np->iev.code, np->iev.value);
         }
-
-        struct input_event *ptr = &ev;
-
-        timeout.tv_sec = 0;
-        timeout.tv_usec = TIMER_INTERVAL_US;
 
         FD_ZERO(&read_fds);
         for (i = 0; i < input_count; i++) {
@@ -286,12 +292,12 @@ void main_loop() {
 
         for (i = 0; i < input_count; i++) {
             if (FD_ISSET(input_fds[i], &read_fds)) {
-                res = read(input_fds[i], ptr, sizeof(ev));
+                res = read(input_fds[i], &ev, sizeof(ev));
 
                 if (res <= 0)
                     continue;
 
-                // check for rescue sequence.
+                // check for the rescue sequence.
                 if (ev.type == EV_KEY) {
                     int all = 1;
                     for (i = 0; i < rescue_len; i++) {
@@ -313,19 +319,13 @@ void main_loop() {
                     continue;
                 }
 
-                // Received a key press or release event. Schedule the event
-                // to be release sometime in the future
+                // Schedule the keyboard event to be released sometime in the future.
+                // Lower bound must be at *least* the difference between last scheduled and now
                 current_time = current_time_ms();
+                lower_bound = max(previous_time - current_time, 0);
+                random_delay = random_between(lower_bound, max_delay);
 
-                // Lower bound must be at *least* the different between last scheduled and now
-                // Cannot schedule an event in the past, so must also be gte
-                lower_bound = (unsigned int) max(previous_time - current_time, 0);
-
-                random_delay = (long) rand_int(lower_bound, max_delay);
-
-                // struct timed_event e;
-                // e.time = current_time + (long) random_delay;
-                // e.iev = ev;
+                // Buffer the keyboard event
                 n1 = malloc(sizeof(struct entry));	/* Insert at the head. */
                 n1->time = current_time + (long) random_delay;
                 n1->iev = ev;
@@ -333,32 +333,15 @@ void main_loop() {
 
                 previous_time = n1->time;
 
-                printf("Insert event %ld,  Code: %d,  Value: %d,  Scheduled delay %ld ms\n",
-                           n1->time, n1->iev.code, n1->iev.value, previous_time - current_time);
-                // if (lower_bound > 0) {
-                //     printf("Lower bound raised to: %*d ms\n", 4, lower_bound);
-                // }
-
-
-                // Emit keystrokes
-                // dequeue items with emission time past the current time
-
-
-
-
-                // if (verbose) {
-                //     printf("+Received event at time: %ld.  Type: %*d,  "
-                //                    "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
-                //            n1->time, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
-                //            4, previous_time - current_time);
-                //     if (lower_bound > 0) {
-                //         printf("Lower bound raised to: %*d ms\n", 4, lower_bound);
-                //     }
-                // }
-
-                // if ((res = pthread_create(&emission_thread, NULL, emit_event, e)) != 0) {
-                //     fprintf(stderr, "pthread_create() failed: %s\n", strerror(errno));
-                // }
+                if (verbose) {
+                    printf("Bufferred event at time: %ld.  Type: %*d,  "
+                                   "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
+                           n1->time, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
+                           4, previous_time - current_time);
+                    if (lower_bound > 0) {
+                        printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
+                    }
+                }
             }
         }
     }
@@ -407,7 +390,7 @@ int main(int argc, char **argv) {
                     usage();
                     exit(1);
                 }
-                snprintf(input_device, BUFSIZE, "%s", optarg);
+                strncpy(input_device, optarg, BUFSIZE-1);
                 break;
             }
 
@@ -417,7 +400,7 @@ int main(int argc, char **argv) {
                     usage();
                     exit(1);
                 }
-                snprintf(output_device, BUFSIZE, "%s", optarg);
+                strncpy(output_device, optarg, BUFSIZE-1);
                 break;
 
             case 'd':
@@ -436,7 +419,7 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 'k':
-                snprintf(rescue_keys_str, BUFSIZE, "%s", optarg);
+                strncpy(rescue_keys_str, optarg, BUFSIZE-1);
                 break;
 
             case 'v':
@@ -470,7 +453,7 @@ int main(int argc, char **argv) {
 
     // Set the rescue keys
     _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
-    strcpy(_rescue_keys_str, rescue_keys_str);
+    strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
     token = strtok(_rescue_keys_str, rescue_key_seps);
     while (token != NULL) {
         keycode = lookup_keycode(token);
