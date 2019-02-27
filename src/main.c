@@ -22,6 +22,7 @@
 #define DEFAULT_STARTUP_DELAY_MS 500  // Wait before grabbing the input device
 #define DEFAULT_POLLING_INTERVAL_MS 8  // Polling interval between writing events, quantizes output times
 #define READ_TIMEOUT_US (10000000 / 100) // Timeout to check for new events
+#define NUM_SUPPORTED_KEYS_THRESH 20  // Find the first device that supports at least this many key events
 
 #ifndef max
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
@@ -119,27 +120,59 @@ long random_between(long min, long max) {
     return min + random_at_most(max - min);
 }
 
-// Finds the first device with "keyboard" in the name
+int supports_event_type(int device_fd, int event_type) {
+  unsigned long evbit = 0;
+  // Get the bit field of available event types.
+  ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
+  return evbit & (1 << event_type);
+}
+
+// Returns true iff the given device has |key|.
+int supports_specific_key(int device_fd, unsigned int key) {
+  size_t nchar = KEY_MAX/8 + 1;
+  unsigned char bits[nchar];
+  // Get the bit fields of available keys.
+  ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
+  return bits[key/8] & (1 << (key % 8));
+}
+
+// Finds the first device with that supports
 int detect_keyboard(char* out) {
     int i;
     int fd;
-    char name[256];
+    int key;
+    int num_supported_keys;
     char device[256];
 
     // Look for an input device with "keyboard" in the name
     for (i = 0; i < 8; i++) {
         sprintf(device, "/dev/input/event%d", i);
+
         if ((fd = open(device, O_RDONLY)) == -1) {
             continue;
         }
-        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-        close(fd);
 
-        if(strstr(name, "keyboard") != NULL) {
-            printf("Found keyboard at: %s\n", device);
-            strncpy(out, device, BUFSIZE-1);
-            return 0;
+        // Only check devices that support EV_KEY events
+        if (supports_event_type(fd, EV_KEY)) {
+            num_supported_keys = 0;
+
+            // Count the number of KEY_* events that are supported
+            for (key = 0; key <= KEY_MAX; key++) {
+                if (supports_specific_key(fd, key)) {
+                    num_supported_keys += 1;
+                }
+            }
+
+            // Above a threshold, we probably found a standard keyboard
+            if (num_supported_keys > NUM_SUPPORTED_KEYS_THRESH) {
+                printf("Found keyboard at: %s (supports %d keys)\n", device, num_supported_keys);
+                strncpy(out, device, BUFSIZE-1);
+                close(fd);
+                return 0;
+            }
         }
+
+        close(fd);
     }
     return -1;
 }
@@ -447,7 +480,7 @@ int main(int argc, char **argv) {
         printf("You are not root! This may not work...\n");
 
     if ((strlen(input_device) == 0) && (detect_keyboard(input_device) == -1)) {
-        fprintf(stderr, "Unable to find a keyboard. Specify which input device to use with the -r parameter");
+        fprintf(stderr, "Unable to find a keyboard. Specify which input device to use with the -r parameter\n");
         exit(1);
     }
 
