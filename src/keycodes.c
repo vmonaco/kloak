@@ -2,12 +2,12 @@
 #include <linux/input.h>
 #include "keycodes.h"
 
-typedef struct item_t {
+struct name_value {
     const char *name;
-    int value;
-} item_t;
+    const int value;
+};
 
-static item_t table[] = {
+static struct name_value key_table[] = {
         {"KEY_ESC", KEY_ESC},
         {"KEY_1", KEY_1},
         {"KEY_2", KEY_2},
@@ -157,8 +157,8 @@ static item_t table[] = {
 };
 
 int lookup_keycode(const char *name) {
-    item_t *p;
-    for (p = table; p->name != NULL; ++p) {
+    struct name_value *p;
+    for (p = key_table; p->name != NULL; ++p) {
         if (strcmp(p->name, name) == 0) {
             return p->value;
         }
@@ -167,8 +167,8 @@ int lookup_keycode(const char *name) {
 }
 
 const char *lookup_keyname(const int code) {
-    item_t *p;
-    for (p = table; p->name != NULL; ++p) {
+    struct name_value *p;
+    for (p = key_table; p->name != NULL; ++p) {
         if (code == p->value) {
             return p->name;
         }
