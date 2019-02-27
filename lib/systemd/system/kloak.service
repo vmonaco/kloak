@@ -10,7 +10,7 @@ Before=getty.target
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/kloak -r /dev/input/event4 -w /dev/uinput
+ExecStart=/usr/sbin/kloak
 Restart=always
 
 [Install]
