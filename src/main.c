@@ -330,6 +330,9 @@ void main_loop() {
      */
 
     while (!interrupt) {
+        // Don't hog the cpu
+        sleep_ms(DEFAULT_POLLING_INTERVAL_MS);
+
         // Emit any events exceeding the current time
         current_time = current_time_ms();
         while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -358,9 +361,6 @@ void main_loop() {
 
         // An event is available, mark the current time
         current_time = current_time_ms();
-
-        // Don't hog the cpu
-        sleep_ms(DEFAULT_POLLING_INTERVAL_MS);
 
         // Buffer the event with a random delay
         for (i = 0; i < input_count; i++) {
@@ -564,7 +564,7 @@ int main(int argc, char **argv) {
     // This allows any keystroke events (e.g., releasing the Return key)
     // to finish before grabbing the input device
     init_output(output_device);
-    
+
     printf("Waiting %d ms...\n", startup_timeout);
     sleep_ms(startup_timeout);
 
