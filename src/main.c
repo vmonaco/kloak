@@ -290,7 +290,7 @@ void emit_event(struct entry *e) {
 
     if (verbose) {
         printf("Released event at time : %ld.  Type: %*d,  "
-                       "Code: %*d,  Value: %*d,  Missed target %*d ms \n",
+                       "Code: %*d,  Value: %*d,  Missed target   %*d ms \n",
                e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
     }
 }
@@ -405,6 +405,8 @@ void main_loop() {
 
                 // Keep track of the previous scheduled release time
                 prev_release_time = n1->time;
+
+
 
                 if (verbose) {
                     printf("Bufferred event at time: %ld.  Type: %*d,  "
