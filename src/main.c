@@ -289,7 +289,7 @@ void emit_event(struct entry *e) {
     }
 
     if (verbose) {
-        printf("-Released event at time: %ld.  Type: %*d,  "
+        printf("Released event at time : %ld.  Type: %*d,  "
                        "Code: %*d,  Value: %*d,  Missed target %*d ms \n",
                e->time, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
     }
