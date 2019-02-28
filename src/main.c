@@ -21,35 +21,41 @@
 #define DEFAULT_MAX_DELAY_MS 100  // 100 ms is short enough to not greatly affect usability
 #define DEFAULT_STARTUP_DELAY_MS 500  // Wait before grabbing the input device
 #define DEFAULT_POLLING_INTERVAL_MS 8  // Polling interval between writing events, quantizes output times
-#define READ_TIMEOUT_US (10000000 / 100) // Timeout to check for new events
+#define READ_TIMEOUT_US 1000 // Timeout to check for new events
 #define NUM_SUPPORTED_KEYS_THRESH 20  // Find the first device that supports at least this many key events
 
 #ifndef max
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-static int rescue_keys[MAX_RESCUE_KEYS];
-static int rescue_len;
-
-static int max_delay = DEFAULT_MAX_DELAY_MS;  // Maximum delay
-static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
-static int polling_interval = DEFAULT_POLLING_INTERVAL_MS;
-static int input_fds[MAX_INPUTS];
-static int input_count = 0;
-static int output_fd = -1;
-static int input_fd = -1;
 static int interrupt = 0;  // Flag to interrupt the main loop and exit
 static int verbose = 0;  // Flag for verbose output
 
-static char input_device[BUFSIZE] = "";
-static char input_name[BUFSIZE] = "Unknown";
-static char output_device[BUFSIZE] = "/dev/uinput";
-static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static char rescue_key_seps[] = ", ";  // delims to strtok
+static char rescue_keys_str[BUFSIZE] = "";
+static char default_rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
+static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
+static int rescue_len;  // Number of rescue keys, set during initialization
 
-static struct input_event ev;
+static int max_delay = DEFAULT_MAX_DELAY_MS;  // Lag will never exceed this upper bound
+static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
+static int polling_interval = DEFAULT_POLLING_INTERVAL_MS;
+
+static int input_fds[MAX_INPUTS];
+static int input_count = 0;
+static int input_fd = -1;
+static int output_fd = -1;
+
+static char input_device[BUFSIZE] = "";
+static char input_name[BUFSIZE] = "";
+static char output_device[BUFSIZE] = "";
+
+static char default_output_devices[][BUFSIZE] = {
+    "/dev/uinput",
+    "/dev/input/uinput"
+};
+
 static struct uinput_user_dev dev;
-static long previous_time;
 
 static struct option long_options[] = {
         {"read",    1, 0, 'r'},
@@ -98,22 +104,22 @@ long current_time_ms(void) {
 // Returns in the closed interval [0, max]
 // Credits: https://stackoverflow.com/questions/2509679/how-to-generate-a-random-integer-number-from-within-a-range
 long random_at_most(long max) {
-  unsigned long
-    // max <= RAND_MAX < ULONG_MAX, so this is okay.
-    num_bins = (unsigned long) max + 1,
-    num_rand = (unsigned long) RAND_MAX + 1,
-    bin_size = num_rand / num_bins,
-    defect   = num_rand % num_bins;
+    unsigned long
+      // max <= RAND_MAX < ULONG_MAX, so this is okay.
+      num_bins = (unsigned long) max + 1,
+      num_rand = (unsigned long) RAND_MAX + 1,
+      bin_size = num_rand / num_bins,
+      defect   = num_rand % num_bins;
 
-  long x;
-  do {
-   x = random();
-  }
-  // This is carefully written not to overflow
-  while (num_rand - defect <= (unsigned long)x);
+    long x;
+    do {
+     x = random();
+    }
+    // This is carefully written not to overflow
+    while (num_rand - defect <= (unsigned long)x);
 
-  // Truncated division is intentional
-  return x/bin_size;
+    // Truncated division is intentional
+    return x/bin_size;
 }
 
 long random_between(long min, long max) {
@@ -121,19 +127,19 @@ long random_between(long min, long max) {
 }
 
 int supports_event_type(int device_fd, int event_type) {
-  unsigned long evbit = 0;
-  // Get the bit field of available event types.
-  ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
-  return evbit & (1 << event_type);
+    unsigned long evbit = 0;
+    // Get the bit field of available event types.
+    ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
+    return evbit & (1 << event_type);
 }
 
 // Returns true iff the given device has |key|.
 int supports_specific_key(int device_fd, unsigned int key) {
-  size_t nchar = KEY_MAX/8 + 1;
-  unsigned char bits[nchar];
-  // Get the bit fields of available keys.
-  ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
-  return bits[key/8] & (1 << (key % 8));
+    size_t nchar = KEY_MAX/8 + 1;
+    unsigned char bits[nchar];
+    // Get the bit fields of available keys.
+    ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
+    return bits[key/8] & (1 << (key % 8));
 }
 
 // Finds the first device with that supports
@@ -148,7 +154,7 @@ int detect_keyboard(char* out) {
     for (i = 0; i < 8; i++) {
         sprintf(device, "/dev/input/event%d", i);
 
-        if ((fd = open(device, O_RDONLY)) == -1) {
+        if ((fd = open(device, O_RDONLY)) < 0) {
             continue;
         }
 
@@ -177,6 +183,23 @@ int detect_keyboard(char* out) {
     return -1;
 }
 
+// Find the location of the uinput device
+int detect_uinput(char* out) {
+    int i;
+    int fd;
+
+    for (i = 0; i < sizeof(default_output_devices) / sizeof(default_output_devices[0]); i++) {
+        if ((fd = open(default_output_devices[i], O_WRONLY | O_NDELAY)) > 0) {
+            printf("Found uinput at: %s\n", default_output_devices[i]);
+            strncpy(out, default_output_devices[i], BUFSIZE-1);
+            close(fd);
+            return 0;
+        }
+    };
+
+    return -1;
+}
+
 void init_input(char *file) {
     int one = 1;
 
@@ -197,6 +220,7 @@ void init_input(char *file) {
         fprintf(stderr, "Unable to determine device name : %s\n", strerror(errno));
         // Don't exit, not a fatal error
     }
+
     // TODO: handle multiple input devices with possibly different delays
     if (input_count < MAX_INPUTS) {
         input_fds[input_count++] = input_fd;
@@ -275,8 +299,9 @@ void main_loop() {
     int i, res;
     int nfds = -1;
     int rescue_state[rescue_len];
-    long current_time, lower_bound, random_delay;
+    long prev_time, current_time, lower_bound, random_delay;
     fd_set read_fds;
+    struct input_event ev;
 
     // initialize the rescue state
     for (i = 0; i < rescue_len; i++)
@@ -297,6 +322,9 @@ void main_loop() {
      */
 
     while (!interrupt) {
+        // TODO: determine sleep time so that output times are quantized
+        sleep_ms(DEFAULT_POLLING_INTERVAL_MS);
+
         // Emit any events exceeding the current time
         current_time = current_time_ms();
         while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -313,7 +341,7 @@ void main_loop() {
         // Wait for next input event
         res = select(nfds, &read_fds, NULL, NULL, &timeout);
 
-        if (res == -1) {
+        if (res < 0) {
             fprintf(stderr, "select() failed: %s\n", strerror(errno));
             exit(1);
         }
@@ -355,7 +383,7 @@ void main_loop() {
                 // Schedule the keyboard event to be released sometime in the future.
                 // Lower bound must be at *least* the difference between last scheduled and now
                 current_time = current_time_ms();
-                lower_bound = max(previous_time - current_time, 0);
+                lower_bound = max(prev_time - current_time, 0);
                 random_delay = random_between(lower_bound, max_delay);
 
                 // Buffer the keyboard event
@@ -364,13 +392,13 @@ void main_loop() {
                 n1->iev = ev;
                 TAILQ_INSERT_TAIL(&head, n1, entries);
 
-                previous_time = n1->time;
+                prev_time = n1->time;
 
                 if (verbose) {
                     printf("Bufferred event at time: %ld.  Type: %*d,  "
                                    "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
                            n1->time, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
-                           4, previous_time - current_time);
+                           4, prev_time - current_time);
                     if (lower_bound > 0) {
                         printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
                     }
@@ -414,11 +442,11 @@ int main(int argc, char **argv) {
 
     while (1) {
         c = getopt_long(argc, argv, "r:w:d:s:k:vh", long_options, &option_index);
-        if (c == -1)
+        if (c < 0)
             break;
         switch (c) {
             case 'r': {
-                if (input_device != NULL) {
+                if (strlen(input_device) > 0) {
                     fprintf(stderr, "Multiple -r options are not allowed\n");
                     usage();
                     exit(1);
@@ -428,7 +456,7 @@ int main(int argc, char **argv) {
             }
 
             case 'w':
-                if (output_device != NULL) {
+                if (strlen(output_device) > 0) {
                     fprintf(stderr, "Multiple -w options are not allowed\n");
                     usage();
                     exit(1);
@@ -451,7 +479,13 @@ int main(int argc, char **argv) {
                     exit(1);
                 }
                 break;
+
             case 'k':
+                if (strlen(rescue_keys_str) > 0) {
+                    fprintf(stderr, "Multiple -k options are not allowed\n");
+                    usage();
+                    exit(1);
+                }
                 strncpy(rescue_keys_str, optarg, BUFSIZE-1);
                 break;
 
@@ -479,12 +513,22 @@ int main(int argc, char **argv) {
     if ((getuid()) != 0)
         printf("You are not root! This may not work...\n");
 
-    if ((strlen(input_device) == 0) && (detect_keyboard(input_device) == -1)) {
+    // Try to auto detect the input and output devices if not specified
+    if ((strlen(input_device) == 0) && (detect_keyboard(input_device) < 0)) {
         fprintf(stderr, "Unable to find a keyboard. Specify which input device to use with the -r parameter\n");
         exit(1);
     }
 
-    // Set the rescue keys
+    if ((strlen(output_device) == 0) && (detect_uinput(output_device) < 0)) {
+        fprintf(stderr, "Unable to find uinput. Specify which output device to use with the -w parameter\n");
+        exit(1);
+    }
+
+    // Set the rescue keys, starting with default combo if needed
+    if (strlen(rescue_keys_str) == 0) {
+        strncpy(rescue_keys_str, default_rescue_keys_str, BUFSIZE-1);
+    }
+
     _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
     strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
     token = strtok(_rescue_keys_str, rescue_key_seps);
@@ -513,11 +557,14 @@ int main(int argc, char **argv) {
     sleep_ms(startup_timeout);
 
     init_input(input_device);
-    banner();
 
+    // Initialize the FIFO event buffer
     TAILQ_INIT(&head);
+
+    banner();
     main_loop();
 
+    // Finished, close everything
     for (i = 0; i < input_count; i++)
         close(input_fds[i]);
 
