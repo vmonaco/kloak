@@ -406,8 +406,6 @@ void main_loop() {
                 // Keep track of the previous scheduled release time
                 prev_release_time = n1->time;
 
-
-
                 if (verbose) {
                     printf("Bufferred event at time: %ld.  Type: %*d,  "
                                    "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
