@@ -21,7 +21,7 @@
 #define DEFAULT_MAX_DELAY_MS 100  // 100 ms is short enough to not greatly affect usability
 #define DEFAULT_STARTUP_DELAY_MS 500  // Wait before grabbing the input device
 #define DEFAULT_POLLING_INTERVAL_MS 8  // Polling interval between writing events, quantizes output times
-#define READ_TIMEOUT_US 1000 // Timeout to check for new events
+#define READ_TIMEOUT_US 100 // Timeout to check for new events
 #define NUM_SUPPORTED_KEYS_THRESH 20  // Find the first device that supports at least this many key events
 
 #ifndef max
@@ -299,17 +299,25 @@ void main_loop() {
     int i, res;
     int nfds = -1;
     int rescue_state[rescue_len];
-    long prev_time, current_time, lower_bound, random_delay;
+    long
+      prev_release_time = 0,
+      current_time = 0,
+      lower_bound = 0,
+      random_delay = 0;
     fd_set read_fds;
     struct input_event ev;
 
     // initialize the rescue state
-    for (i = 0; i < rescue_len; i++)
+    for (i = 0; i < rescue_len; i++) {
         rescue_state[i] = 0;
+    }
 
-    for (i = 0; i < input_count; i++)
-        if (input_fds[i] > nfds)
+    // set nfds to the highest-numbered file descriptor plus one
+    for (i = 0; i < input_count; i++) {
+        if (input_fds[i] > nfds) {
             nfds = input_fds[i];
+        }
+    }
     nfds++;
 
     /* Main loop breaks when the rescue keys are detected
@@ -322,9 +330,6 @@ void main_loop() {
      */
 
     while (!interrupt) {
-        // TODO: determine sleep time so that output times are quantized
-        sleep_ms(DEFAULT_POLLING_INTERVAL_MS);
-
         // Emit any events exceeding the current time
         current_time = current_time_ms();
         while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -351,6 +356,13 @@ void main_loop() {
             continue;
         }
 
+        // An event is available, mark the current time
+        current_time = current_time_ms();
+
+        // Don't hog the cpu
+        sleep_ms(DEFAULT_POLLING_INTERVAL_MS);
+
+        // Buffer the event with a random delay
         for (i = 0; i < input_count; i++) {
             if (FD_ISSET(input_fds[i], &read_fds)) {
                 res = read(input_fds[i], &ev, sizeof(ev));
@@ -382,8 +394,7 @@ void main_loop() {
 
                 // Schedule the keyboard event to be released sometime in the future.
                 // Lower bound must be at *least* the difference between last scheduled and now
-                current_time = current_time_ms();
-                lower_bound = max(prev_time - current_time, 0);
+                lower_bound = max(prev_release_time - current_time, 0);
                 random_delay = random_between(lower_bound, max_delay);
 
                 // Buffer the keyboard event
@@ -392,13 +403,14 @@ void main_loop() {
                 n1->iev = ev;
                 TAILQ_INSERT_TAIL(&head, n1, entries);
 
-                prev_time = n1->time;
+                // Keep track of the previous scheduled release time
+                prev_release_time = n1->time;
 
                 if (verbose) {
                     printf("Bufferred event at time: %ld.  Type: %*d,  "
                                    "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
                            n1->time, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
-                           4, prev_time - current_time);
+                           4, random_delay);
                     if (lower_bound > 0) {
                         printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
                     }
@@ -552,7 +564,7 @@ int main(int argc, char **argv) {
     // This allows any keystroke events (e.g., releasing the Return key)
     // to finish before grabbing the input device
     init_output(output_device);
-
+    
     printf("Waiting %d ms...\n", startup_timeout);
     sleep_ms(startup_timeout);
 
