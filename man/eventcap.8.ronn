@@ -20,7 +20,7 @@ eventcap(8) -- physical keyboard device detection
 Determine which device file corresponds to the physical keyboard. Use eventcap
 can be used to look for the device that generates
 events when keys are pressed. This will typically be one of
-/dev/input/event[0-9].
+/dev/input/event[0-7].
 
 ## EXAMPLES
 In this example, it's /dev/input/event4:

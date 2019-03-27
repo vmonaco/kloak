@@ -171,7 +171,7 @@ int detect_keyboard(char* out) {
 
             // Above a threshold, we probably found a standard keyboard
             if (num_supported_keys > NUM_SUPPORTED_KEYS_THRESH) {
-                printf("Found keyboard at: %s (supports %d keys)\n", device, num_supported_keys);
+                printf("Found keyboard at: %s\n", device);
                 strncpy(out, device, BUFSIZE-1);
                 close(fd);
                 return 0;
@@ -423,11 +423,11 @@ void main_loop() {
 void usage() {
     fprintf(stderr, "Usage: kloak [options]\n");
     fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  -r device file: read given input device (multiple allowed)\n");
-    fprintf(stderr, "  -w device file: write to the given uinput device (mandatory option)\n");
-    fprintf(stderr, "  -d delay: maximum delay (in milliseconds) of released events. Default 100.\n");
-    fprintf(stderr, "  -s startup timeout: time to wait (in milliseconds) before startup. Default 100.\n");
-    fprintf(stderr, "  -k rescue keys: csv list of rescue key names to exit kloak in case the\n"
+    fprintf(stderr, "  -r filename: device file to read events from\n");
+    fprintf(stderr, "  -w filename: device file to write events to (should be uinput)\n");
+    fprintf(stderr, "  -d delay: maximum delay (milliseconds) of released events. Default 100.\n");
+    fprintf(stderr, "  -s startup_timeout: time to wait (milliseconds) before startup. Default 100.\n");
+    fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
             "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
     fprintf(stderr, "  -v: verbose mode\n");
 }

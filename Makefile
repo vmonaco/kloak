@@ -14,10 +14,10 @@ eventcap : src/eventcap.c
 ## master location:
 ## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/Makefile
 
-GENMKFILE_PATH ?= /usr/share/genmkfile
+GENMKFILE_PATH := $(strip $(wildcard /usr/share/genmkfile))
 GENMKFILE_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 export GENMKFILE_PATH
 export GENMKFILE_ROOT_DIR
 
-include $(GENMKFILE_PATH)/makefile-full
+-include $(GENMKFILE_PATH)/makefile-full

@@ -4,15 +4,79 @@
   <img src="figures/kloak.png"><br><br>
 </div>
 
-`kloak` is a privacy tool that makes keystroke biometrics less effective. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification. **This project is still in the prototype stage.**
+`kloak` is a privacy tool that makes keystroke biometrics less effective. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification. **This project is experimental.**
 
 ## Usage
 
-Compile `kloak` and the event capture tool `eventcap`:
+There are two ways to run kloak:
+
+  1. As an application
+  2. As a Linux service
+
+### As an application
+
+First, compile `kloak` and the event capture tool `eventcap`:
 
     $ make all
 
-Determine which device file corresponds to the physical keyboard. Use `eventcap` (or some other event capture tool) and look for the device that generates events when keys are pressed. This will typically be one of `/dev/input/event[0-9]`. In this example, it's `/dev/input/event4`:
+Next, start `kloak` as root. This typically must run as root because `kloak` reads from and writes to device files:
+
+    $ sudo ./kloak
+
+**If you start `kloak` and lose control of your keyboard, pressing RShift + LShift + Esc will exit.** You can specify the rescue key combination with the `-k` option.
+
+Verify that `kloak` is running by starting in verbose mode:
+
+    $ sudo ./kloak -v
+    ...
+    Bufferred event at time: 1553710016364.  Type:   1,  Code:  37,  Value:   1,  Scheduled delay   84 ms
+    Released event at time : 1553710016364.  Type:   1,  Code:  37,  Value:   1,  Missed target     -7 ms
+    Bufferred event at time: 1553710016597.  Type:   1,  Code:  37,  Value:   0,  Scheduled delay   39 ms
+    Released event at time : 1553710016597.  Type:   1,  Code:  37,  Value:   0,  Missed target     -6 ms
+    Bufferred event at time: 1553710017039.  Type:   1,  Code:  32,  Value:   1,  Scheduled delay   79 ms
+    Released event at time : 1553710017039.  Type:   1,  Code:  32,  Value:   1,  Missed target     -3 ms
+    Bufferred event at time: 1553710017291.  Type:   1,  Code:  32,  Value:   0,  Scheduled delay   80 ms
+    Bufferred event at time: 1553710017354.  Type:   1,  Code:  39,  Value:   1,  Scheduled delay   94 ms
+    Lower bound raised to:   31 ms
+    Released event at time : 1553710017291.  Type:   1,  Code:  32,  Value:   0,  Missed target    -33 ms
+    Released event at time : 1553710017354.  Type:   1,  Code:  39,  Value:   1,  Missed target      0 ms
+    ...
+
+Notice that the lower bound on the random delay has to be raised when keys are pressed in quick succession. This ensures that the key events are written to `uinput` in the same order as they were generated.
+
+### As a service
+
+Download the latest [debian package](https://github.com/vmonaco/kloak/releases) or compile from source:
+
+    $ make deb-pkg
+
+This will create ../kloak_0.1-2_amd64.deb. Note that compiling the deb requires [genmkfile](https://github.com/Whonix/genmkfile).
+
+To install the package:
+
+    $ sudo dpkg -i ../kloak_0.1-2_amd64.deb
+
+To check that `kloak` is running:
+
+    $ sudo service kloak status
+
+To stop and start `kloak`:
+
+    $ sudo service kloak stop
+    $ sudo service kloak start
+
+To remove `kloak`:
+
+    $ sudo apt-get purge kloak
+
+
+### Troubleshooting
+
+#### Can't open input/output device
+
+`kloak` will attempt to find your keyboard device to read events from and the location of `uinput` to write events to. If `kloak` cannot find either the input device or output device, these must be specified with the `-r` and `-w` options, respectively.
+
+To find the keyboard device for reading events: determine which device file corresponds to the physical keyboard. Use `eventcap` (or some other event capture tool) and look for the device that generates events when keys are pressed. This will typically be one of `/dev/input/event[0-7]`. In this example, it's `/dev/input/event4`:
 
     $ sudo ./eventcap /dev/input/event4
     Reading From : /dev/input/event4 (AT Translated Set 2 keyboard)
@@ -23,43 +87,36 @@ Determine which device file corresponds to the physical keyboard. Use `eventcap`
     Type:   1    Code:  56    Value:   0
     Type:   0    Code:   0    Value:   0
 
-Start `kloak` by specifying the input and output device files. The output device will typically be either `/dev/uinput` or `/dev/input/uinput`. Note that since `kloak` and `eventcap` require reading from and writing to device files, they probably won't work without running as root:
+`uinput` is the [kernel module](http://thiemonge.org/getting-started-with-uinput) that allows user-land applications to create input devices. This is typically located at either `/dev/uinput` or `/dev/input/uinput`.
+
+Start `kloak` by specifying the input and output device files:
 
     $ sudo ./kloak -r /dev/input/event4 -w /dev/uinput
-    
-`uinput` is the [kernel module](http://thiemonge.org/getting-started-with-uinput) that allows user-land applications to create input devices. **If you start `kloak` and lose control of your keyboard, the default rescue keys are: Right Shift + Left Shift + Esc. This terminates `kloak`.** You can specify the rescue key combination using the `-k` parameter. 
 
-Verify that it's running successfully by starting in verbose mode and looking for the key received/release events:
+#### My keyboard seems very slow
 
-    $ sudo ./kloak -r /dev/input/event4 -w /dev/uinput -v
-    ...
-    +Received event at time: 1482265646198.  Type:   1,  Code:  56,  Value:   1,  Scheduled delay   33 ms 
-    -Released event at time: 1482265646198.  Type:   1,  Code:  56,  Value:   1,  Actual delay   33 ms 
-    +Received event at time: 1482265646311.  Type:   1,  Code:  15,  Value:   1,  Scheduled delay   77 ms 
-    +Received event at time: 1482265646336.  Type:   1,  Code:  56,  Value:   0,  Scheduled delay   33 ms 
-    Lower bound raised to:    8 ms
-    +Received event at time: 1482265646375.  Type:   1,  Code:  15,  Value:   0,  Scheduled delay   68 ms 
-    Lower bound raised to:   29 ms
-    -Released event at time: 1482265646311.  Type:   1,  Code:  15,  Value:   1,  Actual delay   77 ms 
-    -Released event at time: 1482265646336.  Type:   1,  Code:  56,  Value:   0,  Actual delay   33 ms 
-    -Released event at time: 1482265646375.  Type:   1,  Code:  15,  Value:   0,  Actual delay   67 ms
+`kloak` works by introducing a random delay to each key press and release event. This requires temporarily buffering the event before it reaches the application (e.g., a text editor).
 
-Notice that the lower bound on the random delay has to be raised when keys are pressed in quick succession. This ensures that the key events arrive in the same order as they were generated.
+The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. This reflects a tradeoff between usability and privacy.
 
-The maximum delay is specified by the `-d` option. This is the maximum delay (in milliseconds) that can occur between the physical key events and the passing of key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. *This reflects a tradeoff between usability and privacy.*
+If you're a fast typist and it seems like there is a long lag between pressing a key and seeing the character on screen, try lowering the maximum delay. Alternately, if you're a slower typist, you might be able to increase the maximum delay without noticing much difference. Automatically determining the best lag for each typing speed is an item for future work.
+
+### Options
 
 The full usage and options are:
 
+    $ ./kloak -h
+
     Usage: kloak [options]
     Options:
-      -r device file: read given input device (multiple allowed)
-      -w device file: write to the given uinput device (mandatory option)
-      -d delay: maximum delay (in milliseconds) of released events. Default 100.
-      -s startup timeout: time to wait (in milliseconds) before startup. Default 100.
-      -k rescue keys: csv list of rescue key names to exit kloak in case the
+      -r filename: device file to read events from
+      -w filename: device file to write events to (should be uinput)
+      -d delay: maximum delay (milliseconds) of released events. Default 100.
+      -s startup_timeout: time to wait (milliseconds) before startup. Default 100.
+      -k csv_string: csv list of rescue key names to exit kloak in case the
          keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.
       -v: verbose mode
-      
+
 ## Try it out
 
 You can test that `kloak` actually works by trying an [online keystroke biometrics demo](https://www.keytrac.net/en/tryout). For example, try these three different scenarios:
@@ -97,6 +154,8 @@ The first goal can theoretically be achieved only if all users cooperate with ea
 
 The second goal is to make it difficult for an adversary to forge typing behavior and impersonate a user, perhaps bypassing a two-factor authentication that uses keystroke biometrics. This is achieved by making the time between keystrokes unpredictable.
 
+For more info, see the paper [Obfuscating Keystroke Time Intervals to Avoid Identification and Impersonation](https://arxiv.org/pdf/1609.07612.pdf).
+
 ### How it works
 
 The time between key press and release events are typically used to identify users by their typing behavior. `kloak` obfuscates these time intervals by introducing a random delay between the physical key events and the arrival of key events at the application, for example a web browser.
@@ -111,7 +170,3 @@ The time between key press and release events are typically used to identify use
 * Repeated key presses are not obfuscated. If your system is set to repeat held-down keys at a unique rate, this could leak your identity.
 * Writing style is still apparent, in which [stylometry techniques could be used to determine authorship](http://www.vmonaco.com/publications/An%20investigation%20of%20keystroke%20and%20stylometry%20traits%20for%20authenticating%20online%20test%20takers.pdf).
 * Higher level cognitive behavior, such as editing and application usage, are still apparent. These lower-frequency actions are less understood at this point, but could potentially be used to reveal identity.
-
-### More info
-
-See the paper, [Obfuscating Keystroke Time Intervals to Avoid Identification and Impersonation](https://arxiv.org/pdf/1609.07612.pdf)

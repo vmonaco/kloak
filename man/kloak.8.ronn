@@ -23,19 +23,24 @@ kloak(8) -- anti keystroke deanonymization tool
 
   * -r
 
-    device file: read given input device (multiple allowed)
+    filename: device file to read events from
 
   * -w
 
-    device file: write to the given uinput device (mandatory option)
+    filename: device file to write events to (should be uinput)
 
   * -d
 
-    delay: maximum delay (in milliseconds) of released events. Default 100.
+    delay: maximum delay (milliseconds) of released events. Default 100.
 
   * -s
 
-    startup timeout: time to wait (in milliseconds) before startup. Default 100.
+    startup_timeout: time to wait (milliseconds) before startup. Default 100.
+
+  * -k
+
+    csv_string: csv list of rescue key names to exit kloak in case the
+    keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.
 
   * -v
 
@@ -52,10 +57,15 @@ and release events, which are typically used for identification.
 Use eventcap(8) (or some other event capture tool) and look for the device
 that generates events when keys are pressed.
 
-Start `kloak` by specifying the input and output device files.
-The output device will typically be either `/dev/uinput` or `/dev/input/uinput`.
-Note that since kloak and eventcap require reading from and writing to device
-files, they probably won't work without running as root:
+Starting `kloak` without any options will use sensible defaults and attempt to
+find the location of the keyboard device and uinput. Note that since `kloak`
+requires reading from and writing to device files, it probably won't work
+without running as root:
+
+`sudo ./kloak`
+
+Optionally start `kloak` by specifying the input and output device files.
+The output device should be the location of uinput.
 
 `sudo ./kloak -r /dev/input/event4 -w /dev/uinput`
 
