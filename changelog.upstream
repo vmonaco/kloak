@@ -1,3 +1,256 @@
+commit 49ca7208f15b976b51df23666667f14c63a631d7
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Wed Mar 27 19:08:56 2019 +0000
+
+    Updated readme and docs
+
+commit 1b482f93350f2c4d3b5f613cc566dae1f7743552
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Feb 28 12:53:46 2019 -0800
+
+    Formatting
+
+commit e8348b1eec42041d54640bf6c956458c54f9bd98
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Feb 28 12:53:13 2019 -0800
+
+    Removed debugging code
+
+commit 942db81988ef8de2e820a4f3d1fc64bebfd9846c
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Feb 28 11:30:37 2019 -0800
+
+    Fixed sleep location in main loop
+
+commit 97640be7d3c2cd6087e9948a45edeb783fc06e8d
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Feb 28 11:28:27 2019 -0800
+
+    Moved current time capture
+
+commit 242eb57da65ba1d4c8d494baaeac315b2893be0e
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Wed Feb 27 16:59:01 2019 -0800
+
+    fixed output formatting
+
+commit 0302bc52f08d866d485788a5723daf050b94d0e2
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Wed Feb 27 16:50:46 2019 -0800
+
+    Added autodetect uinput, error checking
+
+commit 7f860ff02cf4e46324e619794461799a6529dfb8
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Wed Feb 27 14:56:48 2019 -0800
+
+    fixed keyboard autodetect
+
+commit 6963e326ef66e2e21af0311ff5a2323cd7d777cf
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Wed Feb 27 14:26:41 2019 -0800
+
+    removed options to kloak in service file
+
+commit 26479733905155868ff3ca19223ae405305ffc39
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Feb 26 17:04:09 2019 -0800
+
+    Cleaned up main loop, started polling interval to quantize output times
+
+commit fab6f9c9d9b65d98236adbe764f2a5190ebd3238
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Feb 26 16:02:40 2019 -0800
+
+    Cleaned up keycodes table
+
+commit f40484edb85409b8b05272719aeb8562d9de1467
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Feb 26 15:57:19 2019 -0800
+
+    Added queue to buffer keyboard events, removed dependency on pthreads
+
+commit b9d531ec5c39e344ee46f6078b4be43cd0f4ccd7
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Feb 26 13:33:47 2019 -0800
+
+    ignore case when detecting keyboard
+
+commit 9dcd78b57ec0509c38642eb2938c49c1976bfa3f
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Feb 22 16:38:01 2019 -0800
+
+    Added auto detection of keyboard devices
+
+commit 43fcfdaf3ac0c71df2486db22eb758548eb1fda6
+Merge: abe14ab 4ee9fd3
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 20 12:41:46 2017 -0500
+
+    Merge pull request #9 from adrelanos/master
+
+    Debian packaging fixes
+
+commit 4ee9fd3e36bbd2e4d4e4e8ec237ed2dbd7a1d339
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 17:17:51 2017 +0100
+
+    fix typo
+
+    since lintian complained about it
+
+commit a00aa67ed61469b4f537b7254532c402f1b8b3ed
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 17:15:36 2017 +0100
+
+    bump Debian Standards-Version to 3.9.8 for Debian stretch comparability
+
+commit bf9edcaf545dded5c0f46af6012de542b9eb3412
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 17:12:17 2017 +0100
+
+    remove faketime from packaging (no longer required for reproducible builds)
+
+commit abe14abcd348f76566801524b5ba8ceb3d677c0c
+Merge: 778f2a0 23146cd
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Jan 8 07:43:57 2017 -0500
+
+    Merge pull request #8 from dfgg12/patch-1
+
+    fixing typo in readme
+
+commit 23146cdcdde0caff1e8012b87b87e8a3227436db
+Author: dfgg12 <damian@niom.pl>
+Date:   Sun Jan 8 11:21:46 2017 +0100
+
+    fixing typo in readme
+
+commit 778f2a0bd2b88fff8453b16829b7035002cd1864
+Merge: 241ac94 f4b400b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 15:11:10 2017 -0500
+
+    Merge pull request #6 from adrelanos/make_clean-fix
+
+    fix 'make clean'
+
+commit f4b400b570ea68b12f254d539ce9c80b87cae06b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 6 20:01:20 2017 +0000
+
+    fix 'make clean'
+
+    fixes the following issue
+
+    make clean
+    /usr/share/genmkfile/makefile-full:83: warning: overriding recipe for target 'clean'
+
+    https://github.com/vmonaco/kloak/issues/3
+    https://github.com/vmonaco/kloak/issues/5
+
+commit 241ac947ddb417cc8c03b02daf0572b486788875
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 14:51:09 2017 -0500
+
+    Cleaned up .gitignore
+
+commit c500b2e8fd8610847ffc36295e9f1f22b7dd50b9
+Merge: 63c5b6a 50b531f
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 14:37:07 2017 -0500
+
+    Merge branch 'adrelanos-debian'
+
+commit 63c5b6ad5b13cfdd3fcdd09d90bb2131d39666a1
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 14:35:04 2017 -0500
+
+    Fixed unalloced memory causing sigsev when compiled with -O2
+
+commit 50b531f62b03a7bb32f37640521580cfa9de84d0
+Merge: 0815f83 3613eb9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 6 18:30:27 2017 +0000
+
+    Merge remote-tracking branch 'vmonaco/master' into debian
+
+commit 3613eb98601a6fbf749a0ae90a76a672cc8d8774
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 13:18:53 2017 -0500
+
+    Removed for loop inits
+
+commit aaeb28775404b0e0acb087b1e96ce6e2020c1348
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Jan 6 13:11:35 2017 -0500
+
+    Removed uncommon keys from keycodes.c
+
+commit 0815f830ffae193b04cc68a50f2f499889c0c29f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 6 18:03:46 2017 +0000
+
+    fix, readd flags for hardening, added `$(CPPFLAGS) $(CFLAGS) $(LDFLAGS)`
+
+commit ab75d19d5894c4413488d7b82c6752423226b8a3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 6 18:37:41 2017 +0100
+
+    refactoring, just append Makefile, abandon Makefile_orig
+
+commit db8aa69d975664080da5fb8fcdb15129c5aee263
+Merge: 30bc816 f54c102
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 6 18:35:51 2017 +0100
+
+    Merge remote-tracking branch 'vmonaco/master' into debian
+
+    Conflicts:
+            Makefile
+
+commit f54c10260d8f4e410007df52d0591909c3982179
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 17:04:07 2017 -0500
+
+    Updated readme
+
+commit 1e2da630c48804e29705709d388940db214fa5f5
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 11:56:52 2017 -0500
+
+    Cleaned up Makefile
+
+commit 8bab9fa2688f69ea4dcea061365405b0d24521dc
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 11:55:46 2017 -0500
+
+    Updated readme
+
+commit 77318c14f446fe14b2f0acd515c63b013a67ccaf
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 11:47:57 2017 -0500
+
+    Added option for rescue keys
+
+commit 312590df189269e93ae7e8fc387ba83be0cf4b0f
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 09:54:59 2017 -0500
+
+    Added keycodes lookup hdr and src
+
+commit 4e8b59dab6dec80a0446f0aa5b7faca4b05f984b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Jan 5 09:24:22 2017 -0500
+
+    Changed rescue keys to 'Left Shift + Right Shift + Esc'
+
+commit 30bc816ea69eb4fc79e4ebed514a5cccdb5f9e33
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 4 20:24:21 2017 +0000
+
+    bumped changelog version
+
 commit 31a017ab0e70a3a3a77f13ab6b0adee79c758d1c
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 4 20:24:04 2017 +0000
@@ -6,13 +259,13 @@ Date:   Wed Jan 4 20:24:04 2017 +0000
     - depends on genmkfile, added genmkfile Makefile
     - added systemd unit file for auto start before graphical and getty target
     - for hardening, added `$(CPPFLAGS) $(CFLAGS) $(LDFLAGS)` to original makefile (renamed to Makefile_orig)
-    
+
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/kloak
-    
+
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      No canary found   NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/eventcap
-    
+
     - added manpages for kloak and eventcap
     - TODO: somehow auto detect /dev/input/... keyboard device for systemd unit file
 
