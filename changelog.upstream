@@ -1,3 +1,9 @@
+commit 840d9848d2c66d7860bc768fdee97150e8d66476
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Mar 28 20:28:00 2019 +0000
+
+    Updated changelog
+
 commit 49ca7208f15b976b51df23666667f14c63a631d7
 Author: Vinnie Monaco <contact@vmonaco.com>
 Date:   Wed Mar 27 19:08:56 2019 +0000
@@ -88,7 +94,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Fri Jan 20 12:41:46 2017 -0500
 
     Merge pull request #9 from adrelanos/master
-
+    
     Debian packaging fixes
 
 commit 4ee9fd3e36bbd2e4d4e4e8ec237ed2dbd7a1d339
@@ -96,7 +102,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 20 17:17:51 2017 +0100
 
     fix typo
-
+    
     since lintian complained about it
 
 commit a00aa67ed61469b4f537b7254532c402f1b8b3ed
@@ -117,7 +123,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Sun Jan 8 07:43:57 2017 -0500
 
     Merge pull request #8 from dfgg12/patch-1
-
+    
     fixing typo in readme
 
 commit 23146cdcdde0caff1e8012b87b87e8a3227436db
@@ -132,7 +138,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Fri Jan 6 15:11:10 2017 -0500
 
     Merge pull request #6 from adrelanos/make_clean-fix
-
+    
     fix 'make clean'
 
 commit f4b400b570ea68b12f254d539ce9c80b87cae06b
@@ -140,12 +146,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 6 20:01:20 2017 +0000
 
     fix 'make clean'
-
+    
     fixes the following issue
-
+    
     make clean
     /usr/share/genmkfile/makefile-full:83: warning: overriding recipe for target 'clean'
-
+    
     https://github.com/vmonaco/kloak/issues/3
     https://github.com/vmonaco/kloak/issues/5
 
@@ -205,7 +211,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 6 18:35:51 2017 +0100
 
     Merge remote-tracking branch 'vmonaco/master' into debian
-
+    
     Conflicts:
             Makefile
 
@@ -259,13 +265,13 @@ Date:   Wed Jan 4 20:24:04 2017 +0000
     - depends on genmkfile, added genmkfile Makefile
     - added systemd unit file for auto start before graphical and getty target
     - for hardening, added `$(CPPFLAGS) $(CFLAGS) $(LDFLAGS)` to original makefile (renamed to Makefile_orig)
-
+    
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/kloak
-
+    
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      No canary found   NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/eventcap
-
+    
     - added manpages for kloak and eventcap
     - TODO: somehow auto detect /dev/input/... keyboard device for systemd unit file
 
