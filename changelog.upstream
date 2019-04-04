@@ -1,3 +1,21 @@
+commit 13d4c33ac4cb10f780934972edb8d133dd084365
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:55:51 2019 -0400
+
+    port to debian buster
+
+commit e7445c678dcff11e72da51e695b74fddb17bbed5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:51:04 2019 -0400
+
+    port to debian buster
+
+commit 26e5dbf661e92b28dca2dfcbbadd28749fce588e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 2 11:59:43 2019 +0000
+
+    bumped changelog version
+
 commit 840d9848d2c66d7860bc768fdee97150e8d66476
 Author: Vinnie Monaco <contact@vmonaco.com>
 Date:   Thu Mar 28 20:28:00 2019 +0000
