@@ -10,7 +10,9 @@ Before=getty.target
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/kloak
+## -v for verbosity due to:
+## https://github.com/vmonaco/kloak/issues/13
+ExecStart=/usr/sbin/kloak -v
 Restart=always
 
 [Install]
