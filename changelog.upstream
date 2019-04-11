@@ -1,3 +1,16 @@
+commit 3b7250dc3bde53b2b87c2014b4004e0acd9972f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 11 12:15:26 2019 +0000
+
+    -v for verbosity due to:
+    https://github.com/vmonaco/kloak/issues/13
+
+commit 9a0c0ced31550aeff58e62c6f421ef6fca8349b6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 14:19:34 2019 -0400
+
+    bumped changelog version
+
 commit 13d4c33ac4cb10f780934972edb8d133dd084365
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 4 05:55:51 2019 -0400
