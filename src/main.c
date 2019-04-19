@@ -24,6 +24,10 @@
 #define READ_TIMEOUT_US 100 // Timeout to check for new events
 #define NUM_SUPPORTED_KEYS_THRESH 20  // Find the first device that supports at least this many key events
 
+#ifndef min
+#define min(a, b) ( ((a) < (b)) ? (a) : (b) )
+#endif
+
 #ifndef max
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
@@ -113,7 +117,7 @@ long random_at_most(long max) {
 
     long x;
     do {
-     x = random();
+        x = random();
     }
     // This is carefully written not to overflow
     while (num_rand - defect <= (unsigned long)x);
@@ -123,6 +127,10 @@ long random_at_most(long max) {
 }
 
 long random_between(long min, long max) {
+    // Default to max if the interval is not valids
+    if (min >= max)
+        return max;
+
     return min + random_at_most(max - min);
 }
 
@@ -393,8 +401,9 @@ void main_loop() {
                 }
 
                 // Schedule the keyboard event to be released sometime in the future.
-                // Lower bound must be at *least* the difference between last scheduled and now
-                lower_bound = max(prev_release_time - current_time, 0);
+                // Lower bound must be bounded between:
+                // the difference between last scheduled event and now, and max delay
+                lower_bound = min(max(prev_release_time - current_time, 0), max_delay);
                 random_delay = random_between(lower_bound, max_delay);
 
                 // Buffer the keyboard event
