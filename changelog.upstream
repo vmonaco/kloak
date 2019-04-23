@@ -1,3 +1,22 @@
+commit 17ad376711e10489c9c56d5927c52f29baa7ca12
+Merge: f1afa53 ed7b0ae
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Apr 22 06:58:47 2019 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit ed7b0ae41baab7170a76477dde6677cdb6fde76e
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Apr 19 22:50:50 2019 +0000
+
+    Fixed keyboard freezing/repeating when system time decreases
+
+commit f1afa535fdfe1b6301a6561c3e15c2142b90347d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 11 12:19:07 2019 +0000
+
+    bumped changelog version
+
 commit 3b7250dc3bde53b2b87c2014b4004e0acd9972f5
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 11 12:15:26 2019 +0000
