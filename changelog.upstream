@@ -1,3 +1,21 @@
+commit c2054a4dc01f44a14cd95b9c78830bdf263d1b9f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 12 02:37:40 2019 -0400
+
+    comment
+
+commit 1f0639ac92cc22b2054aac2201acb02ac8a8f406
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 12 02:34:26 2019 -0400
+
+    disable verbosity
+
+commit c27262d2834d9c43b31081129184d575174f1437
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 23 12:39:33 2019 +0000
+
+    bumped changelog version
+
 commit 17ad376711e10489c9c56d5927c52f29baa7ca12
 Merge: f1afa53 ed7b0ae
 Author: Patrick Schleizer <adrelanos@riseup.net>
