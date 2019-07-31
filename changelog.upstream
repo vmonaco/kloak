@@ -1,3 +1,15 @@
+commit 5dd8323fbe28e75924e24556ee374be6bac15641
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 31 03:07:06 2019 -0400
+
+    /var/run -> /run
+
+commit 9e1bd72f5bfc4a0dd3b8027ca7bf438e50e56e68
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 8 11:25:54 2019 +0000
+
+    bumped changelog version
+
 commit f5ba837403b21be61699863086639cf75162ac7c
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jun 8 00:05:33 2019 -0400
