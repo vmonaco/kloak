@@ -4,7 +4,7 @@
 [Unit]
 Description=kloak anti keystroke deanonymization tool
 Documentation=https://github.com/vmonaco/kloak
-ConditionPathExists=!/var/run/qubes/this-is-templatevm
+ConditionPathExists=!/run/qubes/this-is-templatevm
 Before=graphical.target
 Before=getty.target
 
