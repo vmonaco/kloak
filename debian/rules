@@ -12,7 +12,7 @@ include /usr/share/dpkg/buildflags.mk
 %:
 	dh $@
 
-override_dh_install:
+override_dh_installman:
 	make manpages
 	dh_installman $(CURDIR)/debian/tmp-man/*
 
