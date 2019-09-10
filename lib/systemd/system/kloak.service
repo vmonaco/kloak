@@ -1,16 +1,36 @@
-## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2016 - 2019 Patrick Schleizer <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
 [Unit]
 Description=kloak anti keystroke deanonymization tool
 Documentation=https://github.com/vmonaco/kloak
-ConditionPathExists=!/var/run/qubes/this-is-templatevm
+ConditionPathExists=!/run/qubes/this-is-templatevm
 Before=graphical.target
 Before=getty.target
 
 [Service]
 Type=simple
+
+## -v for verbosity due to:
+## https://github.com/vmonaco/kloak/issues/13
+#ExecStart=/usr/sbin/kloak -v
+
+## This cannot be trivially made work on Qubes!
+##
+## /dev/input/event0 is not a keyboard device.
+##
+## ls -la /dev/input/event0
+## crw-rw---- 1 root input 13, 64 May  6 08:25 /dev/input/event0
+##
+## ls -la /dev/input/by-path/platform-pcspkr-event-spkr
+## lrwxrwxrwx 1 root root 9 May  6 08:25 /dev/input/by-path/platform-pcspkr-event-spkr -> ../event0
+##
+## https://github.com/QubesOS/qubes-issues/issues/2558
+## https://github.com/QubesOS/qubes-issues/issues/1850
+## https://forums.whonix.org/t/current-state-of-kloak/5605/6
+
 ExecStart=/usr/sbin/kloak
+
 Restart=always
 
 [Install]

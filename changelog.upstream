@@ -1,3 +1,137 @@
+commit 31c36bf46c83ecfdd583b5b8da708e7dde9840b6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 11:35:21 2019 +0000
+
+    use properly override_dh_installman
+
+commit c9b5e58a8f88325cb4e3fa5a6196bac93619c926
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 1 11:56:03 2019 +0000
+
+    bumped changelog version
+
+commit 1204aad63e67368c9ebfae878baf52ba73d0f0a8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 1 11:13:39 2019 +0000
+
+    readme
+
+commit 37869817809e9af988d8859a0a48a4615e729b9f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 31 07:40:23 2019 +0000
+
+    bumped changelog version
+
+commit 5dd8323fbe28e75924e24556ee374be6bac15641
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 31 03:07:06 2019 -0400
+
+    /var/run -> /run
+
+commit 9e1bd72f5bfc4a0dd3b8027ca7bf438e50e56e68
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 8 11:25:54 2019 +0000
+
+    bumped changelog version
+
+commit f5ba837403b21be61699863086639cf75162ac7c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 8 00:05:33 2019 -0400
+
+    fix debian/watch lintian warning debian-watch-contains-dh_make-template
+
+commit 1508eeb156d875273a9a123e021748b1b78707b4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri May 24 20:43:52 2019 +0000
+
+    bumped changelog version
+
+commit c11753a46ad2a744e2b8e88bba5259f93fa16775
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri May 24 12:29:06 2019 -0400
+
+    readme
+
+commit f4dabb0ad696d1aec2dd71d21fa8199bb618cb48
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 12 10:43:25 2019 +0000
+
+    bumped changelog version
+
+commit c2054a4dc01f44a14cd95b9c78830bdf263d1b9f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 12 02:37:40 2019 -0400
+
+    comment
+
+commit 1f0639ac92cc22b2054aac2201acb02ac8a8f406
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 12 02:34:26 2019 -0400
+
+    disable verbosity
+
+commit c27262d2834d9c43b31081129184d575174f1437
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 23 12:39:33 2019 +0000
+
+    bumped changelog version
+
+commit 17ad376711e10489c9c56d5927c52f29baa7ca12
+Merge: f1afa53 ed7b0ae
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Apr 22 06:58:47 2019 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit ed7b0ae41baab7170a76477dde6677cdb6fde76e
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Apr 19 22:50:50 2019 +0000
+
+    Fixed keyboard freezing/repeating when system time decreases
+
+commit f1afa535fdfe1b6301a6561c3e15c2142b90347d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 11 12:19:07 2019 +0000
+
+    bumped changelog version
+
+commit 3b7250dc3bde53b2b87c2014b4004e0acd9972f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 11 12:15:26 2019 +0000
+
+    -v for verbosity due to:
+    https://github.com/vmonaco/kloak/issues/13
+
+commit 9a0c0ced31550aeff58e62c6f421ef6fca8349b6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 14:19:34 2019 -0400
+
+    bumped changelog version
+
+commit 13d4c33ac4cb10f780934972edb8d133dd084365
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:55:51 2019 -0400
+
+    port to debian buster
+
+commit e7445c678dcff11e72da51e695b74fddb17bbed5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:51:04 2019 -0400
+
+    port to debian buster
+
+commit 26e5dbf661e92b28dca2dfcbbadd28749fce588e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 2 11:59:43 2019 +0000
+
+    bumped changelog version
+
+commit 840d9848d2c66d7860bc768fdee97150e8d66476
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Mar 28 20:28:00 2019 +0000
+
+    Updated changelog
+
 commit 49ca7208f15b976b51df23666667f14c63a631d7
 Author: Vinnie Monaco <contact@vmonaco.com>
 Date:   Wed Mar 27 19:08:56 2019 +0000
@@ -88,7 +222,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Fri Jan 20 12:41:46 2017 -0500
 
     Merge pull request #9 from adrelanos/master
-
+    
     Debian packaging fixes
 
 commit 4ee9fd3e36bbd2e4d4e4e8ec237ed2dbd7a1d339
@@ -96,7 +230,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 20 17:17:51 2017 +0100
 
     fix typo
-
+    
     since lintian complained about it
 
 commit a00aa67ed61469b4f537b7254532c402f1b8b3ed
@@ -117,7 +251,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Sun Jan 8 07:43:57 2017 -0500
 
     Merge pull request #8 from dfgg12/patch-1
-
+    
     fixing typo in readme
 
 commit 23146cdcdde0caff1e8012b87b87e8a3227436db
@@ -132,7 +266,7 @@ Author: Vinnie Monaco <vinmonaco@gmail.com>
 Date:   Fri Jan 6 15:11:10 2017 -0500
 
     Merge pull request #6 from adrelanos/make_clean-fix
-
+    
     fix 'make clean'
 
 commit f4b400b570ea68b12f254d539ce9c80b87cae06b
@@ -140,12 +274,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 6 20:01:20 2017 +0000
 
     fix 'make clean'
-
+    
     fixes the following issue
-
+    
     make clean
     /usr/share/genmkfile/makefile-full:83: warning: overriding recipe for target 'clean'
-
+    
     https://github.com/vmonaco/kloak/issues/3
     https://github.com/vmonaco/kloak/issues/5
 
@@ -205,7 +339,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 6 18:35:51 2017 +0100
 
     Merge remote-tracking branch 'vmonaco/master' into debian
-
+    
     Conflicts:
             Makefile
 
@@ -259,13 +393,13 @@ Date:   Wed Jan 4 20:24:04 2017 +0000
     - depends on genmkfile, added genmkfile Makefile
     - added systemd unit file for auto start before graphical and getty target
     - for hardening, added `$(CPPFLAGS) $(CFLAGS) $(LDFLAGS)` to original makefile (renamed to Makefile_orig)
-
+    
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/kloak
-
+    
     RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
     Full RELRO      No canary found   NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/sbin/eventcap
-
+    
     - added manpages for kloak and eventcap
     - TODO: somehow auto detect /dev/input/... keyboard device for systemd unit file
 
