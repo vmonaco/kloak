@@ -81,7 +81,7 @@ sudo apt-get update
 sudo apt-get install kloak
 ```
 
-### How to Build deb Package
+### How to build deb package
 
 Replace `apparmor-profile-torbrowser` with the actual name of this package with `kloak` and see [instructions](https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser).
 
