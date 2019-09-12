@@ -1,3 +1,60 @@
+commit 0445e2779d5cf8ff2ae27320f2bb7e5ee6e6a069
+Merge: 5048819 1bada28
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 12 12:17:17 2019 +0000
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit 5048819fec985d11b1092b07c029e0b9092d7d8c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 12 12:15:38 2019 +0000
+
+    restore upstream README.md
+    
+    https://github.com/vmonaco/kloak/pull/14#issuecomment-530150750
+
+commit 99841155fbf2dcb27988816ea77c48fa661dfad0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 12 12:13:57 2019 +0000
+
+    readme
+
+commit 1bada28010607c95991723054b7e07612e56c6c9
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 10 16:05:21 2019 -0700
+
+    typo
+
+commit 91c2d90c7bac6b1231c400b6369836506438cc09
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 10 16:03:40 2019 -0700
+
+    updated readme
+
+commit 7827ac96b1297ee4624bafc476b6c779aa364ff5
+Merge: f47066f 2e6d22c
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Sep 10 15:52:44 2019 -0700
+
+    Merge pull request #14 from Whonix/master
+    
+    Debian buster
+
+commit f47066fd0481917793ce21dd51cb84e44c411a3f
+Merge: ed7b0ae 3902e48
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Sep 10 15:42:33 2019 -0700
+
+    Merge pull request #15 from adrelanos/patch-1
+    
+    implement make clean
+
+commit 2e6d22c6b4bd0de550a9a59cb5aa60d93989f73a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 12:45:59 2019 +0000
+
+    bumped changelog version
+
 commit 31c36bf46c83ecfdd583b5b8da708e7dde9840b6
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Aug 28 11:35:21 2019 +0000
@@ -27,6 +84,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jul 31 03:07:06 2019 -0400
 
     /var/run -> /run
+
+commit 3902e4867eabfbaa012f3fbde5eebcdf0ba7ff51
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 00:38:55 2019 +0000
+
+    implement make clean
 
 commit 9e1bd72f5bfc4a0dd3b8027ca7bf438e50e56e68
 Author: Patrick Schleizer <adrelanos@riseup.net>
