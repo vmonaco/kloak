@@ -33,5 +33,25 @@ ExecStart=/usr/sbin/kloak
 
 Restart=always
 
+## Kloak doesn't require any capabilities. This is
+## likely because the things it needs are already
+## owned by the root user which it runs as.
+CapabilityBoundingSet=
+
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateTmp=true
+PrivateUsers=true
+PrivateNetwork=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+RestrictRealtime=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+SystemCallFilter=ioctl nanosleep select write read openat close brk fstat lseek mmap mprotect munmap rt_sigaction rt_sigprocmask access execve getuid arch_prctl set_tid_address set_robust_list prlimit64
+
 [Install]
 WantedBy=multi-user.target
