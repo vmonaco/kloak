@@ -1,0 +1,15 @@
+#include <tunables/global>
+
+/usr/sbin/kloak {
+  /usr/sbin/kloak                   mr,
+
+  owner /dev/input/event*           r,
+  owner /dev/uinput                 w,
+
+  /etc/ld.so.cache                  r,
+  /etc/ld.so.preload                r,
+
+  /{usr/,}lib{,32,64}/lib*so*       mr,
+  /{usr/,}lib/@{multiarch}/**.so*   mr,
+
+}
