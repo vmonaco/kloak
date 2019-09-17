@@ -12,9 +12,15 @@ include /usr/share/dpkg/buildflags.mk
 %:
 	dh $@
 
+APPARMOR_PROFILE_NAME=$(shell basename $$(echo ./debian/$(shell dh_listpackages)/etc/apparmor.d/*.*))
+
 override_dh_installman:
 	make manpages
 	dh_installman $(CURDIR)/debian/tmp-man/*
 
 override_dh_installchangelogs:
 	dh_installchangelogs changelog.upstream upstream
+
+override_dh_install:
+	dh_apparmor --profile-name=$(APPARMOR_PROFILE_NAME) -p$(shell dh_listpackages)
+	dh_install
