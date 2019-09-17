@@ -11,6 +11,6 @@
 
   /{usr/,}lib{,32,64}/lib*so*       mr,
   /{usr/,}lib/@{multiarch}/**.so*   mr,
-  
+
   #include <local/usr.sbin.kloak>
 }

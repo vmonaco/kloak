@@ -5,7 +5,7 @@ Source: kloak
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 12), genmkfile, ronn (>= 0.7.3)
+Build-Depends: debhelper (>= 12), genmkfile, ronn (>= 0.7.3), dh-apparmor
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git
