@@ -1,3 +1,64 @@
+commit 7abcaeeed0cf76a9fb6c585ce322de753b7a31db
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Sep 17 07:35:47 2019 +0000
+
+    remove trailing spaces
+
+commit ed26f834cf781c9e0a7abec038b0cf650b64bc5a
+Merge: 6d29789 f5ba897
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Sep 17 07:28:30 2019 +0000
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit f5ba8977bd36dd5412b2649cfd0adc055676fcab
+Merge: 133804e a0d118b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 16 16:19:14 2019 -0700
+
+    Merge pull request #18 from madaidan/systemd-sandbox
+    
+    Add systemd sandboxing
+
+commit 133804e65377023cb6adeada2d1d7688766ec067
+Merge: 1bada28 887ec7b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 16 16:17:47 2019 -0700
+
+    Merge pull request #19 from madaidan/apparmor-profile
+    
+    Add AppArmor profile
+
+commit 887ec7bd89fd69c724c1350041cc65acd06ce044
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Mon Sep 16 16:41:56 2019 +0000
+
+    Create usr.sbin.kloak
+
+commit 72ad9c9974b0fb85a8ee0ecc4aaee936e51e1699
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Mon Sep 16 16:41:35 2019 +0000
+
+    Update usr.sbin.kloak
+
+commit 78793d1a3607055edbabc66db2c6f066a9a7ecc6
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Sun Sep 15 21:10:37 2019 +0000
+
+    Add AppArmor profile
+
+commit a0d118b443d3d4c634ce47a5f37353f6a4661f47
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Sat Sep 14 22:48:24 2019 +0000
+
+    Add systemd sandboxing
+
+commit 6d297899bb08f7338a9f77209d90becfbc71c3d7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 12 12:48:51 2019 +0000
+
+    bumped changelog version
+
 commit 0445e2779d5cf8ff2ae27320f2bb7e5ee6e6a069
 Merge: 5048819 1bada28
 Author: Patrick Schleizer <adrelanos@riseup.net>
