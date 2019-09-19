@@ -1,3 +1,40 @@
+commit 2f472a8eacdd58bc49c0ac4ab505b095dc0ee320
+Merge: bccd504 54bef10
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 07:50:06 2019 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit 54bef108d45b9ca70b1ef5b0b8fa4142b7832d9b
+Merge: 6f709ff 90dedd6
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Sep 18 09:30:12 2019 -0700
+
+    Merge pull request #22 from madaidan/fix-apparmor
+    
+    Allow certain signals needed to start/stop/restart kloak
+
+commit 90dedd6efe115a10612c06bd1e2b3aecba314132
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Wed Sep 18 16:05:22 2019 +0000
+
+    Allow certain signals needed to start/stop/restart kloak
+
+commit 6f709ff7b8133a48701c90f713cfe21fcb529a27
+Merge: f5ba897 bccd504
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Sep 17 09:04:38 2019 -0700
+
+    Merge pull request #20 from Whonix/master
+    
+    Apparmor Debian packaging integration
+
+commit bccd504ff2ebe558c3b2c3977f128b192b7bfcf2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Sep 17 14:15:24 2019 +0000
+
+    bumped changelog version
+
 commit 7abcaeeed0cf76a9fb6c585ce322de753b7a31db
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Sep 17 07:35:47 2019 +0000
