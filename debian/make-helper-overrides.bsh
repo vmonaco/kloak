@@ -3,6 +3,8 @@
 ## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
+version_numbers_by_upstream=true
+
 make_install_hook_post() {
    if [ ! -d "$DESTDIR/usr/sbin" ]; then
       mkdir --parents "$DESTDIR/usr/sbin"
