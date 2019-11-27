@@ -1,0 +1,22 @@
+.\" generated with Ronn-NG/v0.8.0
+.\" http://github.com/apjanke/ronn-ng/tree/0.8.0
+.TH "EVENTCAP" "8" "November 2019" "kloak" "kloak Manual"
+.SH "NAME"
+\fBeventcap\fR \- physical keyboard device detection
+.P
+.SH "SYNOPSIS"
+\fBeventcap\fR device
+.SH "DESCRIPTION"
+Determine which device file corresponds to the physical keyboard\. Use eventcap can be used to look for the device that generates events when keys are pressed\. This will typically be one of /dev/input/event[0\-7]\.
+.SH "EXAMPLES"
+In this example, it\'s /dev/input/event4:
+.P
+\fBsudo \./eventcap /dev/input/event4\fR
+.P
+Reading From : /dev/input/event4 (AT Translated Set 2 keyboard) Type: 4 Code: 4 Value: 15 Type: 1 Code: 15 Value: 0 Type: 0 Code: 0 Value: 0 Type: 4 Code: 4 Value: 56 Type: 1 Code: 56 Value: 0 Type: 0 Code: 0 Value: 0
+.SH "WWW"
+https://github\.com/vmonaco/kloak
+.SH "CREDITS"
+eventcap was written by Vinnie Monaco\.
+.SH "AUTHOR"
+This man page has been written by Patrick Schleizer (adrelanos@riseup\.net)\.
