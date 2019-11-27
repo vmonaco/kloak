@@ -15,8 +15,8 @@ include /usr/share/dpkg/buildflags.mk
 APPARMOR_PROFILE_NAME=$(shell basename $$(echo ./debian/$(shell dh_listpackages)/etc/apparmor.d/*.*))
 
 override_dh_installman:
-	make manpages
-	dh_installman $(CURDIR)/debian/tmp-man/*
+	dh_installman $(CURDIR)/debian/eventcap.8
+	dh_installman $(CURDIR)/debian/kloak.8
 
 override_dh_installchangelogs:
 	dh_installchangelogs changelog.upstream upstream
