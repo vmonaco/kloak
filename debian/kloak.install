@@ -1,0 +1,5 @@
+## Copyright (C) 2019 - 2019 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+eventcap usr/sbin/
+kloak usr/sbin/
