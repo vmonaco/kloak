@@ -14,5 +14,5 @@ make_install_hook_post() {
 }
 
 make_clean_hook_pre() {
-   rm -rf kloak eventcap src/main.o src/eventcap.o
+   rm -rf kloak eventcap
 }
