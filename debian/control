@@ -14,7 +14,7 @@ Standards-Version: 4.3.0
 Package: kloak
 ## https://github.com/vmonaco/kloak/issues/24
 ## https://github.com/vmonaco/kloak/issues/25
-Architecture: any
+Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: anti keystroke deanonymization tool
  A keystroke-level online anonymization kernel.
