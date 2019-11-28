@@ -1,3 +1,82 @@
+commit 381c686d4d081bbf0547f5cf1e70df7f1ff095ca
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 10:26:02 2019 -0500
+
+    for now "Architecture: amd64"
+    
+    https://github.com/vmonaco/kloak/issues/24#
+    
+    https://github.com/vmonaco/kloak/issues/25
+
+commit 076a61d3dc0b4daab4592637464077773cede43e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 10:25:46 2019 -0500
+
+    comment
+
+commit 7518394c3a3201e5b2138458ce6f01043908a084
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:25:48 2019 -0500
+
+    remove make_clean_hook_pre
+    
+    since no longer required
+    
+    since upstream Makefile now supports `make clean`
+
+commit bd0a1bb25a8b8a4b26b8d10bb57372e4df951dac
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:24:52 2019 -0500
+
+    cleanup
+
+commit 2fd3abd649eadc3797125d0bfbd50891454ba534
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:24:04 2019 -0500
+
+    allow building without genmkfile
+    
+    using standard Debian tools
+    
+    such as `dpkg-buildpackage -b`
+
+commit a68357c55f7ea3923aa5ab0512a7b32f2f2646c1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:21:25 2019 -0500
+
+    add man pages
+    
+    created with ronn
+    
+    created from markdown templates in folder man/
+    
+    debian/eventcap.8
+    debian/kloak.8
+
+commit 86209ea950c75f9e35bc89549086c174143905e8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:20:15 2019 -0500
+
+    work towards support building without genmkfile
+
+commit 8413f9fa474e6551b7fe515941a6f1deae430867
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Nov 26 08:16:49 2019 +0000
+
+    version_numbers_by_upstream=true
+
+commit 30869f354a1bd73ea75fd87a1673b949607fcdce
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Nov 26 08:16:05 2019 +0000
+
+    make-helper-overrides.bsh -> debian/make-helper-overrides.bsh
+
+commit f19cee00fd8c0851d103309096c9063c20103bb9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 13:04:18 2019 +0000
+
+    bumped changelog version
+
 commit 2f472a8eacdd58bc49c0ac4ab505b095dc0ee320
 Merge: bccd504 54bef10
 Author: Patrick Schleizer <adrelanos@riseup.net>
