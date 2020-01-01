@@ -8,6 +8,9 @@
   ## https://github.com/vmonaco/kloak/issues/21
   ## https://forums.whonix.org/t/current-state-of-kloak/5605/10
 
+  ## https://forums.whonix.org/t/current-state-of-kloak/5605/17
+  capability sys_ptrace,
+
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
