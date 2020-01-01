@@ -7,12 +7,12 @@
   ##
   ## https://github.com/vmonaco/kloak/issues/21
   ## https://forums.whonix.org/t/current-state-of-kloak/5605/10
-  
+
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
   signal receive set=term peer=unconfined,
-  
+
   /usr/sbin/kloak                   mr,
 
   owner /dev/input/event*           r,
