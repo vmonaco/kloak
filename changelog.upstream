@@ -1,3 +1,23 @@
+commit 4381af2f3a1dabc07330751eca1369eeb3e40655
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:14:38 2020 -0500
+
+    capability sys_ptrace,
+    
+    https://forums.whonix.org/t/current-state-of-kloak/5605/17
+
+commit 29b286926062f93cb222e355e1996093d6f682f4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:12:50 2020 -0500
+
+    remove trailing spaces
+
+commit a54eb9333552fefcb2a73310f8f832a046e25fa3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Nov 28 03:16:13 2019 -0500
+
+    bumped changelog version
+
 commit 381c686d4d081bbf0547f5cf1e70df7f1ff095ca
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Nov 27 10:26:02 2019 -0500
