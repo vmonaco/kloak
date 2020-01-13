@@ -8,11 +8,8 @@
   ## https://github.com/vmonaco/kloak/issues/21
   ## https://forums.whonix.org/t/current-state-of-kloak/5605/10
 
-  ## https://forums.whonix.org/t/current-state-of-kloak/5605/17
-  capability sys_ptrace,
-
   ## https://forums.whonix.org/t/current-state-of-kloak/5605/19
-  ptrace,
+  ptrace readby,
 
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
