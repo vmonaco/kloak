@@ -1,3 +1,17 @@
+commit 081fa02799e60f8e33e39c858fe13853e01c2b5f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 13 12:30:40 2020 -0500
+
+    apparmor allow ptrace
+    
+    https://forums.whonix.org/t/current-state-of-kloak/5605/19
+
+commit ad4288a320da42c74649dc352b8b93c55bfec9be
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:22:03 2020 -0500
+
+    bumped changelog version
+
 commit 4381af2f3a1dabc07330751eca1369eeb3e40655
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 1 07:14:38 2020 -0500
