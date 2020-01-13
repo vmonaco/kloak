@@ -11,6 +11,9 @@
   ## https://forums.whonix.org/t/current-state-of-kloak/5605/17
   capability sys_ptrace,
 
+  ## https://forums.whonix.org/t/current-state-of-kloak/5605/19
+  ptrace,
+
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
