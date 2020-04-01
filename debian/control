@@ -1,18 +1,20 @@
-## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2012 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
 Source: kloak
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 12), genmkfile, ronn (>= 0.7.3), dh-apparmor
+Build-Depends: debhelper (>= 12), dh-apparmor
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git
 Standards-Version: 4.3.0
 
 Package: kloak
-Architecture: any
+## https://github.com/vmonaco/kloak/issues/24
+## https://github.com/vmonaco/kloak/issues/25
+Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: anti keystroke deanonymization tool
  A keystroke-level online anonymization kernel.

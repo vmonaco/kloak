@@ -1,7 +1,9 @@
 #!/bin/bash
 
-## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
+
+version_numbers_by_upstream=true
 
 make_install_hook_post() {
    if [ ! -d "$DESTDIR/usr/sbin" ]; then
@@ -9,8 +11,4 @@ make_install_hook_post() {
    fi
    cp eventcap "$DESTDIR/usr/sbin/"
    cp kloak "$DESTDIR/usr/sbin/"
-}
-
-make_clean_hook_pre() {
-   rm -rf kloak eventcap src/main.o src/eventcap.o
 }

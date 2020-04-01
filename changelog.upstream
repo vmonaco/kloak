@@ -1,3 +1,189 @@
+commit 11db9d47895fb401a3ed97ea028ab25d53a6b76e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 09:19:55 2020 -0400
+
+    copyright
+
+commit 7121b5a21de24b9479d8df7e2b080154c8a82095
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 09:15:14 2020 -0400
+
+    copyright
+
+commit a14a3938bb9adbadeff200a00e1d6bc07ecfc3ca
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 08:49:57 2020 -0400
+
+    update copyright year
+
+commit aa7ca49556fdbae5f474c94caaa0d74b01be2b93
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 13 12:36:52 2020 -0500
+
+    bumped changelog version
+
+commit 84fca49dc259c68b9d1caa61f4d7cddb78fb6ba9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 13 12:36:11 2020 -0500
+
+    apparmor
+
+commit 64d8f75748a5e7364584dab512003016475d7254
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 13 12:33:07 2020 -0500
+
+    bumped changelog version
+
+commit 081fa02799e60f8e33e39c858fe13853e01c2b5f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 13 12:30:40 2020 -0500
+
+    apparmor allow ptrace
+    
+    https://forums.whonix.org/t/current-state-of-kloak/5605/19
+
+commit ad4288a320da42c74649dc352b8b93c55bfec9be
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:22:03 2020 -0500
+
+    bumped changelog version
+
+commit 4381af2f3a1dabc07330751eca1369eeb3e40655
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:14:38 2020 -0500
+
+    capability sys_ptrace,
+    
+    https://forums.whonix.org/t/current-state-of-kloak/5605/17
+
+commit 29b286926062f93cb222e355e1996093d6f682f4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 1 07:12:50 2020 -0500
+
+    remove trailing spaces
+
+commit a54eb9333552fefcb2a73310f8f832a046e25fa3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Nov 28 03:16:13 2019 -0500
+
+    bumped changelog version
+
+commit 381c686d4d081bbf0547f5cf1e70df7f1ff095ca
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 10:26:02 2019 -0500
+
+    for now "Architecture: amd64"
+    
+    https://github.com/vmonaco/kloak/issues/24#
+    
+    https://github.com/vmonaco/kloak/issues/25
+
+commit 076a61d3dc0b4daab4592637464077773cede43e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 10:25:46 2019 -0500
+
+    comment
+
+commit 7518394c3a3201e5b2138458ce6f01043908a084
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:25:48 2019 -0500
+
+    remove make_clean_hook_pre
+    
+    since no longer required
+    
+    since upstream Makefile now supports `make clean`
+
+commit bd0a1bb25a8b8a4b26b8d10bb57372e4df951dac
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:24:52 2019 -0500
+
+    cleanup
+
+commit 2fd3abd649eadc3797125d0bfbd50891454ba534
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:24:04 2019 -0500
+
+    allow building without genmkfile
+    
+    using standard Debian tools
+    
+    such as `dpkg-buildpackage -b`
+
+commit a68357c55f7ea3923aa5ab0512a7b32f2f2646c1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:21:25 2019 -0500
+
+    add man pages
+    
+    created with ronn
+    
+    created from markdown templates in folder man/
+    
+    debian/eventcap.8
+    debian/kloak.8
+
+commit 86209ea950c75f9e35bc89549086c174143905e8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Nov 27 07:20:15 2019 -0500
+
+    work towards support building without genmkfile
+
+commit 8413f9fa474e6551b7fe515941a6f1deae430867
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Nov 26 08:16:49 2019 +0000
+
+    version_numbers_by_upstream=true
+
+commit 30869f354a1bd73ea75fd87a1673b949607fcdce
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Nov 26 08:16:05 2019 +0000
+
+    make-helper-overrides.bsh -> debian/make-helper-overrides.bsh
+
+commit f19cee00fd8c0851d103309096c9063c20103bb9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 13:04:18 2019 +0000
+
+    bumped changelog version
+
+commit 2f472a8eacdd58bc49c0ac4ab505b095dc0ee320
+Merge: bccd504 54bef10
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 07:50:06 2019 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit 54bef108d45b9ca70b1ef5b0b8fa4142b7832d9b
+Merge: 6f709ff 90dedd6
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Sep 18 09:30:12 2019 -0700
+
+    Merge pull request #22 from madaidan/fix-apparmor
+    
+    Allow certain signals needed to start/stop/restart kloak
+
+commit 90dedd6efe115a10612c06bd1e2b3aecba314132
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Wed Sep 18 16:05:22 2019 +0000
+
+    Allow certain signals needed to start/stop/restart kloak
+
+commit 6f709ff7b8133a48701c90f713cfe21fcb529a27
+Merge: f5ba897 bccd504
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Sep 17 09:04:38 2019 -0700
+
+    Merge pull request #20 from Whonix/master
+    
+    Apparmor Debian packaging integration
+
+commit bccd504ff2ebe558c3b2c3977f128b192b7bfcf2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Sep 17 14:15:24 2019 +0000
+
+    bumped changelog version
+
 commit 7abcaeeed0cf76a9fb6c585ce322de753b7a31db
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Sep 17 07:35:47 2019 +0000

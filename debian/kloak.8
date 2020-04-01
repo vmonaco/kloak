@@ -1,0 +1,58 @@
+.\" generated with Ronn-NG/v0.8.0
+.\" http://github.com/apjanke/ronn-ng/tree/0.8.0
+.TH "KLOAK" "8" "November 2019" "kloak" "kloak Manual"
+.SH "NAME"
+\fBkloak\fR \- anti keystroke deanonymization tool
+.P
+.SH "SYNOPSIS"
+\fBkloak\fR \fI\%#OPTIONS\fR
+.SH "OPTIONS"
+.IP "\[ci]" 4
+\-h
+.IP
+print usage message and exit
+.IP "\[ci]" 4
+\-r
+.IP
+filename: device file to read events from
+.IP "\[ci]" 4
+\-w
+.IP
+filename: device file to write events to (should be uinput)
+.IP "\[ci]" 4
+\-d
+.IP
+delay: maximum delay (milliseconds) of released events\. Default 100\.
+.IP "\[ci]" 4
+\-s
+.IP
+startup_timeout: time to wait (milliseconds) before startup\. Default 100\.
+.IP "\[ci]" 4
+\-k
+.IP
+csv_string: csv list of rescue key names to exit kloak in case the keyboard becomes unresponsive\. Default is \'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC\'\.
+.IP "\[ci]" 4
+\-v
+.IP
+verbose mode
+.IP "" 0
+.SH "DESCRIPTION"
+kloak is a Keystroke\-level online anonymization kernel\.
+.P
+kloak is a privacy tool that makes keystroke biometrics less effective\. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification\.
+.SH "EXAMPLES"
+Use eventcap(8) (or some other event capture tool) and look for the device that generates events when keys are pressed\.
+.P
+Starting \fBkloak\fR without any options will use sensible defaults and attempt to find the location of the keyboard device and uinput\. Note that since \fBkloak\fR requires reading from and writing to device files, it probably won\'t work without running as root:
+.P
+\fBsudo \./kloak\fR
+.P
+Optionally start \fBkloak\fR by specifying the input and output device files\. The output device should be the location of uinput\.
+.P
+\fBsudo \./kloak \-r /dev/input/event4 \-w /dev/uinput\fR
+.SH "WWW"
+https://github\.com/vmonaco/kloak
+.SH "CREDITS"
+kloak was written by Vinnie Monaco\.
+.SH "AUTHOR"
+This man page has been written by Patrick Schleizer (adrelanos@riseup\.net)\.
