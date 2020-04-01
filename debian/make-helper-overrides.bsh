@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
 version_numbers_by_upstream=true

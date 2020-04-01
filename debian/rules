@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-## Copyright (C) 2016 - 2016 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
 export DH_VERBOSE=1
