@@ -1,3 +1,15 @@
+commit a12f457d2c5b7b58ecb3e07e5e56023123baf954
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Apr 4 16:36:13 2020 -0400
+
+    actually can be build for arm64
+
+commit 01bae31488ae1c9b86a214c25c0c8f806a05255e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 07:51:28 2020 -0400
+
+    bumped changelog version
+
 commit 44eb700387831b6152141ff06e16b2eb426845f1
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 07:22:38 2020 -0400
