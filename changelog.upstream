@@ -1,3 +1,24 @@
+commit fd25e68017becafc1d105d9f415d84425599a2d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 14:02:47 2020 -0400
+
+    Architecture: amd64
+    
+    https://github.com/vmonaco/kloak/issues/24
+    https://github.com/vmonaco/kloak/issues/25
+    Actually building might be possible but cross building using qemu has issues.
+    https://github.com/vivier/qemu-m68k/issues/38
+    https://bugs.launchpad.net/qemu/+bug/1756519
+    https://bugs.launchpad.net/qemu/+bug/1793539
+    qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60269d8c
+    qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6000178c
+
+commit 7631d7d1bd24353f8a89738f7d80f966988f3c4b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:50:47 2020 -0400
+
+    bumped changelog version
+
 commit 6ca7fbde8147fa90a5c44764490140f54e58656e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Apr 5 13:46:36 2020 -0400
