@@ -14,7 +14,13 @@ Standards-Version: 4.3.0
 Package: kloak
 ## https://github.com/vmonaco/kloak/issues/24
 ## https://github.com/vmonaco/kloak/issues/25
-Architecture: any
+## Actually building might be possible but cross building using qemu has issues.
+## https://github.com/vivier/qemu-m68k/issues/38
+## https://bugs.launchpad.net/qemu/+bug/1756519
+## https://bugs.launchpad.net/qemu/+bug/1793539
+## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60269d8c
+## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6000178c
+Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: anti keystroke deanonymization tool
  A keystroke-level online anonymization kernel.
