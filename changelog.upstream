@@ -1,3 +1,15 @@
+commit 6ca7fbde8147fa90a5c44764490140f54e58656e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:46:36 2020 -0400
+
+    fix packaging for build without genmkfile
+
+commit dfeff821d06ce32b6918ba9f3f97f5d9ec45dfe5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:27:10 2020 -0400
+
+    bumped changelog version
+
 commit e03b8897c0c666f9c77c8b9714889fff5f60a6cd
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Apr 5 13:09:26 2020 -0400
