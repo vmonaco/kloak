@@ -1,7 +1,9 @@
 ## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-## This file was generated using genmkfile 'make debinstfile'.
+## Manually maintained file. nogenmkfile
 
 etc/*
 lib/*
+eventcap usr/sbin/
+kloak usr/sbin/

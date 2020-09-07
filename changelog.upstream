@@ -1,3 +1,118 @@
+commit 9ededf2f727e93c7e91fa6988c841b140fce053f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 6 07:31:49 2020 -0400
+
+    add `pread64`
+    
+    Thanks to @haroonrafi / @pcrockett for the report!
+    
+    fixes https://github.com/vmonaco/kloak/issues/28
+
+commit 3abdb4faeca4f8af3449f7ca58b66e1e6c7fa7c6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 16 08:36:54 2020 -0400
+
+    bumped changelog version
+
+commit 0dc802c876b846151615f2076d258d29877c63d1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 15 14:05:33 2020 -0400
+
+    readme
+
+commit 94350cf07578c347a0ba054cc4314f6b054689f4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 14:05:55 2020 -0400
+
+    bumped changelog version
+
+commit fd25e68017becafc1d105d9f415d84425599a2d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 14:02:47 2020 -0400
+
+    Architecture: amd64
+    
+    https://github.com/vmonaco/kloak/issues/24
+    https://github.com/vmonaco/kloak/issues/25
+    Actually building might be possible but cross building using qemu has issues.
+    https://github.com/vivier/qemu-m68k/issues/38
+    https://bugs.launchpad.net/qemu/+bug/1756519
+    https://bugs.launchpad.net/qemu/+bug/1793539
+    qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60269d8c
+    qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6000178c
+
+commit 7631d7d1bd24353f8a89738f7d80f966988f3c4b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:50:47 2020 -0400
+
+    bumped changelog version
+
+commit 6ca7fbde8147fa90a5c44764490140f54e58656e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:46:36 2020 -0400
+
+    fix packaging for build without genmkfile
+
+commit dfeff821d06ce32b6918ba9f3f97f5d9ec45dfe5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:27:10 2020 -0400
+
+    bumped changelog version
+
+commit e03b8897c0c666f9c77c8b9714889fff5f60a6cd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:09:26 2020 -0400
+
+    copyright
+
+commit 9fe1fdf798a434fcc49a16d7eaa36267232f7712
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 5 13:08:44 2020 -0400
+
+    apparmor packaging fixes
+
+commit ed1b360678ebddf6d6732d812e54179a76649fc1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Apr 4 16:40:52 2020 -0400
+
+    bumped changelog version
+
+commit a12f457d2c5b7b58ecb3e07e5e56023123baf954
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Apr 4 16:36:13 2020 -0400
+
+    actually can be build for arm64
+
+commit 01bae31488ae1c9b86a214c25c0c8f806a05255e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 07:51:28 2020 -0400
+
+    bumped changelog version
+
+commit 44eb700387831b6152141ff06e16b2eb426845f1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 07:22:38 2020 -0400
+
+    readme
+
+commit 9733e77f2b3b551e209a8830dfb4d57b2f22f90a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:32:15 2020 -0400
+
+    add debian install file
+
+commit 56692cccff9a16766799ac6baf22702de8d958f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 15:56:48 2020 -0400
+
+    add man pages (generated using "genmkfile manpages")
+
+commit 7093613c4723787d9e9c9a9dec4b5320a80c9a32
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 10:48:40 2020 -0400
+
+    bumped changelog version
+
 commit 11db9d47895fb401a3ed97ea028ab25d53a6b76e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 09:19:55 2020 -0400
