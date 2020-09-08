@@ -43,6 +43,10 @@ ProtectHome=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
+## hardened kernels without CONFIG_USER_NS_UNPRIVILEGED=Y
+## need to:
+## * disable or comment out the 3 'Private' namespaces below
+## $ systemctl edit --full kloak
 PrivateTmp=true
 PrivateUsers=true
 PrivateNetwork=true
