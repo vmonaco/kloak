@@ -7,7 +7,7 @@ is accomplished by obfuscating the time intervals between key press and
 release events, which are typically used for identification.
 ## How to install `kloak` using apt-get ##
 
-1\. Download [Whonix's Signing Key]().
+1\. Download Whonix's Signing Key.
 
 ```
 wget https://www.whonix.org/patrick.asc
