@@ -1,3 +1,61 @@
+commit 7d02f04592f6f64fa9e472d7624c11645a5bf86b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 13:40:45 2020 -0400
+
+    readme
+
+commit 0f30fc2370f1406f979567cff60a3aee0e029d96
+Merge: 1a13e75 00c3495
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 11:19:59 2020 -0400
+
+    Merge remote-tracking branch 'madaidan/apparmor'
+
+commit 00c3495ffaa9df609d164aa1f020cd1e5db225ab
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Thu Oct 8 12:38:42 2020 +0000
+
+    Allow getrandom
+
+commit 6c260b638d8835dfe2cb09b7b54c65d8b35449ff
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Thu Oct 8 12:37:58 2020 +0000
+
+    Allow access to more libraries
+
+commit e1eec9ded59a8012d5cc9520bf897380a256fcd2
+Merge: 6694368 bea5410
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 7 20:17:29 2020 -0700
+
+    Merge pull request #30 from itoffshore/alpine
+    
+    add service script note for hardened kernels
+
+commit bea5410a0a8f0b3bc8834a42c4c3322c6b8c6beb
+Author: Stuart Cardall <developer@it-offshore.co.uk>
+Date:   Mon Sep 7 12:00:54 2020 +0100
+
+    add service script note for hardened kernels
+    
+    * hardened kernels without CONFIG_USER_NS_UNPRIVILEGED fail to start
+      the kloak service if private namespaces are enabled.
+
+commit 6694368db2588d828687f0846221f94ccf03e3fa
+Merge: 652105d 1a13e75
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Sep 6 20:16:05 2020 -0700
+
+    Merge pull request #29 from Whonix/master
+    
+    packaging improvements and fixes
+
+commit 1a13e7537bd87c46576fe79432855e4842cea255
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 6 07:33:56 2020 -0400
+
+    bumped changelog version
+
 commit 9ededf2f727e93c7e91fa6988c841b140fce053f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 6 07:31:49 2020 -0400
@@ -94,6 +152,15 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 07:22:38 2020 -0400
 
     readme
+
+commit 652105d67527b3bb24c3b86f219724998f20d83a
+Merge: 54bef10 9733e77
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Apr 1 15:51:08 2020 -0700
+
+    Merge pull request #26 from Whonix/master
+    
+    packaging and apparmor improvements
 
 commit 9733e77f2b3b551e209a8830dfb4d57b2f22f90a
 Author: Patrick Schleizer <adrelanos@riseup.net>
