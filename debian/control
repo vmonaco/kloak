@@ -12,14 +12,22 @@ Vcs-Git: https://github.com/vmonaco/kloak.git
 Standards-Version: 4.3.0
 
 Package: kloak
+## Related tickets:
 ## https://github.com/vmonaco/kloak/issues/24
 ## https://github.com/vmonaco/kloak/issues/25
-## Actually building might be possible but cross building using qemu has issues.
+##
+## Bug:
+## Actually building might be possible but cross building using qemu has issues:
 ## https://github.com/vivier/qemu-m68k/issues/38
+## Update: in above link it is being said that it was fixed.
+## Could try again in Debian bullseye or above.
+##
+## Bug:
 ## https://bugs.launchpad.net/qemu/+bug/1756519
 ## https://bugs.launchpad.net/qemu/+bug/1793539
 ## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60269d8c
 ## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6000178c
+## Update: Same as above.
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: anti keystroke deanonymization tool
