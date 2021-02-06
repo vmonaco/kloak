@@ -1,3 +1,9 @@
+kloak (0:0.2.26-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 06 Feb 2021 11:30:56 +0000
+
 kloak (0:0.2.25-1) unstable; urgency=medium
 
   * New upstream version (local package).
