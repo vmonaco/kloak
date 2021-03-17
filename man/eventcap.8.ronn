@@ -2,7 +2,7 @@ eventcap(8) -- physical keyboard device detection
 =============================================
 
 <span class="comment">
-# Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP adrelanos@riseup.net
+# Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP adrelanos@whonix.org
 # See the file COPYING for copying conditions.
 
 # Not using angle brackets in copyright notice for e-mail address, because
@@ -42,4 +42,4 @@ https://github.com/vmonaco/kloak
 eventcap was written by Vinnie Monaco.
 
 ## AUTHOR
-This man page has been written by Patrick Schleizer (adrelanos@riseup.net).
+This man page has been written by Patrick Schleizer (adrelanos@whonix.org).
