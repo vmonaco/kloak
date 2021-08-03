@@ -1,7 +1,7 @@
 eventcap(8) -- physical keyboard device detection
 =============================================
 
-<span class="comment">
+<!--
 # Copyright (C) 2016 - 2021 ENCRYPTED SUPPORT LP adrelanos@whonix.org
 # See the file COPYING for copying conditions.
 
@@ -11,7 +11,7 @@ eventcap(8) -- physical keyboard device detection
 
 # Not using "##", because for some reason this comment would be visible in the
 # resulting man page.
-</span>
+-->
 
 ## SYNOPSIS
 `eventcap` device
