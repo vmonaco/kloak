@@ -1,11 +1,10 @@
-.\" generated with Ronn-NG/v0.8.0
-.\" http://github.com/apjanke/ronn-ng/tree/0.8.0
-.TH "KLOAK" "8" "April 2020" "kloak" "kloak Manual"
+.\" generated with Ronn-NG/v0.9.1
+.\" http://github.com/apjanke/ronn-ng/tree/0.9.1
+.TH "KLOAK" "8" "January 2020" "kloak" "kloak Manual"
 .SH "NAME"
 \fBkloak\fR \- anti keystroke deanonymization tool
-.P
 .SH "SYNOPSIS"
-\fBkloak\fR \fI\%#OPTIONS\fR
+\fBkloak\fR \fIoptions\fR
 .SH "OPTIONS"
 .IP "\[ci]" 4
 \-h
@@ -30,7 +29,7 @@ startup_timeout: time to wait (milliseconds) before startup\. Default 100\.
 .IP "\[ci]" 4
 \-k
 .IP
-csv_string: csv list of rescue key names to exit kloak in case the keyboard becomes unresponsive\. Default is \'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC\'\.
+csv_string: csv list of rescue key names to exit kloak in case the keyboard becomes unresponsive\. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'\.
 .IP "\[ci]" 4
 \-v
 .IP
@@ -43,7 +42,7 @@ kloak is a privacy tool that makes keystroke biometrics less effective\. This is
 .SH "EXAMPLES"
 Use eventcap(8) (or some other event capture tool) and look for the device that generates events when keys are pressed\.
 .P
-Starting \fBkloak\fR without any options will use sensible defaults and attempt to find the location of the keyboard device and uinput\. Note that since \fBkloak\fR requires reading from and writing to device files, it probably won\'t work without running as root:
+Starting \fBkloak\fR without any options will use sensible defaults and attempt to find the location of the keyboard device and uinput\. Note that since \fBkloak\fR requires reading from and writing to device files, it probably won't work without running as root:
 .P
 \fBsudo \./kloak\fR
 .P
