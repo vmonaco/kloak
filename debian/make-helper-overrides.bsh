@@ -4,3 +4,6 @@
 ## See the file COPYING for copying conditions.
 
 version_numbers_by_upstream=true
+
+## Already included upstream.
+genmkfile_lintian_post_opts+=" --suppress-tags maintainer-manual-page"
