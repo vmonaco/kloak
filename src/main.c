@@ -279,9 +279,9 @@ void emit_event(struct entry *e) {
     int res, delay;
 
     // Don't do anything, waiting to exit
-    if (interrupt) {
-        return;
-    }
+    // if (interrupt) {
+    //     return;
+    // }
 
     delay = (int) (e->time - current_time_ms());
 
@@ -291,10 +291,10 @@ void emit_event(struct entry *e) {
     }
 
     // Since the SYN events are ignored below, write a SYN event
-    if ((res = (write(output_fd, &(syn), sizeof(struct input_event)) < 0)) < 0) {
-        fprintf(stderr, "write() failed: %s\n", strerror(errno));
-        exit(1);
-    }
+    // if ((res = (write(output_fd, &(syn), sizeof(struct input_event)) < 0)) < 0) {
+    //     fprintf(stderr, "write() failed: %s\n", strerror(errno));
+    //     exit(1);
+    // }
 
     if (verbose) {
         printf("Released event at time : %ld.  Type: %*d,  "
@@ -375,8 +375,10 @@ void main_loop() {
             if (FD_ISSET(input_fds[i], &read_fds)) {
                 res = read(input_fds[i], &ev, sizeof(ev));
 
-                if (res <= 0)
+                if (res <= 0) {
+                    fprintf(stderr, "read() failed: %s\n", strerror(errno));
                     continue;
+                }
 
                 // check for the rescue sequence.
                 if (ev.type == EV_KEY) {
@@ -391,14 +393,14 @@ void main_loop() {
                 }
 
                 // Ignore key repeat events (1 is press, 0 is release, 2 is repeat)
-                if (ev.type == EV_KEY && ev.value == 2) {
-                    continue;
-                }
+                // if (ev.type == EV_KEY && ev.value == 2) {
+                //     continue;
+                // }
 
                 // Ignore events other than EV_KEY and EV_REL
-                if (ev.type != EV_KEY && ev.type != EV_REL) {
-                    continue;
-                }
+                // if (ev.type != EV_KEY && ev.type != EV_REL) {
+                //     continue;
+                // }
 
                 // Schedule the keyboard event to be released sometime in the future.
                 // Lower bound must be bounded between:
