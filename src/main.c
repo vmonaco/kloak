@@ -390,13 +390,13 @@ void main_loop() {
                         interrupt = 1;
                 }
 
-                // Ignore events other than EV_KEY
-                if (ev.type != EV_KEY) {
+                // Ignore key repeat events (1 is press, 0 is release, 2 is repeat)
+                if (ev.type == EV_KEY && ev.value == 2) {
                     continue;
                 }
 
-                // Ignore key repeat events (1 is press, 0 is release, 2 is repeat)
-                if (ev.type == EV_KEY && ev.value == 2) {
+                // Ignore events other than EV_KEY and EV_REL
+                if (ev.type != EV_KEY || ev.type != EV_REL) {
                     continue;
                 }
 
@@ -406,7 +406,7 @@ void main_loop() {
                 lower_bound = min(max(prev_release_time - current_time, 0), max_delay);
                 random_delay = random_between(lower_bound, max_delay);
 
-                // Buffer the keyboard event
+                // Buffer the event
                 n1 = malloc(sizeof(struct entry));	/* Insert at the head. */
                 n1->time = current_time + (long) random_delay;
                 n1->iev = ev;
