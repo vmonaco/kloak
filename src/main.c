@@ -396,7 +396,7 @@ void main_loop() {
                 }
 
                 // Ignore events other than EV_KEY and EV_REL
-                if (ev.type != EV_KEY || ev.type != EV_REL) {
+                if (ev.type != EV_KEY && ev.type != EV_REL) {
                     continue;
                 }
 
