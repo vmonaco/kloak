@@ -1,35 +1,26 @@
-#include <stdio.h>
 #include <poll.h>
 #include <string.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <math.h>
 #include <time.h>
-
+#include <sodium.h>
 #include <sys/queue.h>
-
-#include <linux/input.h>
-#include <linux/uinput.h>
-
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
 #include "keycodes.h"
 
-#define BUFSIZE 256  // For device names and rescue key sequence
-#define MAX_INPUTS 16  // How many devices to read from
-#define MAX_DEVICES 16 // max number of devices to detect
-#define MAX_RESCUE_KEYS 10  // Maximum number of rescue keys to exit in case of emergency
-#define DEFAULT_MAX_DELAY_MS 20  // 10 ms is short enough to not greatly affect usability
-#define DEFAULT_STARTUP_DELAY_MS 500  // Wait before grabbing the input device
-#define DEFAULT_POLLING_INTERVAL_MS 1  // Polling interval between writing events, quantizes output times
-#define READ_TIMEOUT_MS 1 // Timeout to check for new events
-#define NUM_SUPPORTED_KEYS_THRESH 20  // Find the first device that supports at least this many key events
+#define BUFSIZE 256  // for device names and rescue key sequence
+#define MAX_INPUTS 16  // number of devices to try autodetection
+#define MAX_DEVICES 16 // max number of devices to read events from
+#define MAX_RESCUE_KEYS 10  // max number of rescue keys to exit in case of emergency
+#define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
+#define POLL_TIMEOUT_MS 1 // timeout to check for new events
+#define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
+#define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
-#define errExit(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
 #define panic(format, ...) do { fprintf(stderr, format "\n", ##__VA_ARGS__); exit(EXIT_FAILURE); } while (0)
 
 #ifndef min
@@ -40,25 +31,23 @@
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-static int interrupt = 0;  // Flag to interrupt the main loop and exit
-static int verbose = 0;  // Flag for verbose output
+static int interrupt = 0;  // flag to interrupt the main loop and exit
+static int verbose = 0;  // flag for verbose output
 
 static char rescue_key_seps[] = ", ";  // delims to strtok
 static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
-// static char default_rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len;  // Number of rescue keys, set during initialization
 
-static int max_delay = DEFAULT_MAX_DELAY_MS;  // Lag will never exceed this upper bound
+static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
-static int polling_interval = DEFAULT_POLLING_INTERVAL_MS;
+
+static int device_count = 0;
+static char named_inputs[MAX_INPUTS][BUFSIZE];
 
 static int input_fds[MAX_INPUTS];
 struct libevdev *output_devs[MAX_INPUTS];
 struct libevdev_uinput *uidevs[MAX_INPUTS];
-
-static int device_count = 0;
-static char named_inputs[MAX_INPUTS][BUFSIZE];
 
 static struct option long_options[] = {
         {"read",    1, 0, 'r'},
@@ -79,11 +68,6 @@ struct entry {
     int device_index;
 };
 
-// struct input_event syn = {.type = EV_SYN, .code = 0, .value = 0};
-// struct timeval timeout = {.tv_sec = 0, .tv_usec = READ_TIMEOUT_US};
-static const int timeout = READ_TIMEOUT_MS;
-
-// Helper function to sleep for a duration given in milliseconds
 void sleep_ms(long milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
@@ -91,47 +75,18 @@ void sleep_ms(long milliseconds) {
     nanosleep(&ts, NULL);
 }
 
-// Helper function to return current time in milliseconds
 long current_time_ms(void) {
-    long ms; // Milliseconds
-    time_t s;  // Seconds
     struct timespec spec;
-
     clock_gettime(CLOCK_REALTIME, &spec);
-
-    s = spec.tv_sec;
-    ms = round(spec.tv_nsec / 1.0e6);
     return (spec.tv_sec) * 1000 + (spec.tv_nsec) / 1000000;
 }
 
-// Assumes 0 <= max <= RAND_MAX
-// Returns in the closed interval [0, max]
-// Credits: https://stackoverflow.com/questions/2509679/how-to-generate-a-random-integer-number-from-within-a-range
-long random_at_most(long max) {
-    unsigned long
-      // max <= RAND_MAX < ULONG_MAX, so this is okay.
-      num_bins = (unsigned long) max + 1,
-      num_rand = (unsigned long) RAND_MAX + 1,
-      bin_size = num_rand / num_bins,
-      defect   = num_rand % num_bins;
+long random_between(long lower, long upper) {
+    // default to max if the interval is not valids
+    if (lower >= upper)
+        return upper;
 
-    long x;
-    do {
-        x = random();
-    }
-    // This is carefully written not to overflow
-    while (num_rand - defect <= (unsigned long)x);
-
-    // Truncated division is intentional
-    return x/bin_size;
-}
-
-long random_between(long min, long max) {
-    // Default to max if the interval is not valids
-    if (min >= max)
-        return max;
-
-    return min + random_at_most(max - min);
+    return lower + randombytes_uniform(upper+1);
 }
 
 void set_rescue_keys(char* rescue_keys_str) {
@@ -161,7 +116,6 @@ int supports_event_type(int device_fd, int event_type) {
     return evbit & (1 << event_type);
 }
 
-// Returns true iff the given device has |key|.
 int supports_specific_key(int device_fd, unsigned int key) {
     size_t nchar = KEY_MAX/8 + 1;
     unsigned char bits[nchar];
@@ -186,13 +140,12 @@ int is_keyboard(int fd) {
       }
     }
 
-  return (num_supported_keys > NUM_SUPPORTED_KEYS_THRESH);
+  return (num_supported_keys > MIN_KEYBOARD_KEYS);
 }
 
 int is_mouse(int fd) {
   return (supports_event_type(fd, EV_REL) || supports_event_type(fd, EV_ABS));
 }
-
 
 void detect_devices() {
     int fd;
@@ -313,7 +266,7 @@ void main_loop() {
         }
 
         // Wait for next input event
-        if ((err = poll(pfds, device_count, timeout)) < 0)
+        if ((err = poll(pfds, device_count, POLL_TIMEOUT_MS)) < 0)
           panic("poll() failed: %s\n", strerror(errno));
 
         // timed out, do nothing
@@ -473,7 +426,7 @@ int main(int argc, char **argv) {
     init_inputs();
     init_outputs();
 
-    // Initialize the FIFO event buffer
+    // initialize the event queue
     TAILQ_INIT(&head);
 
     banner();
