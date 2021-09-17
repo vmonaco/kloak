@@ -1,8 +1,8 @@
 kloak(8) -- anti keystroke deanonymization tool
 =============================================
 
-<span class="comment">
-# Copyright (C) 2016 - 2020 ENCRYPTED SUPPORT LP adrelanos@riseup.net
+<!--
+# Copyright (C) 2016 - 2021 ENCRYPTED SUPPORT LP adrelanos@whonix.org
 # See the file COPYING for copying conditions.
 
 # Not using angle brackets in copyright notice for e-mail address, because
@@ -11,7 +11,7 @@ kloak(8) -- anti keystroke deanonymization tool
 
 # Not using "##", because for some reason this comment would be visible in the
 # resulting man page.
-</span>
+-->
 
 ## SYNOPSIS
 `kloak` [options]
@@ -76,4 +76,4 @@ https://github.com/vmonaco/kloak
 kloak was written by Vinnie Monaco.
 
 ## AUTHOR
-This man page has been written by Patrick Schleizer (adrelanos@riseup.net).
+This man page has been written by Patrick Schleizer (adrelanos@whonix.org).

@@ -1,3 +1,187 @@
+commit 28d3eef79cfe70828bfe1bbe44bfcf79c5f4c593
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Sep 11 16:33:51 2021 -0400
+
+    readme
+
+commit e54394894a96c1a0f1cefd95676bcbd142c67add
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Aug 28 13:54:16 2021 -0400
+
+    bumped changelog version
+
+commit 2b2413d5f97a03560c4f4c88600ce0010e65f8e2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Aug 5 16:47:52 2021 -0400
+
+    bumped changelog version
+
+commit 89254249098f7081ea3b029d6715f7c9882b9c1f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 4 16:03:27 2021 -0400
+
+    lintian
+
+commit 53caa09682651e7a7de554d78acb24151ccb803e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 4 16:01:50 2021 -0400
+
+    re-generated man pages
+
+commit b4cab3fcf728bca4783719eb2cd67b074e7ce6ba
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 11:47:33 2021 -0400
+
+    re-generate man pages (generated using "genmkfile manpages")
+
+commit b7d67c0eb8d2fcce495c9ce3213462d5562ba8f1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 11:43:33 2021 -0400
+
+    man page
+
+commit 8169d9763e89e08bf80d56a8b59e6538b1a82f1a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 05:48:22 2021 -0400
+
+    bullseye
+
+commit 6eaecb7cb1d5202544ef5b5ebb680b81084dfa7f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:32:12 2021 -0400
+
+    bullseye
+
+commit f37f26053f42964f46a6bfc2f3c20908a11aeb08
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:24:33 2021 -0400
+
+    readme
+
+commit 40f31f7351ea32ae84e785c632285cda91203bf1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Mar 18 09:05:55 2021 -0400
+
+    bumped changelog version
+
+commit c04e59f03af45615b1a4390b5d14905677b51f3d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Mar 18 08:57:20 2021 -0400
+
+    copyright
+
+commit db11450344e2f6d51c078e720b8498ac2ccea611
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Mar 18 07:44:35 2021 -0400
+
+    bumped changelog version
+
+commit a4c465baa95f865be0e7767fff232857a3aab757
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Mar 18 07:39:48 2021 -0400
+
+    copyright
+
+commit 13314c1731b39842943d4084db2bb744f4a08414
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Mar 17 11:36:32 2021 -0400
+
+    bumped changelog version
+
+commit 99e8876ea073604e396bcf102ed98a0c31427b70
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Mar 17 09:45:16 2021 -0400
+
+    copyright
+
+commit 370a6d563cc64b7f81824fd5f884ebba37a0a9a3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Feb 6 06:30:56 2021 -0500
+
+    bumped changelog version
+
+commit 58588a837800c020ff6a380feb2bd14b683fdffe
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Feb 6 06:27:53 2021 -0500
+
+    readme
+
+commit 509e5327827dac4f279541da1aee0b8d4b4ce3e6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Dec 3 15:52:42 2020 -0500
+
+    bumped changelog version
+
+commit bf8ea6f9db66dbde2a9133dc69f5185e94b7067f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Dec 3 11:21:18 2020 -0500
+
+    comment
+
+commit 3e61d1a6b5ac92ebbfbb8e55c5e85c79973e5bbc
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 13:40:45 2020 -0400
+
+    bumped changelog version
+
+commit 7d02f04592f6f64fa9e472d7624c11645a5bf86b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 13:40:45 2020 -0400
+
+    readme
+
+commit 0f30fc2370f1406f979567cff60a3aee0e029d96
+Merge: 1a13e75 00c3495
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 11:19:59 2020 -0400
+
+    Merge remote-tracking branch 'madaidan/apparmor'
+
+commit 00c3495ffaa9df609d164aa1f020cd1e5db225ab
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Thu Oct 8 12:38:42 2020 +0000
+
+    Allow getrandom
+
+commit 6c260b638d8835dfe2cb09b7b54c65d8b35449ff
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Thu Oct 8 12:37:58 2020 +0000
+
+    Allow access to more libraries
+
+commit e1eec9ded59a8012d5cc9520bf897380a256fcd2
+Merge: 6694368 bea5410
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 7 20:17:29 2020 -0700
+
+    Merge pull request #30 from itoffshore/alpine
+    
+    add service script note for hardened kernels
+
+commit bea5410a0a8f0b3bc8834a42c4c3322c6b8c6beb
+Author: Stuart Cardall <developer@it-offshore.co.uk>
+Date:   Mon Sep 7 12:00:54 2020 +0100
+
+    add service script note for hardened kernels
+    
+    * hardened kernels without CONFIG_USER_NS_UNPRIVILEGED fail to start
+      the kloak service if private namespaces are enabled.
+
+commit 6694368db2588d828687f0846221f94ccf03e3fa
+Merge: 652105d 1a13e75
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Sep 6 20:16:05 2020 -0700
+
+    Merge pull request #29 from Whonix/master
+    
+    packaging improvements and fixes
+
+commit 1a13e7537bd87c46576fe79432855e4842cea255
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 6 07:33:56 2020 -0400
+
+    bumped changelog version
+
 commit 9ededf2f727e93c7e91fa6988c841b140fce053f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 6 07:31:49 2020 -0400
@@ -94,6 +278,15 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 07:22:38 2020 -0400
 
     readme
+
+commit 652105d67527b3bb24c3b86f219724998f20d83a
+Merge: 54bef10 9733e77
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Apr 1 15:51:08 2020 -0700
+
+    Merge pull request #26 from Whonix/master
+    
+    packaging and apparmor improvements
 
 commit 9733e77f2b3b551e209a8830dfb4d57b2f22f90a
 Author: Patrick Schleizer <adrelanos@riseup.net>

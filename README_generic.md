@@ -7,7 +7,7 @@ is accomplished by obfuscating the time intervals between key press and
 release events, which are typically used for identification.
 ## How to install `kloak` using apt-get ##
 
-1\. Download [Whonix's Signing Key]().
+1\. Download Whonix's Signing Key.
 
 ```
 wget https://www.whonix.org/patrick.asc
@@ -18,13 +18,13 @@ Users can [check Whonix Signing Key](https://www.whonix.org/wiki/Whonix_Signing_
 2\. Add Whonix's signing key.
 
 ```
-sudo apt-key --keyring /etc/apt/trusted.gpg.d/whonix.gpg add ~/patrick.asc
+sudo cp ~/derivative.asc /usr/share/keyrings/derivative.asc
 ```
 
 3\. Add Whonix's APT repository.
 
 ```
-echo "deb https://deb.whonix.org buster main contrib non-free" | sudo tee /etc/apt/sources.list.d/whonix.list
+echo "deb [signed-by=/usr/share/keyrings/derivative.asc] https://deb.whonix.org bullseye main contrib non-free" | sudo tee /etc/apt/sources.list.d/derivative.list
 ```
 
 4\. Update your package lists.
