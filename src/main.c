@@ -220,9 +220,9 @@ void emit_event(struct entry *e) {
     libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
 
     if (verbose) {
-        printf("Released event at time : %ld %ld. Device: %d,  Type: %*d,  "
-                       "Code: %*d,  Value: %*d,  Missed target   %*d ms \n",
-               e->time, now, e->device_index, 3, e->iev.type, 3, e->iev.code, 3, e->iev.value, 4, delay);
+        printf("Released event at time : %ld. Device: %d,  Type: %*d,  "
+                       "Code: %*d,  Value: %*d,  Missed target:  %*d ms \n",
+               e->time, e->device_index, 3, e->iev.type, 5, e->iev.code, 5, e->iev.value, 5, delay);
     }
 }
 
@@ -318,8 +318,8 @@ void main_loop() {
 
                 if (verbose) {
                     printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
-                                   "Code: %*d,  Value: %*d,  Scheduled delay %*ld ms \n",
-                           n1->time, k, 3, n1->iev.type, 3, n1->iev.code, 3, n1->iev.value,
+                                   "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
+                           n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
                            4, random_delay);
                     if (lower_bound > 0) {
                         printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
