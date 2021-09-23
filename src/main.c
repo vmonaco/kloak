@@ -362,6 +362,10 @@ void banner() {
 }
 
 int main(int argc, char **argv) {
+    if (sodium_init() == -1) {
+       panic("sodium_init failed");
+    }
+
     if ((getuid()) != 0)
         printf("You are not root! This may not work...\n");
 
