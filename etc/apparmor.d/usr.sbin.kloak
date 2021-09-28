@@ -23,6 +23,7 @@
 
   owner /dev/input/event*           r,
   owner /dev/uinput                 rw,
+  owner /sys/devices/virtual/input* r,
 
   /etc/ld.so.cache                  r,
   /etc/ld.so.preload                r,
