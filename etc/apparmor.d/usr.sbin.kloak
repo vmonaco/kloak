@@ -22,7 +22,7 @@
   /usr/sbin/kloak                   mr,
 
   owner /dev/input/event*           r,
-  owner /dev/uinput                 w,
+  owner /dev/uinput                 r,
 
   /etc/ld.so.cache                  r,
   /etc/ld.so.preload                r,
