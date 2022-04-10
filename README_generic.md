@@ -5,6 +5,7 @@ A keystroke-level online anonymization kernel.
 A privacy tool that makes keystroke biometrics less effective. This
 is accomplished by obfuscating the time intervals between key press and
 release events, which are typically used for identification.
+
 ## How to install `kloak` using apt-get ##
 
 1\. Download the APT Signing Key.
@@ -13,7 +14,7 @@ release events, which are typically used for identification.
 wget https://www.whonix.org/derivative.asc
 ```
 
-Users can [check Whonix Signing Key](https://www.whonix.org/wiki/Whonix_Signing_Key) for better security.
+Users can [check Whonix Signing Key](https://www.whonix.org/wiki/Signing_Key) for better security.
 
 2\. Add the APT Signing Key..
 
@@ -47,7 +48,9 @@ Can be build using standard Debian package build tools such as:
 dpkg-buildpackage -b
 ```
 
-See instructions. (Replace `generic-package` with the actual name of this package `kloak`.)
+See instructions.
+
+NOTE: Replace `generic-package` with the actual name of this package `kloak`.
 
 * **A)** [easy](https://www.whonix.org/wiki/Dev/Build_Documentation/generic-package/easy), _OR_
 * **B)** [including verifying software signatures](https://www.whonix.org/wiki/Dev/Build_Documentation/generic-package)
