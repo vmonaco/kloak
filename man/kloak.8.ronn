@@ -2,7 +2,7 @@ kloak(8) -- anti keystroke deanonymization tool
 =============================================
 
 <!--
-# Copyright (C) 2016 - 2021 ENCRYPTED SUPPORT LP adrelanos@whonix.org
+# Copyright (C) 2016 - 2022 ENCRYPTED SUPPORT LP adrelanos@whonix.org
 # See the file COPYING for copying conditions.
 
 # Not using angle brackets in copyright notice for e-mail address, because
