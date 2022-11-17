@@ -122,7 +122,7 @@ Start `kloak` by specifying the input and output device files:
 
 `kloak` works by introducing a random delay to each key press and release event. This requires temporarily buffering the event before it reaches the application (e.g., a text editor).
 
-The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. This reflects a tradeoff between usability and privacy.
+The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsiveness of the application decreases. This reflects a tradeoff between usability and privacy.
 
 If you're a fast typist and it seems like there is a long lag between pressing a key and seeing the character on screen, try lowering the maximum delay. Alternately, if you're a slower typist, you might be able to increase the maximum delay without noticing much difference. Automatically determining the best lag for each typing speed is an item for future work.
 
@@ -193,5 +193,5 @@ The time between key press and release events are typically used to identify use
 
 * If the delay is too small, it is not effective. Adjust the delay to as high a value that's comfortable.
 * Repeated key presses are not obfuscated. If your system is set to repeat held-down keys at a unique rate, this could leak your identity.
-* Writing style is still apparent, in which [stylometry techniques could be used to determine authorship](http://www.vmonaco.com/publications/An%20investigation%20of%20keystroke%20and%20stylometry%20traits%20for%20authenticating%20online%20test%20takers.pdf).
+* Writing style is still apparent, in which [stylometry techniques could be used to determine authorship](https://vmonaco.com/papers/An%20investigation%20of%20keystroke%20and%20stylometry%20traits%20for%20authenticating%20online%20test%20takers.pdf).
 * Higher level cognitive behavior, such as editing and application usage, are still apparent. These lower-frequency actions are less understood at this point, but could potentially be used to reveal identity.
