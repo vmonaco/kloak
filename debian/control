@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 13), debhelper-compat (= 13), dh-apparmor
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git
-Standards-Version: 4.5.1
+Standards-Version: 4.6.1.0
 Rules-Requires-Root: no
 
 Package: kloak
