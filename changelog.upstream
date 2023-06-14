@@ -1,3 +1,17 @@
+commit 6dbf7832ad67f950fc85fbf12359d318b07652a7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 09:51:12 2023 +0000
+
+    fix lintian warning
+    
+    P: kloak source: very-long-line-length-in-source-file 676 > 512 [README.md:170]
+
+commit 2155a425603c61490458590c5abfe75f3d8aa5cd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 18:15:43 2023 +0000
+
+    bumped changelog version
+
 commit 39194c7ec3e782594cf7715888013502d6a21824
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Jun 12 16:22:35 2023 +0000
