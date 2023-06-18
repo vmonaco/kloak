@@ -144,12 +144,12 @@ The full usage and options are:
 
 ## Try it out
 
-You can test that `kloak` actually works by trying an [online keystroke biometrics demo](https://www.keytrac.net/en/tryout). For example, try these three different scenarios:
+Consider these three different scenarios:
 * Train normal, test normal
 * Train normal, test kloak
 * Train `kloak`, test `kloak`
 
-*Train normal* means to train with normal typing behavior, i.e., without `kloak` running. At the enrollment page on the KeyTrac demo, enter a username and password without `kloak` running, and then on the authenticate page, try authenticating. For example, the train normal/test normal result is:
+*Train normal* means to train with normal typing behavior, i.e., without `kloak` running. At the enrollment page on the KeyTrac demo (demo no longer available), enter a username and password without `kloak` running, and then on the authenticate page, try authenticating. For example, the train normal/test normal result is:
 
 <div align="center">
   <img src="figures/train-normal_test-normal.png"><br><br>
@@ -161,7 +161,7 @@ Start `kloak` and then try authenticating again. These results were obtained usi
   <img src="figures/train-normal_test-kloak.png"><br><br>
 </div>
 
-Now go back to the [enrollment page](https://www.keytrac.net/en/tryout). Enroll With `kloak` running and then try authenticating with `kloak` still running. Again, this is with a 200 ms maximum delay. The train `kloak`/test `kloak` result is:
+Enroll With `kloak` running and then try authenticating with `kloak` still running. Again, this is with a 200 ms maximum delay. The train `kloak`/test `kloak` result is:
 
 <div align="center">
   <img src="figures/train-kloak_test-kloak.png"><br><br>
