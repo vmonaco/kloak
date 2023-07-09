@@ -1,3 +1,22 @@
+commit e28ba0939f1d3fe01e3c141727ec5534c4423b0b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:08:00 2023 -0400
+
+    same ordering as upstream
+
+commit 29055528d43cf6d53b459d4e180698fe255c78d2
+Merge: d8e06e8 2a3a45b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:03:38 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit d8e06e8e4b8bdff8d4243aa627acbc9233a2b515
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 7 20:08:03 2023 -0400
+
+    bumped changelog version
+
 commit 327df39693b7fa47baf7fde697006e7f649cf796
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Jul 7 20:04:27 2023 -0400
@@ -15,6 +34,12 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Jun 21 09:11:34 2023 +0000
 
     bookworm
+
+commit 2a3a45ba429c8ba6e2c8d8560f79efb6cb43fdb3
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sat Jun 17 20:57:22 2023 -0700
+
+    Update README.md
 
 commit e817caef8bdda365838658b232914dfe4c9143d0
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -66,6 +91,27 @@ Date:   Mon Jun 12 14:52:04 2023 +0000
 
     update copyright year
 
+commit 6b2d75e98af072c68981a677bf66320dafca79fc
+Merge: 38eefc5 af2ddc3
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Nov 16 21:02:23 2022 -0800
+
+    Merge pull request #44 from GerHobbelt/master
+    
+    README fixes: broken link to paper fixed + 1 language typo
+
+commit af2ddc31b008ac0042b5cfdcc53cce72dec9cbf3
+Author: Ger Hobbelt <ger@hobbelt.com>
+Date:   Tue Nov 15 19:58:29 2022 +0100
+
+    updated link to stylometry techniques paper.
+
+commit 53ada224cd9323916f515d5f791050b18ae20639
+Author: Ger Hobbelt <ger@hobbelt.com>
+Date:   Tue Nov 15 19:57:22 2022 +0100
+
+    language fix in README
+
 commit ad1cb08250b6b052c7232d5d2614606dccb6bd54
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 25 06:07:59 2022 -0400
@@ -90,11 +136,35 @@ Date:   Sun Apr 10 12:40:20 2022 -0400
 
     readme
 
+commit 38eefc52728e31e89646dd61bb15ecbbb49c0871
+Merge: aaf1de4 6cce482
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Jan 11 10:37:41 2022 -0800
+
+    Merge pull request #40 from hardcore-sushi/systemd-fix
+    
+    Add some system calls to the systemd whitelist to prevent crashes
+
+commit 6cce4829066bac632e1730b8f379e3c45ac15a02
+Author: Hardcore Sushi <hardcore.sushi@disroot.org>
+Date:   Fri Jan 7 17:24:39 2022 +0100
+
+    Add some system calls to the systemd whitelist to prevent crashes
+
 commit 64aef6d208f37fde04c4f12d84f16c214ed58087
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 9 14:32:31 2021 -0500
 
     readme
+
+commit aaf1de40cbe9679af908063b75da3e87081714e4
+Merge: 7fb3f9e 88477f6
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Sep 17 15:01:42 2021 -0700
+
+    Merge pull request #36 from Whonix/master
+    
+    port packaging to Debian bullseye
 
 commit 88477f678878d2405b85839c8a9029dc0c9b697a
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -221,6 +291,15 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Dec 3 11:21:18 2020 -0500
 
     comment
+
+commit 7fb3f9e9885977cac856ded31d80f6c737780518
+Merge: e1eec9d 00c3495
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Oct 8 13:32:15 2020 -0700
+
+    Merge pull request #32 from madaidan/apparmor
+    
+    Fix AppArmor and seccomp
 
 commit 3e61d1a6b5ac92ebbfbb8e55c5e85c79973e5bbc
 Author: Patrick Schleizer <adrelanos@riseup.net>
