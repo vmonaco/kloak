@@ -1,11 +1,15 @@
+# Last Modified: Sun Jul  9 12:23:04 2023
+include <tunables/global>
+
 ## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-# Last Modified: Sun Jul  9 11:20:59 2023
-include <tunables/global>
 
 /usr/sbin/kloak {
   include <local/usr.sbin.kloak>
+
+  ## Required for 'kloak -v' (verbose) only.
+  network unix stream,
 
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
