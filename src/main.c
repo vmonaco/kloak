@@ -155,40 +155,79 @@ int is_mouse(int fd) {
 
 // extracts device number from device_path and puts it into dev_num
 void get_device_number(char *dev_num, char *device_path) {
-        char *ptr = device_path;
-        int i = 0;
-        while(*ptr) {
-                if(isdigit(*ptr)) {
-                        dev_num[i] = *ptr;
-                        i++;
-                }
 
-                ptr++;
-        }
-        
-        if(i == 1) {
-                dev_num[1] = '\0';
-        }
+        snprintf(dev_num, 3, device_path + 16);
+
 }
 
 
+
+
+
 int change_qubes_input_sender(char *systemd_command, char *device_path) {
-        const int MAX_COMMAND_LEN = 70;
+        
+        const int MAX_COMMAND_LEN = 155;
         char command[MAX_COMMAND_LEN];
 
-        char dev_num[2];
+        char dev_num[3];
 
         get_device_number(dev_num, device_path);
-        snprintf(command, min(63 + strlen(device_path) - 16, MAX_COMMAND_LEN) , "sudo systemctl %s qubes-input-sender-keyboard@event%s.service", systemd_command , dev_num);
 
-        if(verbose) {
-                printf("Executing: %s\n", command);
+        int status = 0;
+
+
+        // if starting or stopping the service, see if it is exists first
+        if(strncmp(systemd_command, "stop", 4) == 0 || strncmp(systemd_command, "start", 5) == 0) {
+                status = change_qubes_input_sender("status", device_path);
+
+                if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
+                        snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
+
+                        if(verbose) {
+                                printf("keyboard Executing: %s\n", command);
+                        }
+                        return system(command);
+
+                } // see if keyboard-mouse service exists
+                else {
+                        snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager status qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", dev_num);
+                        if(verbose) {
+                                printf("keyboard/mouse Executing: %s\n", command);
+                        }
+
+                        status = system(command);
+                        
+                        if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
+                                snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
+                                if(verbose) {
+                                        printf("keyboard/mouse inner Executing: %s\n", command);
+                                }
+                                
+                                return system(command);
+                        } else {
+                                // neither exists
+                                return 0;
+                        }
+                }
+
+        } else {
+                snprintf(command, MAX_COMMAND_LEN , "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
+
+                if(verbose) {
+                        printf("Executing: %s\n", command);
+                }
+                
+                return system(command);
         }
 
-        int status = system(command);
 
-        return status;
+}
 
+
+void restart_all_qubes_input_sender() {
+        for(int i = 0; i < device_count; i++) {
+                change_qubes_input_sender("start", named_inputs[i]);
+        }
 }
 
 
@@ -202,15 +241,8 @@ void detect_devices() {
 
                 // if in qubes, need to stop associated qubes-input-sender service before ioctls work on the device file
                 if(is_qubes) {
-
-                        // if running
-                        if(change_qubes_input_sender("status", device) == 0) {
-
-                                // stop the service
-                                change_qubes_input_sender("stop", device);
-                        }
-
-                        
+                        // stop the service
+                        change_qubes_input_sender("stop", device);
                 }
 
 
@@ -254,12 +286,9 @@ void init_inputs() {
 
                 // in qubes, need to kill the associated qubes-input-sender systemd service if still running before you can grab the device
                 if(is_qubes) {
-                        // if running
-                        if(change_qubes_input_sender("status", named_inputs[i]) == 0) {
 
-                                // stop the service
-                                change_qubes_input_sender("stop", named_inputs[i]);
-                        }
+                        // stop the service
+                        change_qubes_input_sender("stop", named_inputs[i]);
 
                         // check status to make sure the service it was definitely stopped
                         if(change_qubes_input_sender("status", named_inputs[i]) == 0) {
@@ -273,8 +302,8 @@ void init_inputs() {
                 if ((fd = open(named_inputs[i], O_RDONLY)) < 0) {
 
                         // if in qubes, make sure qubes-input-sender service is restarted before panic
-                        if(is_qubes && (change_qubes_input_sender("status", named_inputs[i]) == 3)) {
-                                change_qubes_input_sender("start", named_inputs[i]);
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
                         }
 
                         panic("Could not open: %s", named_inputs[i]);
@@ -285,8 +314,8 @@ void init_inputs() {
                 if (ioctl(fd, FIONBIO, &one) < 0) {
 
                         // if in qubes, make sure qubes-input-sender service is running before panic
-                        if(is_qubes && (change_qubes_input_sender("status", named_inputs[i]) == 3)) {
-                                change_qubes_input_sender("start", named_inputs[i]);
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
                         }
 
                         panic("Could set to nonblocking: %s", named_inputs[i]);
@@ -299,8 +328,8 @@ void init_inputs() {
                 if (ioctl(fd, EVIOCGRAB, &one) < 0) {
 
                         // if in qubes, make sure qubes-input-sender service is running before panic
-                        if(is_qubes && (change_qubes_input_sender("status", named_inputs[i]) == 3)) {
-                                change_qubes_input_sender("start", named_inputs[i]);
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
                         }
 
                         panic("Could not grab: %s", named_inputs[i]);
@@ -315,13 +344,25 @@ void init_outputs() {
         for (int i = 0; i < device_count; i++) {
                 int err = libevdev_new_from_fd(input_fds[i], &output_devs[i]);
 
-                if (err != 0)
+                if (err != 0){
+                        // if in qubes, make sure qubes-input-sender service is running before panic
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
+                        }
+
                         panic("Could not create evdev for input device: %s", named_inputs[i]);
+                }
 
                 err = libevdev_uinput_create_from_device(output_devs[i], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[i]);
 
-                if (err != 0)
+                if (err != 0) {
+                        // if in qubes, make sure qubes-input-sender service is running before panic
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
+                        }
+
                         panic("Could not create uidev for input device: %s", named_inputs[i]);
+                }
         }
 }
 
@@ -379,8 +420,14 @@ void main_loop() {
                 }
 
                 // Wait for next input event
-                if ((err = poll(pfds, device_count, POLL_TIMEOUT_MS)) < 0)
+                if ((err = poll(pfds, device_count, POLL_TIMEOUT_MS)) < 0) {
+                        // if in qubes, make sure qubes-input-sender service is running before panic
+                        if(is_qubes) {
+                                restart_all_qubes_input_sender();
+                        }
+
                         panic("poll() failed: %s\n", strerror(errno));
+                }
 
                 // timed out, do nothing
                 if (err == 0)
@@ -392,8 +439,14 @@ void main_loop() {
                 // Buffer the event with a random delay
                 for (int k = 0; k < device_count; k++) {
                         if (pfds[k].revents & POLLIN) {
-                                if ((err = read(pfds[k].fd, &ev, sizeof(ev))) <= 0)
+                                if ((err = read(pfds[k].fd, &ev, sizeof(ev))) <= 0) {
+                                        // if in qubes, make sure qubes-input-sender service is running before panic
+                                        if(is_qubes) {
+                                                restart_all_qubes_input_sender();
+                                        }
+
                                         panic("read() failed: %s", strerror(errno));
+                                }
 
                                 // check for the rescue sequence.
                                 if (ev.type == EV_KEY) {
@@ -545,8 +598,14 @@ int main(int argc, char **argv) {
                 detect_devices();
 
         // autodetect failed
-        if (device_count == 0)
+        if (device_count == 0) {
+                // if in qubes, make sure qubes-input-sender service is running before panic
+                if(is_qubes) {
+                        restart_all_qubes_input_sender();
+                }
+
                 panic("Unable to find any keyboards or mice. Specify which input device(s) to use with -r");
+        }
 
         // set rescue keys from the default sequence or -k arg
         set_rescue_keys(rescue_keys_str);
@@ -569,10 +628,19 @@ int main(int argc, char **argv) {
         for (int i = 0; i < device_count; i++) {
                 libevdev_uinput_destroy(uidevs[i]);
                 libevdev_free(output_devs[i]);
+
+                // release the device
+                ioctl(input_fds[i], EVIOCGRAB, 0);
+
+
                 close(input_fds[i]);
+
+
 
                 // if in qubes, restart the associated qubes-input-sender service for each of the input devices
                 if(is_qubes) {
+
+                        
                         change_qubes_input_sender("start", named_inputs[i]);
                 }
         }
