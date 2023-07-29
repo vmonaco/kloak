@@ -180,11 +180,11 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
         if(strncmp(systemd_command, "stop", 4) == 0 || strncmp(systemd_command, "start", 5) == 0) {
                 status = change_qubes_input_sender("status", device_path);
 
-                if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
+                if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || strncmp(systemd_command, "start", 5) == 0) {
                         snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
 
                         if(verbose) {
-                                printf("keyboard Executing: %s\n", command);
+                                printf("Executing: %s\n", command);
                         }
                         return system(command);
 
@@ -192,7 +192,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                 else {
                         snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager status qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", dev_num);
                         if(verbose) {
-                                printf("keyboard/mouse Executing: %s\n", command);
+                                printf("Executing: %s\n", command);
                         }
 
                         status = system(command);
@@ -200,7 +200,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                         if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
                                 snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
                                 if(verbose) {
-                                        printf("keyboard/mouse inner Executing: %s\n", command);
+                                        printf("Executing: %s\n", command);
                                 }
                                 
                                 return system(command);
@@ -580,13 +580,10 @@ int main(int argc, char **argv) {
         }
 
 
+        
+
         // see if running in qubes
-        FILE *qubes_file;
-        if(qubes_file = fopen("/var/run/qubes/this-is-appvm", "r")) {
-                fclose(qubes_file);
-                is_qubes = 1;
-        } else if (qubes_file = fopen("/var/run/qubes/this-is-netvm", "r")) {
-                fclose(qubes_file);
+        if(system("stat /var/run/qubes 2> /dev/null > /dev/null") == 0) {
                 is_qubes = 1;
         }
 
@@ -628,19 +625,12 @@ int main(int argc, char **argv) {
         for (int i = 0; i < device_count; i++) {
                 libevdev_uinput_destroy(uidevs[i]);
                 libevdev_free(output_devs[i]);
-
-                // release the device
-                ioctl(input_fds[i], EVIOCGRAB, 0);
-
-
                 close(input_fds[i]);
 
 
 
                 // if in qubes, restart the associated qubes-input-sender service for each of the input devices
                 if(is_qubes) {
-
-                        
                         change_qubes_input_sender("start", named_inputs[i]);
                 }
         }
