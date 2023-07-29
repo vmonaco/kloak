@@ -15,7 +15,7 @@ There are two ways to run kloak:
 
 ### As an application
 
-Install dependencies:
+####Install dependencies:
 
 Fedora:
 
