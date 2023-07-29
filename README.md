@@ -25,7 +25,7 @@ Debian:
 
     $ sudo apt install make pkg-config libsodium23 libsodium-dev libevdev2 libevdev-dev
 
-<h4>Build and run `kloak`</h4>
+<h4>Build and run kloak</h4>
 
 Compile `kloak` and the event capture tool `eventcap`:
 
