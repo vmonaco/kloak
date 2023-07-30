@@ -651,7 +651,7 @@ void usage() {
         fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
                 "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
         fprintf(stderr, "  -v: verbose mode\n");
-        fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d\n", max_noise);
+        fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d\n, can fully disable by setting to 0", max_noise);
 }
 
 void banner() {
