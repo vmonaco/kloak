@@ -482,7 +482,7 @@ void main_loop() {
                                 }
 
 
-                                if(ev.type == EV_REL && ev.value != 0) {
+                                if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
@@ -542,11 +542,6 @@ void main_loop() {
                                                 }
 
 
-                                                // ev = {.type = EV_REL, .code = REL_Y, .value = mid_point};
-                                                // ev2 = {.type = EV_REL, .code = REL_X, .value = pixels_x};
-                                                // ev3 = {.type = EV_SYN, .code = 0, .value = 0};
-                                                // ev4 = {.type = EV_REL, .code = REL_X, .value = pixels_x * -1};
-                                                // ev5 = {.type = EV_REL, .code = REL_Y, .value = final_move};
 
                                                 ev.type = EV_REL;
                                                 ev.code = REL_Y;
@@ -586,9 +581,10 @@ void main_loop() {
 
 
                                 // if mouse move, buffer the extra events
-                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
 
-                                        // int next_time = random_between(last_event_time)
+
+                                        // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
                                         random_delay = random_between(lower_bound, max_delay);
                                         n2 = malloc(sizeof(struct entry));
                                         n2->time = current_time + (long) random_delay;
