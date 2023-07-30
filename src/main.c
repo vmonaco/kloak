@@ -482,7 +482,7 @@ void main_loop() {
                                 }
 
 
-                                if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
+                                if(ev.type == EV_REL && ev.value != 0 ) {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
@@ -580,49 +580,49 @@ void main_loop() {
                                 last_event_time = n1->time;
 
 
-                                // // if mouse move, buffer the extra events
-                                // if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                // if mouse move, buffer the extra events
+                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
 
 
-                                //         // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
-                                //         random_delay = random_between(lower_bound, max_delay);
-                                //         n2 = malloc(sizeof(struct entry));
-                                //         n2->time = current_time + (long) random_delay;
-                                //         n2->iev = ev2;
-                                //         n2->device_index = k;
-                                //         TAILQ_INSERT_TAIL(&head, n2, entries);
+                                        // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
+                                        long random_delay = random_between(lower_bound, max_delay);
+                                        n2 = malloc(sizeof(struct entry));
+                                        n2->time = current_time + (long) random_delay;
+                                        n2->iev = ev2;
+                                        n2->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n2, entries);
 
-                                //         random_delay = random_between(lower_bound, max_delay);
-                                //         n3 = malloc(sizeof(struct entry));
-                                //         n3->time = current_time + (long) random_delay;
-                                //         n3->iev = ev3;
-                                //         n3->device_index = k;
-                                //         TAILQ_INSERT_TAIL(&head, n3, entries);
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n3 = malloc(sizeof(struct entry));
+                                        n3->time = current_time + (long) random_delay;
+                                        n3->iev = ev3;
+                                        n3->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n3, entries);
 
-                                //         random_delay = random_between(lower_bound, max_delay);
-                                //         n4 = malloc(sizeof(struct entry));
-                                //         n4->time = current_time + (long) random_delay;
-                                //         n4->iev = ev4;
-                                //         n4->device_index = k;
-                                //         TAILQ_INSERT_TAIL(&head, n4, entries);
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n4 = malloc(sizeof(struct entry));
+                                        n4->time = current_time + (long) random_delay;
+                                        n4->iev = ev4;
+                                        n4->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n4, entries);
 
-                                //         random_delay = random_between(lower_bound, max_delay);
-                                //         n5 = malloc(sizeof(struct entry));
-                                //         n5->time = current_time + (long) random_delay;
-                                //         n5->iev = ev5;
-                                //         n5->device_index = k;
-                                //         TAILQ_INSERT_TAIL(&head, n5, entries);
-                                // }
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n5 = malloc(sizeof(struct entry));
+                                        n5->time = current_time + (long) random_delay;
+                                        n5->iev = ev5;
+                                        n5->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n5, entries);
+                                }
 
 
 
                                 // Keep track of the previous scheduled release time
                                 prev_release_time = n1->time;
 
-                                // // on mouse moves
-                                // if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
-                                //         prev_release_time = n5->time;
-                                // }
+                                // on mouse moves
+                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                        prev_release_time = n5->time;
+                                }
 
                                 if (verbose) {
                                         printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
