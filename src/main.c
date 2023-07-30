@@ -21,7 +21,7 @@
 #define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
-#define DEFAULT_MAX_NOISE 2
+#define DEFAULT_MAX_NOISE 0
 #define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
 #define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
