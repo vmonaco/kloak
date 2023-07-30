@@ -10,6 +10,7 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "keycodes.h"
 
@@ -20,6 +21,7 @@
 #define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
+#define DEFAULT_MAX_NOISE 2
 #define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
 #define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
@@ -41,6 +43,7 @@ static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len;  // Number of rescue keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
+static int max_noise = DEFAULT_MAX_NOISE;
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
 
 static int device_count = 0;
@@ -59,6 +62,7 @@ static struct option long_options[] = {
         {"keys",    1, 0, 'k'},
         {"verbose", 0, 0, 'v'},
         {"help",    0, 0, 'h'},
+        {"noise",   1, 0, 'n'},
         {0,         0, 0, 0}
 };
 
@@ -389,6 +393,11 @@ void main_loop() {
                 random_delay = 0;
         struct input_event ev;
         struct entry *n1, *np;
+        
+        // only used on mouse moves
+        struct input_event ev2, ev3, ev4, ev5;
+        struct entry *n2 = NULL, *n3 = NULL, *n4 = NULL, *n5 = NULL;
+
 
         // initialize the rescue state
         int rescue_state[rescue_len];
@@ -472,6 +481,99 @@ void main_loop() {
                                         random_delay = random_between(lower_bound, max_delay);
                                 }
 
+
+                                if(ev.type == EV_REL && ev.value != 0) {
+                                        if(ev.code == REL_X) {
+
+                                                // select a random midpoint to add the perpendicular move
+                                                int mid_point = random_between(1, abs(ev.value));
+
+                                                int final_move = abs(ev.value) - mid_point;
+
+                                                if(ev.value < 0) {
+                                                        mid_point *= -1;
+                                                        final_move *= -1;
+                                                }
+
+                                                int pixels_y = random_between(1, max_noise);
+
+                                                // randomly decide whether y move will be up or down
+                                                if(random_between(0, 1)) {
+                                                        pixels_y *= -1;
+                                                }
+
+
+                                                ev.type = EV_REL;
+                                                ev.code = REL_X;
+                                                ev.value = mid_point;
+
+                                                ev2.type = EV_REL;
+                                                ev2.code = REL_Y;
+                                                ev2.value = pixels_y;
+
+                                                ev3.type = EV_SYN;
+                                                ev3.code = 0;
+                                                ev3.value = 0;
+
+                                                ev4.type = EV_REL;
+                                                ev4.code = REL_Y;
+                                                ev4.value = pixels_y * -1;
+
+                                                ev5.type = EV_REL;
+                                                ev5.code = REL_X;
+                                                ev5.value = final_move;
+
+                                        } else if(ev.code == REL_Y) {
+                                                // select a random midpoint to add the perpendicular move
+                                                int mid_point = random_between(1, abs(ev.value));
+
+                                                int final_move = abs(ev.value) - mid_point;
+
+                                                if(ev.value < 0) {
+                                                        mid_point *= -1;
+                                                        final_move *= -1;
+                                                }
+
+                                                int pixels_x = random_between(1, max_noise);
+
+                                                // randomly decide whether y move will be up or down
+                                                if(random_between(0, 1)) {
+                                                        pixels_x *= -1;
+                                                }
+
+
+                                                // ev = {.type = EV_REL, .code = REL_Y, .value = mid_point};
+                                                // ev2 = {.type = EV_REL, .code = REL_X, .value = pixels_x};
+                                                // ev3 = {.type = EV_SYN, .code = 0, .value = 0};
+                                                // ev4 = {.type = EV_REL, .code = REL_X, .value = pixels_x * -1};
+                                                // ev5 = {.type = EV_REL, .code = REL_Y, .value = final_move};
+
+                                                ev.type = EV_REL;
+                                                ev.code = REL_Y;
+                                                ev.value = mid_point;
+
+                                                ev2.type = EV_REL;
+                                                ev2.code = REL_X;
+                                                ev2.value = pixels_x;
+
+                                                ev3.type = EV_SYN;
+                                                ev3.code = 0;
+                                                ev3.value = 0;
+
+                                                ev4.type = EV_REL;
+                                                ev4.code = REL_X;
+                                                ev4.value = pixels_x * -1;
+
+                                                ev5.type = EV_REL;
+                                                ev5.code = REL_Y;
+                                                ev5.value = final_move;
+                                        }
+                                }
+
+                                int last_event_time = 0;
+
+
+
                                 // Buffer the event
                                 n1 = malloc(sizeof(struct entry));
                                 n1->time = current_time + (long) random_delay;
@@ -479,8 +581,52 @@ void main_loop() {
                                 n1->device_index = k;
                                 TAILQ_INSERT_TAIL(&head, n1, entries);
 
+
+                                last_event_time = n1->time;
+
+
+                                // if mouse move, buffer the extra events
+                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+
+                                        // int next_time = random_between(last_event_time)
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n2 = malloc(sizeof(struct entry));
+                                        n2->time = current_time + (long) random_delay;
+                                        n2->iev = ev2;
+                                        n2->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n2, entries);
+
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n3 = malloc(sizeof(struct entry));
+                                        n3->time = current_time + (long) random_delay;
+                                        n3->iev = ev3;
+                                        n3->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n3, entries);
+
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n4 = malloc(sizeof(struct entry));
+                                        n4->time = current_time + (long) random_delay;
+                                        n4->iev = ev4;
+                                        n4->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n4, entries);
+
+                                        random_delay = random_between(lower_bound, max_delay);
+                                        n5 = malloc(sizeof(struct entry));
+                                        n5->time = current_time + (long) random_delay;
+                                        n5->iev = ev5;
+                                        n5->device_index = k;
+                                        TAILQ_INSERT_TAIL(&head, n5, entries);
+                                }
+
+
+
                                 // Keep track of the previous scheduled release time
                                 prev_release_time = n1->time;
+
+                                // on mouse moves
+                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                        prev_release_time = n5->time;
+                                }
 
                                 if (verbose) {
                                         printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
@@ -505,6 +651,7 @@ void usage() {
         fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
                 "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
         fprintf(stderr, "  -v: verbose mode\n");
+        fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d\n", max_noise);
 }
 
 void banner() {
@@ -538,7 +685,7 @@ int main(int argc, char **argv) {
                 printf("You are not root! This may not work...\n");
 
         while (1) {
-                int c = getopt_long(argc, argv, "r:d:s:k:vh", long_options, NULL);
+                int c = getopt_long(argc, argv, "r:d:s:k:n:vh", long_options, NULL);
 
                 if (c < 0)
                         break;
@@ -571,6 +718,11 @@ int main(int argc, char **argv) {
                 case 'h':
                         usage();
                         exit(0);
+                        break;
+                
+                case 'n':
+                        if((max_noise = atoi(optarg)) < 0)
+                                panic("Maximum noise must be >= 0");
                         break;
 
                 default:
