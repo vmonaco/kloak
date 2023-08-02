@@ -10,7 +10,6 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 #include <ctype.h>
-#include <math.h>
 
 #include "keycodes.h"
 
@@ -33,6 +32,9 @@
 #ifndef max
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
+
+#define mouse_move_with_obfuscation ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)
+#define abs(x) ((x >= 0) ? x : x * -1)
 
 static int interrupt = 0;  // flag to interrupt the main loop and exit
 static int verbose = 0;  // flag for verbose output
@@ -482,7 +484,8 @@ void main_loop() {
                                 }
 
 
-                                if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
+                                // if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
+                                if(mouse_move_with_obfuscation) {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
@@ -536,7 +539,7 @@ void main_loop() {
 
                                                 int pixels_x = random_between(1, max_noise);
 
-                                                // randomly decide whether y move will be up or down
+                                                // randomly decide whether x move will be up or down
                                                 if(random_between(0, 1)) {
                                                         pixels_x *= -1;
                                                 }
@@ -581,7 +584,8 @@ void main_loop() {
 
 
                                 // if mouse move, buffer the extra events
-                                if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                // if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                if(mouse_move_with_obfuscation) {
 
 
                                         // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
@@ -622,7 +626,8 @@ void main_loop() {
                                 prev_release_time = n1->time;
 
                                 // on mouse moves
-                                if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                // if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                if(mouse_move_with_obfuscation) {
                                         prev_release_time = n5->time;
                                 }
 
