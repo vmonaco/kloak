@@ -43,7 +43,7 @@ static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len;  // Number of rescue keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
-static int max_noise = DEFAULT_MAX_NOISE;
+int max_noise = DEFAULT_MAX_NOISE;
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
 
 static int device_count = 0;
@@ -482,7 +482,7 @@ void main_loop() {
                                 }
 
 
-                                if(ev.type == EV_REL && ev.value != 0 ) {
+                                if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
@@ -581,34 +581,36 @@ void main_loop() {
 
 
                                 // if mouse move, buffer the extra events
-                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
 
 
                                         // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
                                         long random_delay = random_between(lower_bound, max_delay);
                                         n2 = malloc(sizeof(struct entry));
-                                        n2->time = current_time + (long) random_delay;
+
+                                        // cutting the delay added to each of the mouse cursor moves in half makes them much less painful
+                                        n2->time = current_time + (long) (random_delay / 3);
                                         n2->iev = ev2;
                                         n2->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n2, entries);
 
                                         random_delay = random_between(lower_bound, max_delay);
                                         n3 = malloc(sizeof(struct entry));
-                                        n3->time = current_time + (long) random_delay;
+                                        n3->time = current_time + (long) (random_delay / 3);
                                         n3->iev = ev3;
                                         n3->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n3, entries);
 
                                         random_delay = random_between(lower_bound, max_delay);
                                         n4 = malloc(sizeof(struct entry));
-                                        n4->time = current_time + (long) random_delay;
+                                        n4->time = current_time + (long) (random_delay / 3);
                                         n4->iev = ev4;
                                         n4->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n4, entries);
 
                                         random_delay = random_between(lower_bound, max_delay);
                                         n5 = malloc(sizeof(struct entry));
-                                        n5->time = current_time + (long) random_delay;
+                                        n5->time = current_time + (long) (random_delay / 3);
                                         n5->iev = ev5;
                                         n5->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n5, entries);
@@ -620,7 +622,7 @@ void main_loop() {
                                 prev_release_time = n1->time;
 
                                 // on mouse moves
-                                if(ev.type == EV_REL && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
+                                if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
                                         prev_release_time = n5->time;
                                 }
 
