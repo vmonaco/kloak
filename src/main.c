@@ -98,6 +98,15 @@ long random_between(long lower, long upper) {
         return lower + randombytes_uniform(upper+1);
 }
 
+static inline long rand_between(long lower, long upper) {
+        if(lower >= upper){
+                return upper;
+        }
+
+        return lower + randombytes_uniform(upper+1);
+}
+
+
 void set_rescue_keys(char* rescue_keys_str) {
         char *_rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
         strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
@@ -480,7 +489,7 @@ void main_loop() {
                                 if (ev.type == EV_SYN) {
                                         random_delay = lower_bound;
                                 } else {
-                                        random_delay = random_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay);
                                 }
 
 
@@ -489,7 +498,8 @@ void main_loop() {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
-                                                int mid_point = random_between(1, abs(ev.value));
+                                                // int mid_point = random_between(1, abs(ev.value));
+                                                int mid_point = rand_between(1, abs(ev.value));
 
                                                 int final_move = abs(ev.value) - mid_point;
 
@@ -498,10 +508,10 @@ void main_loop() {
                                                         final_move *= -1;
                                                 }
 
-                                                int pixels_y = random_between(1, max_noise);
+                                                int pixels_y = rand_between(1, max_noise);
 
                                                 // randomly decide whether y move will be up or down
-                                                if(random_between(0, 1)) {
+                                                if(rand_between(0, 1)) {
                                                         pixels_y *= -1;
                                                 }
 
@@ -528,7 +538,7 @@ void main_loop() {
 
                                         } else if(ev.code == REL_Y) {
                                                 // select a random midpoint to add the perpendicular move
-                                                int mid_point = random_between(1, abs(ev.value));
+                                                int mid_point = rand_between(1, abs(ev.value));
 
                                                 int final_move = abs(ev.value) - mid_point;
 
@@ -537,10 +547,10 @@ void main_loop() {
                                                         final_move *= -1;
                                                 }
 
-                                                int pixels_x = random_between(1, max_noise);
+                                                int pixels_x = rand_between(1, max_noise);
 
                                                 // randomly decide whether x move will be up or down
-                                                if(random_between(0, 1)) {
+                                                if(rand_between(0, 1)) {
                                                         pixels_x *= -1;
                                                 }
 
@@ -589,7 +599,7 @@ void main_loop() {
 
 
                                         // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
-                                        long random_delay = random_between(lower_bound, max_delay);
+                                        long random_delay = rand_between(lower_bound, max_delay);
                                         n2 = malloc(sizeof(struct entry));
 
                                         // cutting the delay added to each of the mouse cursor moves in half makes them much less painful
@@ -598,21 +608,21 @@ void main_loop() {
                                         n2->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n2, entries);
 
-                                        random_delay = random_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay);
                                         n3 = malloc(sizeof(struct entry));
                                         n3->time = current_time + (long) (random_delay / 3);
                                         n3->iev = ev3;
                                         n3->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n3, entries);
 
-                                        random_delay = random_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay);
                                         n4 = malloc(sizeof(struct entry));
                                         n4->time = current_time + (long) (random_delay / 3);
                                         n4->iev = ev4;
                                         n4->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n4, entries);
 
-                                        random_delay = random_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay);
                                         n5 = malloc(sizeof(struct entry));
                                         n5->time = current_time + (long) (random_delay / 3);
                                         n5->iev = ev5;
