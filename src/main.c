@@ -549,7 +549,7 @@ void main_loop() {
 
                                                 int pixels_x = rand_between(1, max_noise);
 
-                                                // randomly decide whether x move will be up or down
+                                                // randomly decide whether x move will be left or right
                                                 if(rand_between(0, 1)) {
                                                         pixels_x *= -1;
                                                 }
@@ -667,15 +667,34 @@ void usage() {
         fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d\n, can fully disable by setting to 0", max_noise);
 }
 
+void print_device_name(char *path) {
+        char name[256];
+
+        int fd = open(path, O_RDONLY);
+
+        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+
+
+        printf("%s", name);
+
+
+        close(fd);
+}
+
 void banner() {
         printf("********************************************************************************\n"
                "* Started kloak : Keystroke-level Online Anonymizing Kernel\n"
                "* Maximum delay : %d ms\n"
-               "* Reading from  : %s\n",
+               "* Reading from  : %s (",
                max_delay, named_inputs[0]);
 
+        print_device_name(named_inputs[0]);
+        printf(")\n");
+
         for (int i = 1; i < device_count; i++) {
-                printf("*                 %s\n", named_inputs[i]);
+                printf("*                 %s (", named_inputs[i]);
+                print_device_name(named_inputs[i]);
+                printf(")\n");
         }
 
         printf("* Rescue keys   : %s", lookup_keyname(rescue_keys[0]));
@@ -685,7 +704,14 @@ void banner() {
 
         printf("\n");
         printf("********************************************************************************\n");
+
+
+        // for(int i = 0; i < device_count; i++) {
+                // get_device_name(named_inputs[i]);
+        // }
 }
+
+
 
 int main(int argc, char **argv) {
         if (sodium_init() == -1) {
