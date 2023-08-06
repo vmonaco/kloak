@@ -10,12 +10,15 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 #include <ctype.h>
+#include <sys/inotify.h>
+#include <fcntl.h>
 
+#include "kloak.h"
 #include "keycodes.h"
 
 #define BUFSIZE 256  // for device names and rescue key sequence
-#define MAX_INPUTS 16  // number of devices to try autodetection
-#define MAX_DEVICES 16 // max number of devices to read events from
+#define MAX_INPUTS 32  // number of devices to try autodetection
+#define MAX_DEVICES 32 // max number of devices to read events from
 #define MAX_RESCUE_KEYS 10  // max number of rescue keys to exit in case of emergency
 #define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
@@ -36,6 +39,9 @@
 #define mouse_move_with_obfuscation ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)
 #define abs(x) ((x >= 0) ? x : x * -1)
 
+#define INOTIFY_EVENT_SIZE sizeof(struct inotify_event)
+#define INOTIFY_EVENT_BUFFER_SIZE (128 * (INOTIFY_EVENT_SIZE + 16))
+
 static int interrupt = 0;  // flag to interrupt the main loop and exit
 static int verbose = 0;  // flag for verbose output
 
@@ -54,6 +60,8 @@ static char named_inputs[MAX_INPUTS][BUFSIZE];
 static int input_fds[MAX_INPUTS];
 struct libevdev *output_devs[MAX_INPUTS];
 struct libevdev_uinput *uidevs[MAX_INPUTS];
+
+struct pollfd *pfds;
 
 static int is_qubes = 0;
 
@@ -171,7 +179,7 @@ int is_mouse(int fd) {
 // extracts device number from device_path and puts it into dev_num
 void get_device_number(char *dev_num, char *device_path) {
 
-        snprintf(dev_num, 3, device_path + 16);
+        snprintf(dev_num, 5, device_path + 16);
 
 }
 
@@ -184,7 +192,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
         const int MAX_COMMAND_LEN = 155;
         char command[MAX_COMMAND_LEN];
 
-        char dev_num[3];
+        char dev_num[5];
 
         get_device_number(dev_num, device_path);
 
@@ -195,8 +203,8 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
         if(strncmp(systemd_command, "stop", 4) == 0 || strncmp(systemd_command, "start", 5) == 0) {
                 status = change_qubes_input_sender("status", device_path);
 
-                if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || strncmp(systemd_command, "start", 5) == 0) {
-                        snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
+                if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (strncmp(systemd_command, "start", 5) == 0)) {
+                        snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null &", systemd_command , dev_num);
 
                         if(verbose) {
                                 printf("Executing: %s\n", command);
@@ -213,7 +221,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                         status = system(command);
                         
                         if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
-                                snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
+                                snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null &", systemd_command , dev_num);
                                 if(verbose) {
                                         printf("Executing: %s\n", command);
                                 }
@@ -291,6 +299,346 @@ void detect_devices() {
 
 
 
+
+
+void cleanup() {
+
+        if(verbose) {
+                printf("Final clean up\n");
+        }
+        // close everything
+        for (int i = 0; i < device_count; i++) {
+                libevdev_uinput_destroy(uidevs[i]);
+                libevdev_free(output_devs[i]);
+                close(input_fds[i]);
+
+
+
+                // if in qubes, restart the associated qubes-input-sender service for each of the input devices
+                if(is_qubes) {
+                        change_qubes_input_sender("start", named_inputs[i]);
+                }
+        }
+
+
+
+
+        device_count = 0;
+}
+
+void cleanup_device(char * event_file) {
+        int fd;
+        int one = 1;
+
+
+        char device[256];
+        sprintf(device, "/dev/input/%s", event_file);
+
+        if(verbose) {
+                printf("Cleaning up: %s\n", device);
+        }
+
+        // not an event file
+        if(strncmp(event_file, "event", 5) != 0) {
+                // if(verbose) {
+                        // printf("%s is not an event file, skipping clenaup\n", device);
+                // }
+                return;
+        }
+
+        
+
+
+
+
+        int device_number = -1;
+
+        int device_len = strlen(device);
+
+        int named_len = 0;
+
+        // find the device's index
+        for(int i = 0; i < device_count; i++) {
+                
+                named_len = strlen(named_inputs[i]);
+                if(device_len == named_len && strcmp(device, named_inputs[i]) == 0) {
+
+                        device_number = i;
+
+                        if(verbose) {
+                                printf("matched: %s\n", named_inputs[device_number]);
+                        }
+
+                        break;
+
+                }
+        }
+
+        // not in named_inputs, don't need to clean
+        if(device_number == -1) {
+                return;
+        }
+
+
+
+        // if(verbose) {
+                // printf("Running cleanup operations for : %s\n", named_inputs[device_number]);
+        // }
+
+        // these aren't needed after the device has been removed and will cause the cleanup to error out with a double free
+        // libevdev_uinput_destroy(uidevs[device_number]);
+        // libevdev_free(output_devs[device_number]);
+        close(input_fds[device_number]);
+
+        // if(verbose) {
+                // printf("Closed input_fd for %s\n", device);
+        // }
+
+
+        // TODO: detaching and re-attaching mouse works perfectly, detaching keyboard breaks mouse for some reason. Re-attaching keyboard after fixes both, very strange
+        // likely something here in cleanup causing it
+
+        // shift everything after to the left 1
+        for(int i = device_number; i < device_count-1; i++) {
+                strcpy(named_inputs[i], named_inputs[i+1]);
+                input_fds[i] = input_fds[i+1];
+                output_devs[i] = output_devs[i+1];
+                uidevs[i] = uidevs[i+1];
+        }
+
+        device_count -= 1;
+
+        if(verbose) {
+                printf("Done cleaning up: %s, new device count: %d\n", device, device_count);
+        }
+
+        // re-load input file descriptors for polling
+        pfds = calloc(device_count, sizeof(struct pollfd));
+        for (int j = 0; j < device_count; j++) {
+                pfds[j].fd = input_fds[j];
+                pfds[j].events = POLLIN;
+        }
+
+        if(verbose) {
+                printf("Reloaded input file descriptors\n\n");
+        }
+
+
+}
+
+void init_new_input(char * event_file) {
+
+        if(device_count == MAX_DEVICES) {
+                return;
+        }
+
+        int fd;
+        int one = 1;
+
+        // not an event file
+        if(strncmp(event_file, "event", 5) != 0) {
+                return;
+        }
+
+        char device[256];
+        sprintf(device, "/dev/input/%s", event_file);
+
+
+
+        if(verbose) {
+                printf("Initializing: %s: ", device);
+                print_device_name(device);
+                printf("\n");
+        }
+
+
+
+        // if in qubes, need to stop associated qubes-input-sender service before ioctls work on the device file
+        if(is_qubes) {
+                // stop the service
+                change_qubes_input_sender("stop", device);
+        }
+
+        if ((fd = open(device, O_RDONLY)) >= 0) {
+
+                char dev_path[256];
+                ioctl(fd, EVIOCGPHYS(256), dev_path);
+
+                for(int i = 0; i < device_count; i++) {
+
+                        // make sure there isn't garbage in dev_path, skip initialization if there is
+                        if(isalpha(dev_path[0]) == 0) {
+                                if(verbose) {
+                                        printf("Garbage in dev_path\n");
+                                }
+                                change_qubes_input_sender("start", device);
+                                return;
+                        }
+
+                        int current_path = libevdev_get_phys(output_devs[i]);
+
+                        if(strlen(dev_path) == strlen(current_path)) {
+                                printf("Comparing %s and %s \n", dev_path, current_path);
+                        } else {
+                                // printf("Lengths don't match\n");
+                                continue;
+                        }
+
+                        // device is already handled by kloak, skip initialization
+                        if(strlen(dev_path) == strlen(current_path) && strncmp(dev_path, current_path, strlen(dev_path)) == 0) {
+                                if(verbose) {
+                                        printf("Device is already handled\n");
+                                }
+                                change_qubes_input_sender("start", device);
+                                return;
+                        }
+                }
+
+                if(verbose) {
+                        printf("Loop ended for %s\n", device);
+                }
+
+                // struct input_id iid;
+                // ioctl(fd, sizeof(struct input_id), iid);
+
+                // printf("\n\nProduct ID from input_id: %d\n\n", iid.product);
+
+                // char uniq[2048];
+
+                // ioctl(fd, EVIOCGUNIQ(sizeof(uniq)), uniq);
+
+                // printf("\n\nUnique identifier at beginning of init_new_device: %s\n\n", uniq);
+
+                
+                if (is_keyboard(fd) || is_mouse(fd)) {
+                        // printf("Device Count: %d\n", device_count);
+                        strncpy(named_inputs[device_count], device, BUFSIZE-1);
+                        if (verbose) {
+                                printf("Found new device: ");
+                                print_device_name(device);
+                                printf("\n");
+                        }
+
+                        // set the device to nonblocking mode
+                        if (ioctl(fd, FIONBIO, &one) < 0) {
+
+                                // if in qubes, make sure qubes-input-sender service is running before panic
+                                if(is_qubes) {
+                                        restart_all_qubes_input_sender();
+                                }
+
+                                panic("Could not set to nonblocking: %s", named_inputs[device_count]);
+                        }
+
+                        if(verbose) {
+                                printf("Put %s into nonblocking mode\n", device);
+                        }
+
+                        // grab the input device
+                        if (ioctl(fd, EVIOCGRAB, &one) < 0) {
+
+                                // if in qubes, make sure qubes-input-sender service is running before panic
+                                if(is_qubes) {
+                                        restart_all_qubes_input_sender();
+                                }
+
+                                panic("Could not grab: %s", named_inputs[device_count]);
+                        }
+
+                        if(verbose) {
+                                printf("Grabbed %s\n", device);
+                        }
+
+
+                        input_fds[device_count] = fd;
+
+                        if(verbose) {
+                                printf("Put %s into input_fds\n", device);
+                        }
+                        
+
+
+                        int err = libevdev_new_from_fd(input_fds[device_count], &output_devs[device_count]);
+                        
+                        if (err != 0){
+                                // if in qubes, make sure qubes-input-sender service is running before panic
+                                if(is_qubes) {
+                                        restart_all_qubes_input_sender();
+                                }
+
+                                panic("Could not create evdev for input device: %s", named_inputs[device_count]);
+                        }
+
+                        if(verbose) {
+                                printf("Finished new_from_fd for %s\n", device);
+                        }
+
+                        // not an actual vendor id, used to avoid running this again on the device created by libevdev
+                        // libevdev_set_id_vendor(output_devs[device_count], 1);
+                        // libevdev_set_id_product(output_devs[device_count], 1);
+
+                        // char new_location[256];
+
+                        // snprintf(new_location, 256, "/dev/input/libevdev%d", device_count);
+
+                        // libevdev_set_phys(output_devs[device_count], new_location);
+
+                        // printf("\n\nPhysical Location: %s\n\n", libevdev_get_phys(output_devs[device_count]));
+
+
+
+                        // printf("\n\nUnique identifier for newly created device: %d\n\n", libevdev_get_id_version(output_devs[device_count]));
+
+
+                        err = libevdev_uinput_create_from_device(output_devs[device_count], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[device_count]);
+
+                        if(verbose) {
+                                printf("Finished create_from_device for %s\n", device);
+                        }
+
+                        if (err != 0) {
+                                // if in qubes, make sure qubes-input-sender service is running before panic
+                                if(is_qubes) {
+                                        restart_all_qubes_input_sender();
+                                }
+
+                                panic("Could not create uidev for input device: %s", named_inputs[device_count]);
+                        }
+
+                        device_count += 1;
+
+
+                        if(verbose) {
+                                printf("Reloading input file descriptors for polling\n");
+                        }
+                        // re-load input file descriptors for polling
+                        pfds = calloc(device_count, sizeof(struct pollfd));
+                        for (int j = 0; j < device_count; j++) {
+                                pfds[j].fd = input_fds[j];
+                                pfds[j].events = POLLIN;
+                        }
+
+
+                } else if (is_qubes && (change_qubes_input_sender("status", device) == 3)) { 
+
+                        close(fd);
+                        
+                        // if not keyboard and mouse, in case qubes-input-sender was stopped, restart it. Don't restart if keyboard or mouse
+                        change_qubes_input_sender("start", device);
+                        
+                }
+
+        }
+
+
+        if(verbose) {
+                printf("Done initializing: ");
+                print_device_name(device);
+                printf("\n");
+        }
+
+}
+
 void init_inputs() {
         int fd;
         int one = 1;
@@ -304,12 +652,6 @@ void init_inputs() {
 
                         // stop the service
                         change_qubes_input_sender("stop", named_inputs[i]);
-
-                        // check status to make sure the service it was definitely stopped
-                        if(change_qubes_input_sender("status", named_inputs[i]) == 0) {
-                                panic("Failed to stop qubes-input-sender service for %s", named_inputs[i]);
-                        }
-
                 }
 
 
@@ -388,11 +730,11 @@ void emit_event(struct entry *e) {
 
         libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
 
-        if (verbose) {
-                printf("Released event at time : %ld. Device: %d,  Type: %*d,  "
-                       "Code: %*d,  Value: %*d,  Missed target:  %*d ms \n",
-                       e->time, e->device_index, 3, e->iev.type, 5, e->iev.code, 5, e->iev.value, 5, delay);
-        }
+        // if (verbose) {
+        //         printf("Released event at time : %ld. Device: %d,  Type: %*d,  "
+        //                "Code: %*d,  Value: %*d,  Missed target:  %*d ms \n",
+        //                e->time, e->device_index, 3, e->iev.type, 5, e->iev.code, 5, e->iev.value, 5, delay);
+        // }
 }
 
 void main_loop() {
@@ -417,11 +759,29 @@ void main_loop() {
         }
 
         // load input file descriptors for polling
-        struct pollfd *pfds = calloc(device_count, sizeof(struct pollfd));
+        pfds = calloc(device_count, sizeof(struct pollfd));
         for (int j = 0; j < device_count; j++) {
                 pfds[j].fd = input_fds[j];
                 pfds[j].events = POLLIN;
         }
+
+        // inotify file descriptor
+        int ino_fd = inotify_init1(IN_NONBLOCK);
+
+        if(ino_fd < 0) {
+                panic("Failed to create inotify file descriptor\n");
+        }
+
+
+        // watch /dev/input for filesystem events, except IN_ACCESS (noisy)
+        int watch_fd = inotify_add_watch(ino_fd, "/dev/input/", IN_ALL_EVENTS);
+
+        if(watch_fd < 0) {
+                panic("Failed to create watch file descriptor\n");
+        }
+
+
+        
 
         // the main loop breaks when the rescue keys are detected
         // On each iteration, wait for input from the input devices
@@ -431,6 +791,41 @@ void main_loop() {
         // so that events are always scheduled in the order they
         // arrive (FIFO).
         while (!interrupt) {
+
+                char event_buffer[BUFSIZE];
+                int len = 0;
+                len = read(ino_fd, event_buffer, BUFSIZE);
+
+                if(len > 0) {
+                        int i = 0;
+                        while(i < len) {
+                                struct inotify_event *ino_event = (struct inotify_event *) &event_buffer[i];
+                                char path[30];
+                                char dev_name[256];
+
+                                snprintf(path, 30, "/dev/input/%s", ino_event->name);
+
+                                // if((ino_event->mask & IN_CREATE) != 0 || (ino_event->mask & IN_DELETE) != 0 || (ino_event->mask & IN_DELETE_SELF) != 0) {
+                                //         printf("Mask: %d, name: %s\n", ino_event->mask, ino_event->name);
+                                // }
+
+
+                                if((ino_event->mask & IN_CREATE) != 0) {
+                                        init_new_input(ino_event->name);
+                                } else if(((ino_event->mask & IN_DELETE) != 0) || ((ino_event->mask & IN_DELETE_SELF) != 0)) {
+                                        cleanup_device(ino_event->name);
+                                }
+
+
+                                i += INOTIFY_EVENT_SIZE + ino_event->len;
+
+                        }
+
+                        
+
+                }
+
+
                 // Emit any events exceeding the current time
                 current_time = current_time_ms();
                 while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -438,6 +833,7 @@ void main_loop() {
                         TAILQ_REMOVE(&head, np, entries);
                         free(np);
                 }
+
 
                 // Wait for next input event
                 if ((err = poll(pfds, device_count, POLL_TIMEOUT_MS)) < 0) {
@@ -448,6 +844,7 @@ void main_loop() {
 
                         panic("poll() failed: %s\n", strerror(errno));
                 }
+
 
                 // timed out, do nothing
                 if (err == 0)
@@ -641,15 +1038,15 @@ void main_loop() {
                                         prev_release_time = n5->time;
                                 }
 
-                                if (verbose) {
-                                        printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
-                                               "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
-                                               n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
-                                               4, random_delay);
-                                        if (lower_bound > 0) {
-                                                printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
-                                        }
-                                }
+                                // if (verbose) {
+                                //         printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
+                                //                "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
+                                //                n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
+                                //                4, random_delay);
+                                //         if (lower_bound > 0) {
+                                //                 printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
+                                //         }
+                                // }
                         }
                 }
         }
@@ -671,15 +1068,11 @@ void print_device_name(char *path) {
         char name[256];
 
         int fd = open(path, O_RDONLY);
-
-        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-
-
+        ioctl(fd, EVIOCGNAME(sizeof(name)), name); 
         printf("%s", name);
-
-
         close(fd);
 }
+
 
 void banner() {
         printf("********************************************************************************\n"
@@ -706,9 +1099,6 @@ void banner() {
         printf("********************************************************************************\n");
 
 
-        // for(int i = 0; i < device_count; i++) {
-                // get_device_name(named_inputs[i]);
-        // }
 }
 
 
@@ -812,19 +1202,21 @@ int main(int argc, char **argv) {
         banner();
         main_loop();
 
-        // close everything
-        for (int i = 0; i < device_count; i++) {
-                libevdev_uinput_destroy(uidevs[i]);
-                libevdev_free(output_devs[i]);
-                close(input_fds[i]);
+        // // close everything
+        // for (int i = 0; i < device_count; i++) {
+        //         libevdev_uinput_destroy(uidevs[i]);
+        //         libevdev_free(output_devs[i]);
+        //         close(input_fds[i]);
 
 
 
-                // if in qubes, restart the associated qubes-input-sender service for each of the input devices
-                if(is_qubes) {
-                        change_qubes_input_sender("start", named_inputs[i]);
-                }
-        }
+        //         // if in qubes, restart the associated qubes-input-sender service for each of the input devices
+        //         if(is_qubes) {
+        //                 change_qubes_input_sender("start", named_inputs[i]);
+        //         }
+        // }
+
+        cleanup();
 
         exit(EXIT_SUCCESS);
 }
