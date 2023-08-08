@@ -424,8 +424,7 @@ void init_new_input(char * event_file) {
         // if in qubes, need to stop associated qubes-input-sender service before ioctls work on the device file
         if(is_qubes) {
                 // stop the service
-                int service_stop_status = change_qubes_input_sender("stop", device);
-                printf("Status code when stopping the service: %d\n", service_stop_status);
+                change_qubes_input_sender("stop", device);
         }
 
         if ((fd = open(device, O_RDONLY)) >= 0) {
