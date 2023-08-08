@@ -562,6 +562,9 @@ void init_new_input(char * event_file) {
                         // if not keyboard and mouse, in case qubes-input-sender was stopped, restart it. Don't restart if keyboard or mouse
                         change_qubes_input_sender("start", device);
                         
+                } else {
+                        // not a keyboard or mouse, not qubes
+                        close(fd);
                 }
 
         }
