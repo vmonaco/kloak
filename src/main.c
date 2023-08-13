@@ -226,7 +226,7 @@ int is_mouse(int fd) {
 
 
 // extracts device number from device_path and puts it into dev_num
-void get_device_number(char *dev_num, char *device_path, const int max_len) {
+void get_device_number(char *dev_num, char *device_path) {
 
         // snprintf(dev_num, max_len, device_path + 16);
 //         switch from snprintf to sscanf to avoid warnings from -Wformat-security
@@ -250,7 +250,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
 
         char dev_num[5];
 
-        get_device_number(dev_num, device_path, 5);
+        get_device_number(dev_num, device_path);
 
         int status = 0;
 
@@ -1195,11 +1195,11 @@ int main(int argc, char **argv) {
 
 
                         // remove spaces from line
-                        for(int i = 0 ; i < length; i++) {
+                        for(long unsigned int i = 0 ; i < length; i++) {
 
 
                                 if(isspace(line[i])) {
-                                        for(int j = i; j < length; j++) {
+                                        for(long unsigned int j = i; j < length; j++) {
                                                 line[j] = line[j+1];
                                         }
                                         i--;
@@ -1221,7 +1221,7 @@ int main(int argc, char **argv) {
 
 
                         // find the index of =
-                        for(int i = 0; i < length; i++) {
+                        for(long unsigned int i = 0; i < length; i++) {
                                 if(line[i] == '=') {
                                         equal = i;
                                         break;
