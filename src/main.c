@@ -76,6 +76,7 @@ static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len = 0;  // Number of rescue keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
+static int max_delay_mouse = DEFAULT_MAX_MOUSE_DELAY_MS; // lag will never exceed this upper bound on mouse movements
 int max_noise = DEFAULT_MAX_NOISE;
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
 static int max_devices = MAX_DEVICES;
@@ -267,7 +268,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                         snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
 
                         if(verbose) {
-                                printf("Executing: %s\n", command);
+                                printf("Executing: " GREEN("%s\n"), command);
                         }
                         return system(command);
 
@@ -275,7 +276,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                 else {
                         snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager status qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", dev_num);
                         if(verbose) {
-                                printf("Executing: %s\n", command);
+                                printf("Executing: " GREEN("%s\n"), command);
                         }
 
                         status = system(command);
@@ -283,7 +284,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                         if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (status == 3 && strncmp(systemd_command, "start", 5) == 0)) {
                                 snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard-mouse@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
                                 if(verbose) {
-                                        printf("Executing: %s\n", command);
+                                        printf("Executing: " GREEN("%s\n"), command);
                                 }
                                 
                                 return system(command);
@@ -297,7 +298,7 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
                 snprintf(command, MAX_COMMAND_LEN , "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
 
                 if(verbose) {
-                        printf("Executing: %s\n", command);
+                        printf("Executing: " GREEN("%s\n"), command);
                 }
                 
                 return system(command);
@@ -776,8 +777,8 @@ void emit_event(struct entry *e) {
         libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
 
         if (verbose) {
-                printf("Released event at time : %ld. Device: %d,  Type: %*d,  "
-                       "Code: %*d,  Value: %*d,  Missed target:  %*d ms \n",
+                printf("Released event at time : " GREEN("%ld ") ". Device: " GREEN("%d ") ",  Type: " GREEN("%*d") ",  "
+                       "Code: " GREEN("%*d") ",  Value: " GREEN("%*d") ",  Missed target:  " GREEN("%*d") " ms \n",
                        e->time, e->device_index, 3, e->iev.type, 5, e->iev.code, 5, e->iev.value, 5, delay);
         }
 }
@@ -1105,8 +1106,8 @@ void main_loop() {
                                 }
 
                                 if (verbose) {
-                                        printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
-                                               "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
+                                        printf("Bufferred event at time: " GREEN("%ld") ". Device: " GREEN("%d") ", Type: " GREEN("%*d")
+                                               ", Code: " GREEN("%*d") ", Value: " GREEN("%*d") ", Scheduled delay: " GREEN("%*ld") " ms \n",
                                                n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
                                                4, random_delay);
                                         if (lower_bound > 0) {
@@ -1189,7 +1190,6 @@ int main(int argc, char **argv) {
 
 
         if(conf_fd != NULL) {
-                printf("Found config file\n");
                 char * line = NULL;
                 char option[50];
                 char value[50];
@@ -1257,6 +1257,7 @@ int main(int argc, char **argv) {
                                 if(val_length < 1) {
                                         continue;
                                 }
+                                
 
                                 if(opt_length == 12 && strncmp(option, "MAX_DELAY_MS", 12) == 0) {
                                         if(!only_digits(value, val_length)) {
@@ -1325,6 +1326,13 @@ int main(int argc, char **argv) {
                                         printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
 
                                         
+                                } else if(opt_length == 18 && strncmp(option, "MAX_MOUSE_DELAY_MS", 18) == 0) {
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &max_delay_mouse);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
                                 } else {
                                         printf( "Unknown option in config file:" YELLOW(" %s\n"), option);
                                 }
