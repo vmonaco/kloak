@@ -201,7 +201,7 @@ int supports_specific_key(int device_fd, unsigned int key) {
 
 int is_keyboard(int fd) {
         int key;
-        int num_supported_keys;
+        int num_supported_keys = 0;
 
         // Only check devices that support EV_KEY events
         if (supports_event_type(fd, EV_KEY)) {
@@ -389,8 +389,8 @@ void cleanup(){
 
 
 void cleanup_device(char * event_file) {
-        int fd;
-        int one = 1;
+        // int fd;
+        // int one = 1;
 
 
         char device[256];
@@ -560,7 +560,7 @@ void init_new_input(char * event_file) {
                         
                         char name[256];
                         
-                        int name_status = ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+                        ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
 
                         if (verbose) {
@@ -763,7 +763,10 @@ void init_outputs() {
 }
 
 void emit_event(struct entry *e) {
-        int res, delay;
+//         res is not used
+        // int res, delay;
+        
+        int  delay;
         long now = current_time_ms();
         delay = (int) (e->time - now);
 
@@ -855,7 +858,7 @@ void main_loop() {
                         while(i < len) {
                                 struct inotify_event *ino_event = (struct inotify_event *) &event_buffer[i];
                                 char path[30];
-                                char dev_name[256];
+                                // char dev_name[256];
 
                                 snprintf(path, 30, "/dev/input/%s", ino_event->name);
 
@@ -1026,7 +1029,7 @@ void main_loop() {
                                         }
                                 }
 
-                                int last_event_time = 0;
+                                // int last_event_time = 0;
 
 
 
@@ -1038,7 +1041,7 @@ void main_loop() {
                                 TAILQ_INSERT_TAIL(&head, n1, entries);
 
 
-                                last_event_time = n1->time;
+                                // last_event_time = n1->time;
 
 
                                 // if mouse move, buffer the extra events
