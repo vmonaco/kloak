@@ -28,7 +28,7 @@
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
 #define DEFAULT_MAX_MOUSE_DELAY_MS 20  // upper bound on mouse event delay
-#define DEFAULT_MAX_NOISE 0
+#define DEFAULT_MAX_NOISE 0     // max number of pixels of adversarial noise added to mouse movements
 #define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
 
@@ -1256,7 +1256,7 @@ int main(int argc, char **argv) {
                                                 continue;
                                         }
                                         sscanf(value, "%d", &max_delay);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
 
                                 } else if (opt_length == 9 && strncmp(option, "MAX_NOISE", 9) == 0) {
 
@@ -1266,12 +1266,15 @@ int main(int argc, char **argv) {
                                                 continue;
                                         }
                                         sscanf(value, "%d", &max_noise);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+
 
 
                                 } else if (opt_length == 4 && strncmp(option, "KEYS", 4) == 0) {
                                         sscanf(value, "%s", rescue_keys_str);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+
+                                        
                                 } else if (opt_length == 16 && strncmp(option, "STARTUP_DELAY_MS", 16) == 0) {
 
                                         if(!only_digits(value, val_length)) {
@@ -1280,13 +1283,15 @@ int main(int argc, char **argv) {
                                                 continue;
                                         }
                                         sscanf(value, "%d", &startup_timeout);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
 
 
                                 } else if(opt_length == 7 && strncmp(option, "VERBOSE", 7) == 0) {
                                         if(val_length == 1 && (value[0] == '0' || value[0] == 1)) {
                                                 sscanf(value, "%d", &verbose);
-                                                printf("Set %s to %s\n", option, value);
+                                                printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+
+                                                
                                         } else {
                                                 printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
 
@@ -1299,16 +1304,20 @@ int main(int argc, char **argv) {
                                                 continue;
                                         }
                                         sscanf(value, "%d", &max_devices);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+
+                                        
                                 } else if(opt_length == 15 && strncmp(option, "POLL_TIMEOUT_MS", 15) == 0) {
                                         if(!only_digits(value, val_length)) {
                                                 printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
                                                 continue;
                                         }
                                         sscanf(value, "%d", &poll_timeout_ms);
-                                        printf("Set %s to %s\n", option, value);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+
+                                        
                                 } else {
-                                        printf( YELLOW("Unknown option in config file:") " %s\n", option);
+                                        printf( "Unknown option in config file:" YELLOW(" %s\n"), option);
                                 }
                         }
 
