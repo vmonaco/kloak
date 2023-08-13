@@ -33,6 +33,8 @@
   /var/run/qubes r,
   /var/run/qubes/ r,
 
+  /etc/kloak/kloak.conf r,
+
   # Site-specific additions and overrides. See local/README for details.
   #include <local/usr.sbin.kloak>
 }

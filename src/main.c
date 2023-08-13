@@ -12,6 +12,10 @@
 #include <ctype.h>
 #include <sys/inotify.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+
 
 #include "kloak.h"
 #include "keycodes.h"
@@ -23,10 +27,19 @@
 #define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
+#define DEFAULT_MAX_MOUSE_DELAY_MS 20  // upper bound on mouse event delay
 #define DEFAULT_MAX_NOISE 0
 #define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
-#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
+
+// terminal output color
+#define RED(string) "\x1b[31m" string "\x1b[0m"
+#define GREEN(string) "\x1b[32m" string "\x1b[0m"
+#define YELLOW(string) "\x1b[33m" string "\x1b[0m"
+#define BLUE(string) "\x1b[34m" string "\x1b[0m"
+
+
+#define panic(format, ...) do { cleanup(); fprintf(stderr, RED(format) "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
 
 #ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
@@ -42,17 +55,31 @@
 #define INOTIFY_EVENT_SIZE sizeof(struct inotify_event)
 #define INOTIFY_EVENT_BUFFER_SIZE (128 * (INOTIFY_EVENT_SIZE + 16))
 
+// required to avoid warnings from -Wstack-protector in supports_specific_key
+#define NCHAR KEY_MAX/8 + 1
+
+
+// required to avoid warnings from -Wstack-protector in change_qubes_input_sender
+#define MAX_COMMAND_LEN 155
+
+
+
+
+
+
 static int interrupt = 0;  // flag to interrupt the main loop and exit
 static int verbose = 0;  // flag for verbose output
 
 static char rescue_key_seps[] = ", ";  // delims to strtok
 static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
-static int rescue_len;  // Number of rescue keys, set during initialization
+static int rescue_len = 0;  // Number of rescue keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 int max_noise = DEFAULT_MAX_NOISE;
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
+static int max_devices = MAX_DEVICES;
+static int poll_timeout_ms = POLL_TIMEOUT_MS;
 
 static int device_count = 0;
 static char named_inputs[MAX_INPUTS][BUFSIZE];
@@ -116,13 +143,27 @@ static inline long rand_between(long lower, long upper) {
         return lower + randombytes_uniform(upper+1);
 }
 
+int only_digits(const char* string, const int length) {
+        for(int i = 0; i < length; i++) {
+                if(!isdigit(string[i])) {
+                        return 0;
+                }
+        }
+        return 1;
+}
+
+
 
 void set_rescue_keys(char* rescue_keys_str) {
+        printf("Rescue key str: %s, length: %lu\n", rescue_keys_str, strlen(rescue_keys_str));
         char *_rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
         strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
+        _rescue_keys_str[strlen(rescue_keys_str)] = '\0';
+        printf("_rescue_keys_str: %s\n", _rescue_keys_str);
         char* token = strtok(_rescue_keys_str, rescue_key_seps);
 
         while (token != NULL) {
+                printf("Token: %s\n", token);
                 int keycode = lookup_keycode(token);
                 if (keycode < 0) {
                         panic("Invalid key name: '%s'\nSee keycodes.h for valid names", token);
@@ -145,8 +186,12 @@ int supports_event_type(int device_fd, int event_type) {
 }
 
 int supports_specific_key(int device_fd, unsigned int key) {
-        size_t nchar = KEY_MAX/8 + 1;
-        unsigned char bits[nchar];
+        // size_t nchar = KEY_MAX/8 + 1;
+        // unsigned char bits[nchar];
+
+        // change required to avoid warnings from -Wstack-protector
+        unsigned char bits[NCHAR];
+
         // Get the bit fields of available keys.
         ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
         return bits[key/8] & (1 << (key % 8));
@@ -181,10 +226,11 @@ int is_mouse(int fd) {
 
 
 // extracts device number from device_path and puts it into dev_num
-void get_device_number(char *dev_num, char *device_path) {
+void get_device_number(char *dev_num, char *device_path, const int max_len) {
 
-        snprintf(dev_num, 5, device_path + 16);
-
+        // snprintf(dev_num, max_len, device_path + 16);
+//         switch from snprintf to sscanf to avoid warnings from -Wformat-security
+        sscanf(device_path + 16, "%s", dev_num);
 
 }
 
@@ -200,19 +246,22 @@ int change_qubes_input_sender(char *systemd_command, char *device_path) {
         }
 
 
-        const int MAX_COMMAND_LEN = 155;
         char command[MAX_COMMAND_LEN];
 
         char dev_num[5];
 
-        get_device_number(dev_num, device_path);
+        get_device_number(dev_num, device_path, 5);
 
         int status = 0;
 
 
         // if starting or stopping the service, see if it is exists first
         if(strncmp(systemd_command, "stop", 4) == 0 || strncmp(systemd_command, "start", 5) == 0) {
-                status = change_qubes_input_sender("status", device_path);
+                
+                // don't need to check the status on starts, both services always exist for every input device, so it will always return the same value
+                if(strncmp(systemd_command, "stop", 4) == 0) {
+                        status = change_qubes_input_sender("status", device_path);
+                }
 
                 if((status == 0 && strncmp(systemd_command, "stop", 4) == 0) || (strncmp(systemd_command, "start", 5) == 0)) {
                         snprintf(command, MAX_COMMAND_LEN, "sudo systemctl -q --no-pager %s qubes-input-sender-keyboard@event%s.service 2> /dev/null > /dev/null", systemd_command , dev_num);
@@ -270,7 +319,7 @@ void detect_devices() {
         int fd;
         char device[256];
 
-        for (int i = 0; i < MAX_DEVICES; i++) {
+        for (int i = 0; i < max_devices; i++) {
                 sprintf(device, "/dev/input/event%d", i);
 
                 // if in qubes, need to stop associated qubes-input-sender service before ioctls work on the device file
@@ -308,6 +357,33 @@ void detect_devices() {
         }
 }
 
+
+
+void cleanup(){
+        // close everything
+        for (int i = 0; i < device_count; i++) {
+                
+                const char * devnode = libevdev_uinput_get_devnode(uidevs[i]);
+                
+                // for some reason, get_devnode sometimes returns garbage causing a double free, skip these
+                if(devnode[0] != '/') {
+                        continue;
+                        
+                }
+
+                
+                libevdev_uinput_destroy(uidevs[i]);
+                libevdev_free(output_devs[i]);
+                close(input_fds[i]);
+
+
+
+                // if in qubes, restart the associated qubes-input-sender service for each of the input devices
+                if(is_qubes) {
+                        change_qubes_input_sender("start", named_inputs[i]);
+                }
+        }
+}
 
 
 
@@ -400,7 +476,7 @@ void cleanup_device(char * event_file) {
 
 void init_new_input(char * event_file) {
 
-        if(device_count == MAX_DEVICES) {
+        if(device_count == max_devices) {
                 return;
         }
 
@@ -429,6 +505,9 @@ void init_new_input(char * event_file) {
 
         if ((fd = open(device, O_RDONLY)) >= 0) {
 
+                if(verbose) {
+                        printf("Starting init of %s\n, device_count: %d\n", device, device_count);
+                }
                 char dev_path[256];
                 ioctl(fd, EVIOCGPHYS(256), dev_path);
 
@@ -447,8 +526,20 @@ void init_new_input(char * event_file) {
                         const char * current_path = libevdev_get_phys(output_devs[i]);
 
 
+
+                        int dev_path_len = strlen(dev_path);
+
+                        // get_phys can return a null pointer, causing segfault on strlen below
+                        if(current_path == NULL) {
+                                continue;
+                        }
+                        int current_path_len =strlen(current_path);
+
+
+
                         // device is already handled by kloak, skip initialization
-                        if(strlen(dev_path) == strlen(current_path) && strncmp(dev_path, current_path, strlen(dev_path)) == 0) {
+                        if(dev_path_len == current_path_len && strncmp(dev_path, current_path, dev_path_len) == 0) {
+
 
 
                                 if(is_qubes) {
@@ -458,6 +549,7 @@ void init_new_input(char * event_file) {
 
                                 return;
                         }
+
                 }
 
 
@@ -465,6 +557,12 @@ void init_new_input(char * event_file) {
                 if (is_keyboard(fd) || is_mouse(fd)) {
 
                         strncpy(named_inputs[device_count], device, BUFSIZE-1);
+                        
+                        char name[256];
+                        
+                        int name_status = ioctl(fd, EVIOCGNAME(sizeof(name)), name);
+
+
                         if (verbose) {
                                 printf("initializing new device: ");
                                 print_device_name(device);
@@ -483,9 +581,13 @@ void init_new_input(char * event_file) {
                                 panic("Could not set to nonblocking: %s", named_inputs[device_count]);
                         }
 
-                        if(verbose) {
-                                printf("Put %s into nonblocking mode\n", device);
+
+                        // if in qubes, make sure the service is definitely stopped. sometimes hasn't fully started up in the previous stop, fails to grab when reaching this point if that happens
+                        if(is_qubes) {
+                                // stop the service
+                                change_qubes_input_sender("stop", device);
                         }
+                        
 
                         // grab the input device
                         if (ioctl(fd, EVIOCGRAB, &one) < 0) {
@@ -504,8 +606,10 @@ void init_new_input(char * event_file) {
 
 
 
+
                         int err = libevdev_new_from_fd(input_fds[device_count], &output_devs[device_count]);
-                        
+
+
                         if (err != 0){
                                 // if in qubes, make sure qubes-input-sender service is running before panic
                                 if(is_qubes) {
@@ -541,6 +645,7 @@ void init_new_input(char * event_file) {
                         }
                         // re-load input file descriptors for polling
                         pfds = calloc(device_count, sizeof(struct pollfd));
+
                         for (int j = 0; j < device_count; j++) {
                                 pfds[j].fd = input_fds[j];
                                 pfds[j].events = POLLIN;
@@ -686,8 +791,20 @@ void main_loop() {
         struct entry *n2 = NULL, *n3 = NULL, *n4 = NULL, *n5 = NULL;
 
 
+        // on SIGINT, run cleanup function, on qubes if you don't restart the qubes-input-sender services, the mouse and kleyboard won't work until being plugged back in
+        struct sigaction new_action, old_action;
+        new_action.sa_handler = cleanup;
+        sigemptyset(&new_action.sa_mask);
+        new_action.sa_flags = 0;
+        sigaction(SIGINT, &new_action, &old_action);
+        
+        
+        
         // initialize the rescue state
-        int rescue_state[rescue_len];
+        // using MAX_RESCUE_KEYS necessary to avoid warnings from -Wstack-protector, rescue keys still work exactly the same        
+        int rescue_state[MAX_RESCUE_KEYS];
+        // int rescue_state[rescue_len];
+        
         for (int i = 0; i < rescue_len; i++) {
                 rescue_state[i] = 0;
         }
@@ -770,7 +887,7 @@ void main_loop() {
 
 
                 // Wait for next input event
-                if ((err = poll(pfds, device_count, POLL_TIMEOUT_MS)) < 0) {
+                if ((err = poll(pfds, device_count, poll_timeout_ms)) < 0) {
                         // if in qubes, make sure qubes-input-sender service is running before panic
                         if(is_qubes) {
                                 restart_all_qubes_input_sender();
@@ -972,15 +1089,15 @@ void main_loop() {
                                         prev_release_time = n5->time;
                                 }
 
-                                // if (verbose) {
-                                //         printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
-                                //                "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
-                                //                n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
-                                //                4, random_delay);
-                                //         if (lower_bound > 0) {
-                                //                 printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
-                                //         }
-                                // }
+                                if (verbose) {
+                                        printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
+                                               "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
+                                               n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
+                                               4, random_delay);
+                                        if (lower_bound > 0) {
+                                                printf("Lower bound raised to: %*ld ms\n", 4, lower_bound);
+                                        }
+                                }
                         }
                 }
         }
@@ -1037,6 +1154,11 @@ void banner() {
         printf("\n");
         printf("********************************************************************************\n");
 
+        
+        printf("Output Colors: \n");
+        printf(GREEN("Green Text: ") "General Information\n");
+        printf(YELLOW("Yellow Text: ") "Warnings\n");
+        printf(RED("Red Text: ") "Errors\n\n");
 
 }
 
@@ -1045,6 +1167,152 @@ void banner() {
 int main(int argc, char **argv) {
         if (sodium_init() == -1) {
                 panic("sodium_init failed");
+        }
+
+        // open config file
+        FILE * conf_fd = fopen("/etc/kloak/kloak.conf", "r");
+
+
+        if(conf_fd != NULL) {
+                printf("Found config file\n");
+                char * line = NULL;
+                char option[50];
+                char value[50];
+                size_t length = 0;
+                ssize_t read = 0;
+                int line_num = 0;
+
+                while((read = getline(&line, &length, conf_fd)) != -1) {
+                        line_num++;
+                        sprintf(option, "%s", "");
+                        sprintf(value, "%s", "");
+                        
+                        int equal = -1;
+                        length = read;
+
+
+                        // remove spaces from line
+                        for(int i = 0 ; i < length; i++) {
+
+
+                                if(isspace(line[i])) {
+                                        for(int j = i; j < length; j++) {
+                                                line[j] = line[j+1];
+                                        }
+                                        i--;
+                                        length--;
+                                }
+
+                        }
+
+                        line[length] ='\0';
+
+
+
+                        // skip comments and empty lines
+                        if(line[0] == '#' || isspace(line[0])) {
+                                continue;
+                        }
+
+
+
+
+                        // find the index of =
+                        for(int i = 0; i < length; i++) {
+                                if(line[i] == '=') {
+                                        equal = i;
+                                        break;
+                                }
+                        }
+
+
+                        if(equal != -1) {
+                                strncpy(option, line, equal);
+                                option[equal] = '\0';
+                                strncpy(value, line+equal+1, (strlen(line)-equal)-1);
+                                value[(strlen(line)-equal)-1] = '\0';
+                        }
+
+
+                        int opt_length = strlen(option);
+                        int val_length = strlen(value);
+
+                        if(opt_length > 0 && val_length > 0) {
+
+                                if(val_length < 1) {
+                                        continue;
+                                }
+
+                                if(opt_length == 12 && strncmp(option, "MAX_DELAY_MS", 12) == 0) {
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &max_delay);
+                                        printf("Set %s to %s\n", option, value);
+
+                                } else if (opt_length == 9 && strncmp(option, "MAX_NOISE", 9) == 0) {
+
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &max_noise);
+                                        printf("Set %s to %s\n", option, value);
+
+
+                                } else if (opt_length == 4 && strncmp(option, "KEYS", 4) == 0) {
+                                        sscanf(value, "%s", rescue_keys_str);
+                                        printf("Set %s to %s\n", option, value);
+                                } else if (opt_length == 16 && strncmp(option, "STARTUP_DELAY_MS", 16) == 0) {
+
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &startup_timeout);
+                                        printf("Set %s to %s\n", option, value);
+
+
+                                } else if(opt_length == 7 && strncmp(option, "VERBOSE", 7) == 0) {
+                                        if(val_length == 1 && (value[0] == '0' || value[0] == 1)) {
+                                                sscanf(value, "%d", &verbose);
+                                                printf("Set %s to %s\n", option, value);
+                                        } else {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+
+                                                continue;
+                                        }
+                                } else if(opt_length == 11 && strncmp(option, "MAX_DEVICES", 11) == 0) {
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &max_devices);
+                                        printf("Set %s to %s\n", option, value);
+                                } else if(opt_length == 15 && strncmp(option, "POLL_TIMEOUT_MS", 15) == 0) {
+                                        if(!only_digits(value, val_length)) {
+                                                printf( YELLOW("Invalid value ")  "%s " YELLOW("for option ") "%s\n", value, option);
+                                                continue;
+                                        }
+                                        sscanf(value, "%d", &poll_timeout_ms);
+                                        printf("Set %s to %s\n", option, value);
+                                } else {
+                                        printf( YELLOW("Unknown option in config file:") " %s\n", option);
+                                }
+                        }
+
+
+                }
+
+
+                fclose(conf_fd);
+        } else {
+                printf(YELLOW("Didn't find config file at /etc/kloak/kloak.conf. Options not specified on the command line will be their defaults\n"));
         }
 
 

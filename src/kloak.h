@@ -10,7 +10,7 @@ int supports_event_type(int , int );
 int supports_specific_key(int, unsigned int);
 int is_keyboard(int );
 int is_mouse(int );
-void get_device_number(char *, char *);
+void get_device_number(char* dev_num, char* device_path, const int max_len);
 int change_qubes_input_sender(char *, char *);
 void restart_all_qubes_input_sender();
 void detect_devices();
@@ -18,7 +18,8 @@ void cleanup_device(char * );
 void init_new_input(char * );
 void init_inputs();
 void init_outputs();
-
+int only_digits(const char*, const int);
+void cleanup();
 
 void main_loop();
 void usage();
