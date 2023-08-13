@@ -96,6 +96,7 @@ static int is_qubes = 0;
 static struct option long_options[] = {
         {"read",    1, 0, 'r'},
         {"delay",   1, 0, 'd'},
+        {"mousedelay",   1, 0, 'm'},
         {"start",   1, 0, 's'},
         {"keys",    1, 0, 'k'},
         {"verbose", 0, 0, 'v'},
@@ -831,8 +832,6 @@ void main_loop() {
         }
 
 
-        // watch /dev/input for filesystem events
-        // int watch_fd = inotify_add_watch(ino_fd, "/dev/input/", IN_ALL_EVENTS);
 
         // watch /dev/input/ for file creation (device attached) and file deletion (device removed)
         int watch_fd = inotify_add_watch(ino_fd, "/dev/input/", IN_CREATE | IN_DELETE);
@@ -947,13 +946,15 @@ void main_loop() {
                                 // schedule the keyboard event to be released sometime in the future.
                                 // lower bound must be bounded between time since last scheduled event and max delay
                                 // preserves event order and bounds the maximum delay
-                                lower_bound = min(max(prev_release_time - current_time, 0), max_delay);
+                                // lower_bound = min(max(prev_release_time - current_time, 0), max_delay);
+                                lower_bound = min(max(prev_release_time - current_time, 0), ev.type == EV_REL ? max_delay_mouse : max_delay);
 
                                 // syn events are not delayed
                                 if (ev.type == EV_SYN) {
                                         random_delay = lower_bound;
                                 } else {
-                                        random_delay = rand_between(lower_bound, max_delay);
+                                        // random_delay = rand_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, ev.type == EV_REL ? max_delay_mouse : max_delay);
                                 }
 
 
@@ -1063,32 +1064,36 @@ void main_loop() {
 
 
                                         // if the times these are given are actually incremental (n2 = n1 + rand, n3 = n2 + rand, etc) it seems to break the cursor movement obfuscation for some reason
-                                        long random_delay = rand_between(lower_bound, max_delay);
+                                        long random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n2 = malloc(sizeof(struct entry));
 
                                         // cutting the delay added to each of the mouse cursor moves in half makes them much less painful
-                                        n2->time = current_time + (long) (random_delay / 3);
+                                        // n2->time = current_time + (long) (random_delay / 3);
+                                        n2->time = current_time + (long) random_delay;
                                         n2->iev = ev2;
                                         n2->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n2, entries);
 
-                                        random_delay = rand_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n3 = malloc(sizeof(struct entry));
-                                        n3->time = current_time + (long) (random_delay / 3);
+                                        // n3->time = current_time + (long) (random_delay / 3);
+                                        n3->time = current_time + (long) random_delay;
                                         n3->iev = ev3;
                                         n3->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n3, entries);
 
-                                        random_delay = rand_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n4 = malloc(sizeof(struct entry));
-                                        n4->time = current_time + (long) (random_delay / 3);
+                                        // n4->time = current_time + (long) (random_delay / 3);
+                                        n4->time = current_time + (long) random_delay;
                                         n4->iev = ev4;
                                         n4->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n4, entries);
 
-                                        random_delay = rand_between(lower_bound, max_delay);
+                                        random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n5 = malloc(sizeof(struct entry));
-                                        n5->time = current_time + (long) (random_delay / 3);
+                                        // n5->time = current_time + (long) (random_delay / 3);
+                                        n5->time = current_time + (long) random_delay;
                                         n5->iev = ev5;
                                         n5->device_index = k;
                                         TAILQ_INSERT_TAIL(&head, n5, entries);
@@ -1123,12 +1128,13 @@ void usage() {
         fprintf(stderr, "Usage: kloak [options]\n");
         fprintf(stderr, "Options:\n");
         fprintf(stderr, "  -r filename: device file to read events from. Can specify multiple -r options.\n");
-        fprintf(stderr, "  -d delay: maximum delay (milliseconds) of released events. Default 100.\n");
+        fprintf(stderr, "  -d delay: maximum delay (milliseconds) of released key events. Default 100.\n");
+        fprintf(stderr, "  -m delay: maximum delay (milliseconds) of released mouse movement events. Default 20.\n");
         fprintf(stderr, "  -s startup_timeout: time to wait (milliseconds) before startup. Default 100.\n");
         fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
                 "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
         fprintf(stderr, "  -v: verbose mode\n");
-        fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d\n, can fully disable by setting to 0", max_noise);
+        fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d, can fully disable by setting to 0\n", max_noise);
 }
 
 void print_device_name(char *path) {
@@ -1149,9 +1155,10 @@ void print_device_name(char *path) {
 void banner() {
         printf("********************************************************************************\n"
                "* Started kloak : Keystroke-level Online Anonymizing Kernel\n"
-               "* Maximum delay : %d ms\n"
+               "* Maximum keyboard delay : %d ms\n"
+               "* Maximum mouse movement delay : %d ms\n"
                "* Reading from  : %s (",
-               max_delay, named_inputs[0]);
+               max_delay, max_delay_mouse, named_inputs[0]);
 
         print_device_name(named_inputs[0]);
         printf(")\n");
@@ -1353,7 +1360,7 @@ int main(int argc, char **argv) {
                 printf("You are not root! This may not work...\n");
 
         while (1) {
-                int c = getopt_long(argc, argv, "r:d:s:k:n:vh", long_options, NULL);
+                int c = getopt_long(argc, argv, "r:d:s:k:n:m:vh", long_options, NULL);
 
                 if (c < 0)
                         break;
@@ -1391,6 +1398,10 @@ int main(int argc, char **argv) {
                 case 'n':
                         if((max_noise = atoi(optarg)) < 0)
                                 panic("Maximum noise must be >= 0");
+                        break;
+                case 'm':
+                        if((max_delay_mouse = atoi(optarg)) < 0)
+                                panic("Maximum mouse delay must be >= 0\n");
                         break;
 
                 default:
