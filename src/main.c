@@ -24,6 +24,7 @@
 #define MAX_INPUTS 32  // number of devices to try autodetection
 #define MAX_DEVICES 32 // max number of devices to read events from
 #define MAX_RESCUE_KEYS 10  // max number of rescue keys to exit in case of emergency
+#define MAX_DISABLE_KEYS 10  // max number of keys used when temporarily disabling kloak
 #define MIN_KEYBOARD_KEYS 20  // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1 // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
@@ -49,7 +50,7 @@
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-#define mouse_move_with_obfuscation ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)
+#define mouse_move_with_obfuscation ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y) && !disable
 #define abs(x) ((x >= 0) ? x : x * -1)
 
 #define INOTIFY_EVENT_SIZE sizeof(struct inotify_event)
@@ -68,12 +69,18 @@
 
 
 static int interrupt = 0;  // flag to interrupt the main loop and exit
+static int disable = 0;  // flag to temporarily disable adding of delay and noise to events
 static int verbose = 0;  // flag for verbose output
 
 static char rescue_key_seps[] = ", ";  // delims to strtok
 static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len = 0;  // Number of rescue keys, set during initialization
+
+static char disable_key_seps[] = ", ";  // delims to strtok
+static char disable_keys_str[BUFSIZE] = "KEY_LEFTCTRL,KEY_RIGHTCTRL";
+static int disable_keys[MAX_DISABLE_KEYS];  // Codes of the disable key combo
+static int disable_len = 0;  // Number of disable keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int max_delay_mouse = DEFAULT_MAX_MOUSE_DELAY_MS; // lag will never exceed this upper bound on mouse movements
@@ -99,6 +106,7 @@ static struct option long_options[] = {
         {"mousedelay",   1, 0, 'm'},
         {"start",   1, 0, 's'},
         {"keys",    1, 0, 'k'},
+        {"disablekeys",    1, 0, 't'},
         {"verbose", 0, 0, 'v'},
         {"help",    0, 0, 'h'},
         {"noise",   1, 0, 'n'},
@@ -157,15 +165,12 @@ int only_digits(const char* string, const int length) {
 
 
 void set_rescue_keys(char* rescue_keys_str) {
-        printf("Rescue key str: %s, length: %lu\n", rescue_keys_str, strlen(rescue_keys_str));
         char *_rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
         strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
         _rescue_keys_str[strlen(rescue_keys_str)] = '\0';
-        printf("_rescue_keys_str: %s\n", _rescue_keys_str);
         char* token = strtok(_rescue_keys_str, rescue_key_seps);
 
         while (token != NULL) {
-                printf("Token: %s\n", token);
                 int keycode = lookup_keycode(token);
                 if (keycode < 0) {
                         panic("Invalid key name: '%s'\nSee keycodes.h for valid names", token);
@@ -179,6 +184,29 @@ void set_rescue_keys(char* rescue_keys_str) {
         }
         free(_rescue_keys_str);
 }
+
+
+void set_disable_keys(char* disable_keys_str) {
+        char *_disable_keys_str = malloc(strlen(disable_keys_str) + 1);
+        strncpy(_disable_keys_str, disable_keys_str, strlen(disable_keys_str));
+        _disable_keys_str[strlen(disable_keys_str)] = '\0';
+        char* token = strtok(_disable_keys_str, disable_key_seps);
+
+        while (token != NULL) {
+                int keycode = lookup_keycode(token);
+                if (keycode < 0) {
+                        panic("Invalid key name: '%s'\nSee keycodes.h for valid names", token);
+                } else if (disable_len < MAX_DISABLE_KEYS) {
+                        disable_keys[disable_len] = keycode;
+                        disable_len++;
+                } else {
+                        panic("Cannot set more than %d disable keys", MAX_DISABLE_KEYS);
+                }
+                token = strtok(NULL, disable_key_seps);
+        }
+        free(_disable_keys_str);
+}
+
 
 int supports_event_type(int device_fd, int event_type) {
         unsigned long evbit = 0;
@@ -765,8 +793,8 @@ void emit_event(struct entry *e) {
         libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
 
         if (verbose) {
-                printf("Released event at time : " GREEN("%ld ") ". Device: " GREEN("%d ") ",  Type: " GREEN("%*d") ",  "
-                       "Code: " GREEN("%*d") ",  Value: " GREEN("%*d") ",  Missed target:  " GREEN("%*d") " ms \n",
+                printf("Released event at time : " GREEN("%ld") ". Device: " GREEN("%d") ", Type: " GREEN("%*d") ", "
+                       "Code: " GREEN("%*d") ", Value: " GREEN("%*d") ", Missed target:  " GREEN("%*d") " ms \n",
                        e->time, e->device_index, 3, e->iev.type, 5, e->iev.code, 5, e->iev.value, 5, delay);
         }
 }
@@ -802,6 +830,15 @@ void main_loop() {
         for (int i = 0; i < rescue_len; i++) {
                 rescue_state[i] = 0;
         }
+        
+        // initialize the disable state
+        // using MAX_DISABLE_KEYS necessary to avoid warnings from -Wstack-protector, disable keys still work exactly the same        
+        int disable_state[MAX_DISABLE_KEYS];
+        
+        for (int i = 0; i < disable_len; i++) {
+                disable_state[i] = 0;
+        }
+        
 
         // load input file descriptors for polling
         pfds = calloc(device_count, sizeof(struct pollfd));
@@ -927,6 +964,34 @@ void main_loop() {
                                         if (all)
                                                 interrupt = 1;
                                 }
+                                
+                                
+                                // check for the disable sequence.
+                                if (ev.type == EV_KEY) {
+                                        int all = 1;
+                                        for (int j = 0; j < disable_len; j++) {
+                                                if (disable_keys[j] == ev.code)
+                                                        disable_state[j] = (ev.value == 0 ? 0 : 1);
+                                                all = all && disable_state[j];
+                                        }
+                                        if (all) {
+                                                if(disable == 0) {
+                                                        // disable 
+                                                        disable = 1;
+                                                        
+                                                        if(verbose) {
+                                                                printf("disable sequence: stopped adding delay and noise. enter disable sequence again to re-enable\n");
+                                                        }
+                                                } else {
+                                                        // re-enable
+                                                        disable = 0;
+                                                        
+                                                        if(verbose){
+                                                                printf("disable sequence: adding delay and/or noise again. enter disable sequence again to disable\n");
+                                                        }
+                                                }
+                                        }
+                                }
 
                                 // schedule the keyboard event to be released sometime in the future.
                                 // lower bound must be bounded between time since last scheduled event and max delay
@@ -937,7 +1002,11 @@ void main_loop() {
                                 if (ev.type == EV_SYN) {
                                         random_delay = lower_bound;
                                 } else {
-                                        random_delay = rand_between(lower_bound, ev.type == EV_REL ? max_delay_mouse : max_delay);
+                                        if(!disable) {
+                                                random_delay = rand_between(lower_bound, ev.type == EV_REL ? max_delay_mouse : max_delay);
+                                        } else {
+                                                random_delay = 0;
+                                        }
                                 }
 
 
@@ -981,7 +1050,7 @@ void main_loop() {
                                                 ev5.type = EV_REL;
                                                 ev5.code = REL_X;
                                                 ev5.value = final_move;
-
+                                                        
                                         } else if(ev.code == REL_Y) {
                                                 // select a random midpoint to add the perpendicular move
                                                 int mid_point = rand_between(1, abs(ev.value));
@@ -1103,6 +1172,7 @@ void usage() {
         fprintf(stderr, "  -s startup_timeout: time to wait (milliseconds) before startup. Default 100.\n");
         fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
                 "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
+        fprintf(stderr, "  -t disable_csv_string: csv list of key names to temporarily disable and re-enable adding delay and noise. Default is 'KEY_LEFTCTRL,KEY_RIGHTCTRL'\n");
         fprintf(stderr, "  -v: verbose mode\n");
         fprintf(stderr, "  -n: max noise added to mouse movements in pixels. Default %d, can fully disable by setting to 0\n", max_noise);
 }
@@ -1143,15 +1213,18 @@ void banner() {
         for (int i = 1; i < rescue_len; i++) {
                 printf(" + %s", lookup_keyname(rescue_keys[i]));
         }
+        
+        printf("\n");
+        
+        printf("* Disable/Re-enable keys   : %s", lookup_keyname(disable_keys[0]));
+        for (int i = 1; i < disable_len; i++) {
+                printf(" + %s", lookup_keyname(disable_keys[i]));
+        }
 
         printf("\n");
         printf("********************************************************************************\n");
 
-        
-        printf("Output Colors: \n");
-        printf(GREEN("Green Text: ") "General Information\n");
-        printf(YELLOW("Yellow Text: ") "Warnings\n");
-        printf(RED("Red Text: ") "Errors\n\n");
+
 
 }
 
@@ -1310,6 +1383,9 @@ int main(int argc, char **argv) {
                                         }
                                         sscanf(value, "%d", &max_delay_mouse);
                                         printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
+                                } else if(opt_length == 12 && strncmp(option, "DISABLE_KEYS", 12) == 0) {
+                                        sscanf(value, "%s", disable_keys_str);
+                                        printf( "Set " GREEN("%s") " to " GREEN("%s\n"), option, value);
                                 } else {
                                         printf( "Unknown option in config file:" YELLOW(" %s\n"), option);
                                 }
@@ -1354,6 +1430,10 @@ int main(int argc, char **argv) {
 
                 case 'k':
                         strncpy(rescue_keys_str, optarg, BUFSIZE-1);
+                        break;
+                        
+                case 't':
+                        strncpy(disable_keys_str, optarg, BUFSIZE-1);
                         break;
 
                 case 'v':
@@ -1408,6 +1488,11 @@ int main(int argc, char **argv) {
         // set rescue keys from the default sequence or -k arg
         set_rescue_keys(rescue_keys_str);
 
+        
+        set_disable_keys(disable_keys_str);
+
+        
+        
         // wait for pending events to finish, avoids keys being "held down"
         printf("Waiting %d ms...\n", startup_timeout);
         sleep_ms(startup_timeout);
