@@ -188,8 +188,6 @@ int supports_event_type(int device_fd, int event_type) {
 }
 
 int supports_specific_key(int device_fd, unsigned int key) {
-        // size_t nchar = KEY_MAX/8 + 1;
-        // unsigned char bits[nchar];
 
         // change required to avoid warnings from -Wstack-protector
         unsigned char bits[NCHAR];
@@ -230,8 +228,7 @@ int is_mouse(int fd) {
 // extracts device number from device_path and puts it into dev_num
 void get_device_number(char *dev_num, char *device_path) {
 
-        // snprintf(dev_num, max_len, device_path + 16);
-//         switch from snprintf to sscanf to avoid warnings from -Wformat-security
+        // switch from snprintf to sscanf to avoid warnings from -Wformat-security
         sscanf(device_path + 16, "%s", dev_num);
 
 }
@@ -319,7 +316,6 @@ void restart_all_qubes_input_sender() {
 
 void detect_devices() {
         int fd;
-        // char device[256];
 
         // reducing size from 256 to 250 necessary to fix warnings from -Wstringop-truncation. 250 characters is still more than enough since it only stores the path to the device node
         char device[250];
@@ -394,9 +390,6 @@ void cleanup(){
 
 
 void cleanup_device(char * event_file) {
-        // int fd;
-        // int one = 1;
-
 
         char device[256];
         sprintf(device, "/dev/input/%s", event_file);
@@ -404,9 +397,6 @@ void cleanup_device(char * event_file) {
 
         // not an event file
         if(strncmp(event_file, "event", 5) != 0) {
-                // if(verbose) {
-                        // printf("%s is not an event file, skipping clenaup\n", device);
-                // }
                 return;
         }
 
@@ -493,7 +483,6 @@ void init_new_input(char * event_file) {
                 return;
         }
 
-        // char device[256];
 
         // reducing size from 256 to 250 necessary to fix warnings from -Wstringop-truncation. 250 characters is still more than enough since it only stores the path to the device node
         char device[250];
@@ -768,8 +757,6 @@ void init_outputs() {
 }
 
 void emit_event(struct entry *e) {
-//         res is not used
-        // int res, delay;
         
         int  delay;
         long now = current_time_ms();
@@ -811,7 +798,6 @@ void main_loop() {
         // initialize the rescue state
         // using MAX_RESCUE_KEYS necessary to avoid warnings from -Wstack-protector, rescue keys still work exactly the same        
         int rescue_state[MAX_RESCUE_KEYS];
-        // int rescue_state[rescue_len];
         
         for (int i = 0; i < rescue_len; i++) {
                 rescue_state[i] = 0;
@@ -861,7 +847,6 @@ void main_loop() {
                         while(i < len) {
                                 struct inotify_event *ino_event = (struct inotify_event *) &event_buffer[i];
                                 char path[30];
-                                // char dev_name[256];
 
                                 snprintf(path, 30, "/dev/input/%s", ino_event->name);
 
@@ -946,24 +931,20 @@ void main_loop() {
                                 // schedule the keyboard event to be released sometime in the future.
                                 // lower bound must be bounded between time since last scheduled event and max delay
                                 // preserves event order and bounds the maximum delay
-                                // lower_bound = min(max(prev_release_time - current_time, 0), max_delay);
                                 lower_bound = min(max(prev_release_time - current_time, 0), ev.type == EV_REL ? max_delay_mouse : max_delay);
 
                                 // syn events are not delayed
                                 if (ev.type == EV_SYN) {
                                         random_delay = lower_bound;
                                 } else {
-                                        // random_delay = rand_between(lower_bound, max_delay);
                                         random_delay = rand_between(lower_bound, ev.type == EV_REL ? max_delay_mouse : max_delay);
                                 }
 
 
-                                // if(ev.type == EV_REL && ev.value != 0 && max_noise != 0) {
                                 if(mouse_move_with_obfuscation) {
                                         if(ev.code == REL_X) {
 
                                                 // select a random midpoint to add the perpendicular move
-                                                // int mid_point = random_between(1, abs(ev.value));
                                                 int mid_point = rand_between(1, abs(ev.value));
 
                                                 int final_move = abs(ev.value) - mid_point;
@@ -1043,8 +1024,6 @@ void main_loop() {
                                         }
                                 }
 
-                                // int last_event_time = 0;
-
 
 
                                 // Buffer the event
@@ -1055,11 +1034,8 @@ void main_loop() {
                                 TAILQ_INSERT_TAIL(&head, n1, entries);
 
 
-                                // last_event_time = n1->time;
-
 
                                 // if mouse move, buffer the extra events
-                                // if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
                                 if(mouse_move_with_obfuscation) {
 
 
@@ -1067,8 +1043,6 @@ void main_loop() {
                                         long random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n2 = malloc(sizeof(struct entry));
 
-                                        // cutting the delay added to each of the mouse cursor moves in half makes them much less painful
-                                        // n2->time = current_time + (long) (random_delay / 3);
                                         n2->time = current_time + (long) random_delay;
                                         n2->iev = ev2;
                                         n2->device_index = k;
@@ -1076,7 +1050,6 @@ void main_loop() {
 
                                         random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n3 = malloc(sizeof(struct entry));
-                                        // n3->time = current_time + (long) (random_delay / 3);
                                         n3->time = current_time + (long) random_delay;
                                         n3->iev = ev3;
                                         n3->device_index = k;
@@ -1084,7 +1057,6 @@ void main_loop() {
 
                                         random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n4 = malloc(sizeof(struct entry));
-                                        // n4->time = current_time + (long) (random_delay / 3);
                                         n4->time = current_time + (long) random_delay;
                                         n4->iev = ev4;
                                         n4->device_index = k;
@@ -1092,7 +1064,6 @@ void main_loop() {
 
                                         random_delay = rand_between(lower_bound, max_delay_mouse);
                                         n5 = malloc(sizeof(struct entry));
-                                        // n5->time = current_time + (long) (random_delay / 3);
                                         n5->time = current_time + (long) random_delay;
                                         n5->iev = ev5;
                                         n5->device_index = k;
@@ -1105,7 +1076,6 @@ void main_loop() {
                                 prev_release_time = n1->time;
 
                                 // on mouse moves
-                                // if(ev.type == EV_REL && max_noise != 0 && ev.value != 0 && (ev.code == REL_X || ev.code == REL_Y)) {
                                 if(mouse_move_with_obfuscation) {
                                         prev_release_time = n5->time;
                                 }
