@@ -317,7 +317,10 @@ void restart_all_qubes_input_sender() {
 
 void detect_devices() {
         int fd;
-        char device[256];
+        // char device[256];
+
+        // reducing size from 256 to 250 necessary to fix warnings from -Wstringop-truncation. 250 characters is still more than enough since it only stores the path to the device node
+        char device[250];
 
         for (int i = 0; i < max_devices; i++) {
                 sprintf(device, "/dev/input/event%d", i);
@@ -488,12 +491,12 @@ void init_new_input(char * event_file) {
                 return;
         }
 
-        char device[256];
+        // char device[256];
+
+        // reducing size from 256 to 250 necessary to fix warnings from -Wstringop-truncation. 250 characters is still more than enough since it only stores the path to the device node
+        char device[250];
+        
         sprintf(device, "/dev/input/%s", event_file);
-
-
-
-
 
 
 
