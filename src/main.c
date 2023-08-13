@@ -898,8 +898,17 @@ void main_loop() {
                         if(is_qubes) {
                                 restart_all_qubes_input_sender();
                         }
+                        
+                        
+                        // 4 raised on sigterm (ctrl-c), cleanup will be called to close kloak cleanly using sigaction below
+                        if(errno == 4) {
+                                exit(EXIT_SUCCESS);
+                        }
 
+                        
                         panic("poll() failed: %s\n", strerror(errno));
+  
+                        
                 }
 
 
