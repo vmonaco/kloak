@@ -1,3 +1,16 @@
+commit 07d37f52867816ede568c7fb88bde1ae012359e3
+Merge: fdd0d49 e488037
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 09:02:19 2023 -0400
+
+    Merge branch 'chatgpt'
+
+commit fdd0d492bca9e125e95ea787066e266ad404fdc3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 08:19:56 2023 -0400
+
+    bumped changelog version
+
 commit 8e59a85024c4fb4345918d28396e85c85c7abef2
 Merge: 6a5f677 cda8d74
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -24,6 +37,32 @@ Date:   Sun Aug 13 22:54:12 2023 -0700
 
     added missing seccomp filters
 
+commit e4880377bf9e3ae638b74c23a8ef92b07c9bad04
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 08:27:38 2023 -0400
+
+    apparmor
+
+commit c8178aea02117addfb28dba06e824ece7732dee2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:31:42 2023 -0400
+
+    disable broken seccomp SystemCallFilter
+    
+    https://github.com/vmonaco/kloak/pull/38#issuecomment-1627688486
+
+commit 6e13598c6d8d39c1f891e7ed036f1e1e800d5c85
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:30:48 2023 -0400
+
+    apparmor
+
+commit 2f08794c4b238bb08e0e06a9b10f031f739955be
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:26:22 2023 -0400
+
+    seccomp
+
 commit 6a5f677a15e34989d4a87382304806e70771c6f0
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jul 9 06:32:50 2023 -0400
@@ -41,6 +80,37 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jul 9 05:32:55 2023 -0400
 
     bumped changelog version
+
+commit 2a8b5a6934019598beb8290ac4b214407395c54e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 14:14:05 2023 -0400
+
+    Added a running variable to control the while loop and added a signal handler (handle_signal) to catch the interrupt signal (SIGINT) and terminate the program gracefully.
+    
+    Fixed the command-line argument handling by checking if argc is less than 2 (instead of assuming argc > 1). If no arguments are provided, the program displays the usage message and exits.
+    
+    Updated the ioctl() call to check the return value for errors. If the ioctl() operation fails to get the device name, an error message is printed, and the program exits.
+    
+    Removed the check for root access since it was only printing a message and not affecting the program's execution. If root access is required, it should be checked externally before running the program.
+    
+    Closed the device file descriptor (fd) before exiting the program to release system resources properly.
+
+commit 54f0b3e111a44bb95223200575fe9d19a8c70c09
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 14:10:20 2023 -0400
+
+    The rescue_len variable was not initialized, causing undefined behavior. I added the initialization rescue_len = 0 to fix it.
+    
+    In the init_inputs() function, I added error handling for the malloc call to allocate memory for the pfds array.
+    
+    In the emit_event() function, I added error handling for the libevdev_uinput_write_event function call to check if writing the event to uinput was successful.
+
+commit cd31cd4060c97c6dabb4af88a17d9a56c3981931
+Merge: d11ed97 2a3a45b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:17:08 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master' into dev
 
 commit e28ba0939f1d3fe01e3c141727ec5534c4423b0b
 Author: Patrick Schleizer <adrelanos@whonix.org>
