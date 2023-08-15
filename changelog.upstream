@@ -1,3 +1,35 @@
+commit 8e59a85024c4fb4345918d28396e85c85c7abef2
+Merge: 6a5f677 cda8d74
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 08:15:19 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/dev'
+
+commit cda8d74c37227656cc09c1f7324a69b8f908c9cc
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Sun Aug 13 23:00:11 2023 -0700
+
+    one more missing seccomp filter
+
+commit e475b1c9c552643328da48f39bef999a88d6be21
+Merge: 34e9f42 2a3a45b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Aug 13 22:56:56 2023 -0700
+
+    Merge branch 'master' into dev
+
+commit 34e9f421d75ef5e99f71c6d84bb6fb088ac91637
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Sun Aug 13 22:54:12 2023 -0700
+
+    added missing seccomp filters
+
+commit 6a5f677a15e34989d4a87382304806e70771c6f0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 06:32:50 2023 -0400
+
+    bumped changelog version
+
 commit d97fc922d1032594768b77fbbc7c2683f54abaa9
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jul 9 06:13:21 2023 -0400
@@ -169,6 +201,91 @@ Date:   Tue Nov 9 14:32:31 2021 -0500
 
     readme
 
+commit d11ed97e3c26318ca96a07806d492597950f36bb
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:22:59 2021 -0700
+
+    fixed typo
+
+commit edf0a41c9ad05e901d6726804112308dc098965f
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:21:07 2021 -0700
+
+    fixed apparmor profile: added r to /sys/devices/virtual/input
+
+commit 5870a8d3c79567333fbb720d2ea1af43ceee2aea
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:15:49 2021 -0700
+
+    fixed apparmor profile: added w to /dev/uinput
+
+commit 1e16893c10fbfcac899fe341cae87022a295e626
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:14:00 2021 -0700
+
+    fixed apparmor profile: added r to /dev/uinput
+
+commit 2edb4b2bc4c72d6ca457afb4f8265f5ea69e0da9
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:33:44 2021 -0700
+
+    formatted main.c
+
+commit 1db17e2ac3113cc5253330d5d459fd64dba93164
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:11:05 2021 -0700
+
+    added pkg-config to build depends
+
+commit c2142bf9eafbc4ed8360e1e8a286fbabc68a74d2
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:10:00 2021 -0700
+
+    added libsodium init
+
+commit 12f16aac4f8e207a3a23ea9e843e219332a1cd94
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 21:32:52 2021 -0700
+
+    typo
+
+commit 4f271826d6c1621ad8e4a85046da12525698e88f
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 21:32:07 2021 -0700
+
+    added deb dependencies
+
+commit 5fca94d9e7c27a0b3d9dd8332371987fef6047ec
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 11:30:55 2021 -0700
+
+    fixed verbose output format
+
+commit ca5510586597ebd6287afa9c878c2bfc3bbf2b9b
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 11:20:52 2021 -0700
+
+    added build flags to makefile
+
+commit ea6f6be0a33f19038b42aff42aacfd09020b3041
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:27:14 2021 -0700
+
+    use libsodium for prng
+
+commit 5dc5412f78b7111c42818b973a7a25248b5d49ca
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:02:39 2021 -0700
+
+    added support for multiple input devices
+
+commit 36f83eb631be27e325d9209e956e04f37fbe470c
+Merge: 59c47d8 aaf1de4
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:01:55 2021 -0700
+
+    Merge branch 'master' of github.com:vmonaco/kloak into mouse
+
 commit aaf1de40cbe9679af908063b75da3e87081714e4
 Merge: 7fb3f9e 88477f6
 Author: Vinnie Monaco <vinmonaco@gmail.com>
@@ -177,6 +294,24 @@ Date:   Fri Sep 17 15:01:42 2021 -0700
     Merge pull request #36 from Whonix/master
     
     port packaging to Debian bullseye
+
+commit 59c47d88e4b579e93a85209484681f536035e8d6
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 14:34:16 2021 -0700
+
+    removed restrictions on event types
+
+commit 99d2af051dccbee7f2cd3f35fbc2d7ae64af00c7
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 11:51:38 2021 -0700
+
+    fixed typo
+
+commit 7b94b28e472cef7e3c52960986a3bc7dfa651f94
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 11:45:23 2021 -0700
+
+    started support for EV_REL events
 
 commit 88477f678878d2405b85839c8a9029dc0c9b697a
 Author: Patrick Schleizer <adrelanos@whonix.org>
