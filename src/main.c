@@ -21,7 +21,7 @@
 #define DEFAULT_MAX_DELAY_MS 20  // upper bound on event delay
 #define DEFAULT_STARTUP_DELAY_MS 500  // wait before grabbing the input device
 
-#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
+#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); } while (0)
 
 #ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
@@ -37,7 +37,7 @@ static int verbose = 0;  // flag for verbose output
 static char rescue_key_seps[] = ", ";  // delims to strtok
 static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
-static int rescue_len;  // Number of rescue keys, set during initialization
+static int rescue_len = 0;  // Number of rescue keys, set during initialization
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
@@ -82,16 +82,18 @@ long current_time_ms(void) {
 }
 
 long random_between(long lower, long upper) {
-        // default to max if the interval is not valids
+        // default to max if the interval is not valid
         if (lower >= upper)
                 return upper;
 
-        return lower + randombytes_uniform(upper+1);
+        return lower + randombytes_uniform(upper - lower + 1);
 }
 
-void set_rescue_keys(char* rescue_keys_str) {
-        char *_rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
+void set_rescue_keys(const char* rescue_keys_str) {
+        char* _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
         strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
+        _rescue_keys_str[strlen(rescue_keys_str)] = '\0';
+
         char* token = strtok(_rescue_keys_str, rescue_key_seps);
 
         while (token != NULL) {
@@ -126,12 +128,10 @@ int supports_specific_key(int device_fd, unsigned int key) {
 
 int is_keyboard(int fd) {
         int key;
-        int num_supported_keys;
+        int num_supported_keys = 0;
 
         // Only check devices that support EV_KEY events
         if (supports_event_type(fd, EV_KEY)) {
-                num_supported_keys = 0;
-
                 // Count the number of KEY_* events that are supported
                 for (key = 0; key <= KEY_MAX; key++) {
                         if (supports_specific_key(fd, key)) {
@@ -217,7 +217,10 @@ void emit_event(struct entry *e) {
         long now = current_time_ms();
         delay = (int) (e->time - now);
 
-        libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
+        res = libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
+        if (res != 0) {
+                panic("Failed to write event to uinput: %s", strerror(-res));
+        }
 
         if (verbose) {
                 printf("Released event at time : %ld. Device: %d,  Type: %*d,  "
@@ -228,22 +231,24 @@ void emit_event(struct entry *e) {
 
 void main_loop() {
         int err;
-        long
-                prev_release_time = 0,
-                current_time = 0,
-                lower_bound = 0,
-                random_delay = 0;
+        long prev_release_time = 0;
+        long current_time = 0;
+        long lower_bound = 0;
+        long random_delay = 0;
         struct input_event ev;
         struct entry *n1, *np;
 
         // initialize the rescue state
-        int rescue_state[rescue_len];
+        int rescue_state[MAX_RESCUE_KEYS];
         for (int i = 0; i < rescue_len; i++) {
                 rescue_state[i] = 0;
         }
 
         // load input file descriptors for polling
         struct pollfd *pfds = calloc(device_count, sizeof(struct pollfd));
+        if (pfds == NULL) {
+                panic("Failed to allocate memory for pollfd array");
+        }
         for (int j = 0; j < device_count; j++) {
                 pfds[j].fd = input_fds[j];
                 pfds[j].events = POLLIN;
@@ -308,7 +313,10 @@ void main_loop() {
 
                                 // Buffer the event
                                 n1 = malloc(sizeof(struct entry));
-                                n1->time = current_time + (long) random_delay;
+                                if (n1 == NULL) {
+                                        panic("Failed to allocate memory for entry");
+                                }
+                                n1->time = current_time + random_delay;
                                 n1->iev = ev;
                                 n1->device_index = k;
                                 TAILQ_INSERT_TAIL(&head, n1, entries);
@@ -317,7 +325,7 @@ void main_loop() {
                                 prev_release_time = n1->time;
 
                                 if (verbose) {
-                                        printf("Bufferred event at time: %ld. Device: %d,  Type: %*d,  "
+                                        printf("Buffered event at time: %ld. Device: %d,  Type: %*d,  "
                                                "Code: %*d,  Value: %*d,  Scheduled delay: %*ld ms \n",
                                                n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
                                                4, random_delay);
