@@ -1,34 +1,30 @@
-## Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+# Last Modified: Sun Jul  9 12:23:04 2023
+include <tunables/global>
+
+## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-#include <tunables/global>
 
 /usr/sbin/kloak {
-  ## This allows unconfined processes to send kloak the
-  ## SIGCONT, SIGKILL and SIGTERM signals which is needed
-  ## for systemd to start/stop/restart kloak.
-  ##
-  ## https://github.com/vmonaco/kloak/issues/21
-  ## https://forums.whonix.org/t/current-state-of-kloak/5605/10
+  include <local/usr.sbin.kloak>
 
-  ## https://forums.whonix.org/t/current-state-of-kloak/5605/19
-  ptrace readby,
+  ## Required for 'kloak -v' (verbose) only.
+  network unix stream,
 
   signal receive set=cont peer=unconfined,
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
   signal receive set=term peer=unconfined,
 
-  /usr/sbin/kloak                   mr,
+  ptrace readby,
 
-  owner /dev/input/event*           r,
-  owner /dev/uinput                 rw,
-  owner /sys/devices/virtual/input/input* r,
-
-  /etc/ld.so.cache                  r,
-  /etc/ld.so.preload                r,
-
-  /{,usr/}lib{,32,64}/**            mr,
+  /etc/ld.so.cache r,
+  /etc/ld.so.preload r,
+  /usr/sbin/kloak mr,
+  /{,usr/}lib{,32,64}/** mr,
+  owner /dev/input/event* r,
+  owner /dev/uinput rw,
+  owner /sys/devices/virtual/input/** r,
 
   /var/run/qubes r,
   /var/run/qubes/ r,

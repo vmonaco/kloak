@@ -5,8 +5,8 @@
 void sleep_ms(long );
 long current_time_ms(void);
 long int random_between(long int, long int);
-void set_rescue_keys(char* );
-void set_disable_keys(char* );
+void set_rescue_keys(const char* );
+void set_disable_keys(const char* );
 int supports_event_type(int , int );
 int supports_specific_key(int, unsigned int);
 int is_keyboard(int );

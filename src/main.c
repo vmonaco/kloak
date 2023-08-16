@@ -40,7 +40,8 @@
 #define BLUE(string) "\x1b[34m" string "\x1b[0m"
 
 
-#define panic(format, ...) do { cleanup(); fprintf(stderr, RED(format) "\n", ## __VA_ARGS__); exit(EXIT_FAILURE); } while (0)
+#define panic(format, ...) do { cleanup(); fprintf(stderr, RED(format) "\n", ## __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); } while (0)
+
 
 #ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
@@ -77,10 +78,14 @@ static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
 static int rescue_keys[MAX_RESCUE_KEYS];  // Codes of the rescue key combo
 static int rescue_len = 0;  // Number of rescue keys, set during initialization
 
+
+
 static char disable_key_seps[] = ", ";  // delims to strtok
 static char disable_keys_str[BUFSIZE] = "KEY_LEFTCTRL,KEY_RIGHTCTRL";
 static int disable_keys[MAX_DISABLE_KEYS];  // Codes of the disable key combo
 static int disable_len = 0;  // Number of disable keys, set during initialization
+
+
 
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int max_delay_mouse = DEFAULT_MAX_MOUSE_DELAY_MS; // lag will never exceed this upper bound on mouse movements
@@ -136,12 +141,15 @@ long current_time_ms(void) {
 }
 
 long random_between(long lower, long upper) {
-        // default to max if the interval is not valids
+        // default to max if the interval is not valid
         if (lower >= upper)
                 return upper;
 
-        return lower + randombytes_uniform(upper+1);
+        return lower + randombytes_uniform(upper - lower + 1);
 }
+
+
+
 
 static inline long rand_between(long lower, long upper) {
         if(lower >= upper){
@@ -164,10 +172,13 @@ int only_digits(const char* string, const int length) {
 
 
 
-void set_rescue_keys(char* rescue_keys_str) {
-        char *_rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
+
+void set_rescue_keys(const char* rescue_keys_str) {
+        char* _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
         strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
         _rescue_keys_str[strlen(rescue_keys_str)] = '\0';
+
+
         char* token = strtok(_rescue_keys_str, rescue_key_seps);
 
         while (token != NULL) {
@@ -186,7 +197,7 @@ void set_rescue_keys(char* rescue_keys_str) {
 }
 
 
-void set_disable_keys(char* disable_keys_str) {
+void set_disable_keys(const char* disable_keys_str) {
         char *_disable_keys_str = malloc(strlen(disable_keys_str) + 1);
         strncpy(_disable_keys_str, disable_keys_str, strlen(disable_keys_str));
         _disable_keys_str[strlen(disable_keys_str)] = '\0';
@@ -233,8 +244,6 @@ int is_keyboard(int fd) {
 
         // Only check devices that support EV_KEY events
         if (supports_event_type(fd, EV_KEY)) {
-                num_supported_keys = 0;
-
                 // Count the number of KEY_* events that are supported
                 for (key = 0; key <= KEY_MAX; key++) {
                         if (supports_specific_key(fd, key)) {
@@ -790,7 +799,10 @@ void emit_event(struct entry *e) {
         long now = current_time_ms();
         delay = (int) (e->time - now);
 
-        libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
+        res = libevdev_uinput_write_event(uidevs[e->device_index], e->iev.type, e->iev.code, e->iev.value);
+        if (res != 0) {
+                panic("Failed to write event to uinput: %s", strerror(-res));
+        }
 
         if (verbose) {
                 printf("Released event at time : " GREEN("%ld") ". Device: " GREEN("%d") ", Type: " GREEN("%*d") ", "
@@ -801,11 +813,10 @@ void emit_event(struct entry *e) {
 
 void main_loop() {
         int err;
-        long
-                prev_release_time = 0,
-                current_time = 0,
-                lower_bound = 0,
-                random_delay = 0;
+        long prev_release_time = 0;
+        long current_time = 0;
+        long lower_bound = 0;
+        long random_delay = 0;
         struct input_event ev;
         struct entry *n1, *np;
         
@@ -824,9 +835,8 @@ void main_loop() {
         
         
         // initialize the rescue state
-        // using MAX_RESCUE_KEYS necessary to avoid warnings from -Wstack-protector, rescue keys still work exactly the same        
         int rescue_state[MAX_RESCUE_KEYS];
-        
+
         for (int i = 0; i < rescue_len; i++) {
                 rescue_state[i] = 0;
         }
@@ -841,7 +851,13 @@ void main_loop() {
         
 
         // load input file descriptors for polling
+
         pfds = calloc(device_count, sizeof(struct pollfd));
+
+        if (pfds == NULL) {
+                panic("Failed to allocate memory for pollfd array");
+        }
+
         for (int j = 0; j < device_count; j++) {
                 pfds[j].fd = input_fds[j];
                 pfds[j].events = POLLIN;
@@ -1097,7 +1113,10 @@ void main_loop() {
 
                                 // Buffer the event
                                 n1 = malloc(sizeof(struct entry));
-                                n1->time = current_time + (long) random_delay;
+                                if (n1 == NULL) {
+                                        panic("Failed to allocate memory for entry");
+                                }
+                                n1->time = current_time + random_delay;
                                 n1->iev = ev;
                                 n1->device_index = k;
                                 TAILQ_INSERT_TAIL(&head, n1, entries);
@@ -1150,8 +1169,10 @@ void main_loop() {
                                 }
 
                                 if (verbose) {
-                                        printf("Bufferred event at time: " GREEN("%ld") ". Device: " GREEN("%d") ", Type: " GREEN("%*d")
+
+                                        printf("Buffered event at time: " GREEN("%ld") ". Device: " GREEN("%d") ", Type: " GREEN("%*d")
                                                ", Code: " GREEN("%*d") ", Value: " GREEN("%*d") ", Scheduled delay: " GREEN("%*ld") " ms \n",
+
                                                n1->time, k, 3, n1->iev.type, 5, n1->iev.code, 5, n1->iev.value,
                                                4, random_delay);
                                         if (lower_bound > 0) {
