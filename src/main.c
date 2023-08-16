@@ -795,7 +795,7 @@ void init_outputs() {
 
 void emit_event(struct entry *e) {
         
-        int  delay;
+        int  delay, res;
         long now = current_time_ms();
         delay = (int) (e->time - now);
 
