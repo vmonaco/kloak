@@ -134,8 +134,7 @@ The full usage and options are:
 
     Usage: kloak [options]
     Options:
-      -r filename: device file to read events from
-      -w filename: device file to write events to (should be uinput)
+      -r filename: device file to read events from. Can specify multiple -r options.
       -d delay: maximum delay (milliseconds) of released events. Default 100.
       -s startup_timeout: time to wait (milliseconds) before startup. Default 100.
       -k csv_string: csv list of rescue key names to exit kloak in case the

@@ -1,3 +1,406 @@
+commit 59056a25d1e14d6d81ee8a9666eda0bc62fe342a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 09:19:43 2023 -0400
+
+    seccomp
+
+commit 167f38528ed47cef87be2cea9ba1fa5b4bbbe2d8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 09:08:18 2023 -0400
+
+    bumped changelog version
+
+commit 07d37f52867816ede568c7fb88bde1ae012359e3
+Merge: fdd0d49 e488037
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 09:02:19 2023 -0400
+
+    Merge branch 'chatgpt'
+
+commit fdd0d492bca9e125e95ea787066e266ad404fdc3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 08:19:56 2023 -0400
+
+    bumped changelog version
+
+commit 8e59a85024c4fb4345918d28396e85c85c7abef2
+Merge: 6a5f677 cda8d74
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 15 08:15:19 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/dev'
+
+commit cda8d74c37227656cc09c1f7324a69b8f908c9cc
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Sun Aug 13 23:00:11 2023 -0700
+
+    one more missing seccomp filter
+
+commit e475b1c9c552643328da48f39bef999a88d6be21
+Merge: 34e9f42 2a3a45b
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Aug 13 22:56:56 2023 -0700
+
+    Merge branch 'master' into dev
+
+commit 34e9f421d75ef5e99f71c6d84bb6fb088ac91637
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Sun Aug 13 22:54:12 2023 -0700
+
+    added missing seccomp filters
+
+commit e4880377bf9e3ae638b74c23a8ef92b07c9bad04
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 08:27:38 2023 -0400
+
+    apparmor
+
+commit c8178aea02117addfb28dba06e824ece7732dee2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:31:42 2023 -0400
+
+    disable broken seccomp SystemCallFilter
+    
+    https://github.com/vmonaco/kloak/pull/38#issuecomment-1627688486
+
+commit 6e13598c6d8d39c1f891e7ed036f1e1e800d5c85
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:30:48 2023 -0400
+
+    apparmor
+
+commit 2f08794c4b238bb08e0e06a9b10f031f739955be
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 07:26:22 2023 -0400
+
+    seccomp
+
+commit 6a5f677a15e34989d4a87382304806e70771c6f0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 06:32:50 2023 -0400
+
+    bumped changelog version
+
+commit d97fc922d1032594768b77fbbc7c2683f54abaa9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 06:13:21 2023 -0400
+
+    readme
+
+commit 1ac67d459855b4d623c4ae6aa4bd183ef7bd84b2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 9 05:32:55 2023 -0400
+
+    bumped changelog version
+
+commit 2a8b5a6934019598beb8290ac4b214407395c54e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 14:14:05 2023 -0400
+
+    Added a running variable to control the while loop and added a signal handler (handle_signal) to catch the interrupt signal (SIGINT) and terminate the program gracefully.
+    
+    Fixed the command-line argument handling by checking if argc is less than 2 (instead of assuming argc > 1). If no arguments are provided, the program displays the usage message and exits.
+    
+    Updated the ioctl() call to check the return value for errors. If the ioctl() operation fails to get the device name, an error message is printed, and the program exits.
+    
+    Removed the check for root access since it was only printing a message and not affecting the program's execution. If root access is required, it should be checked externally before running the program.
+    
+    Closed the device file descriptor (fd) before exiting the program to release system resources properly.
+
+commit 54f0b3e111a44bb95223200575fe9d19a8c70c09
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 14:10:20 2023 -0400
+
+    The rescue_len variable was not initialized, causing undefined behavior. I added the initialization rescue_len = 0 to fix it.
+    
+    In the init_inputs() function, I added error handling for the malloc call to allocate memory for the pfds array.
+    
+    In the emit_event() function, I added error handling for the libevdev_uinput_write_event function call to check if writing the event to uinput was successful.
+
+commit cd31cd4060c97c6dabb4af88a17d9a56c3981931
+Merge: d11ed97 2a3a45b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:17:08 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master' into dev
+
+commit e28ba0939f1d3fe01e3c141727ec5534c4423b0b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:08:00 2023 -0400
+
+    same ordering as upstream
+
+commit 29055528d43cf6d53b459d4e180698fe255c78d2
+Merge: d8e06e8 2a3a45b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 8 13:03:38 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit d8e06e8e4b8bdff8d4243aa627acbc9233a2b515
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 7 20:08:03 2023 -0400
+
+    bumped changelog version
+
+commit 327df39693b7fa47baf7fde697006e7f649cf796
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 7 20:04:27 2023 -0400
+
+    seccomp
+
+commit fb89c86d206aada6dabb818c3dff1f6b3ac6c1a3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 21 09:43:23 2023 +0000
+
+    bumped changelog version
+
+commit e1f1f152a406042af0fef3b801b4bd4850c10ae8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 21 09:11:34 2023 +0000
+
+    bookworm
+
+commit 2a3a45ba429c8ba6e2c8d8560f79efb6cb43fdb3
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sat Jun 17 20:57:22 2023 -0700
+
+    Update README.md
+
+commit e817caef8bdda365838658b232914dfe4c9143d0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jun 16 11:28:58 2023 +0000
+
+    bumped changelog version
+
+commit 9bc6515a828f64e10c367169ecdc249f237fb464
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jun 16 10:49:08 2023 +0000
+
+    readme
+
+commit 8f585808b10b080434bcf74f45dee9e826ec89fa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 10:09:18 2023 +0000
+
+    bumped changelog version
+
+commit 6dbf7832ad67f950fc85fbf12359d318b07652a7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 09:51:12 2023 +0000
+
+    fix lintian warning
+    
+    P: kloak source: very-long-line-length-in-source-file 676 > 512 [README.md:170]
+
+commit 2155a425603c61490458590c5abfe75f3d8aa5cd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 18:15:43 2023 +0000
+
+    bumped changelog version
+
+commit 39194c7ec3e782594cf7715888013502d6a21824
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 16:22:35 2023 +0000
+
+    Standards-Version: 4.6.1.0
+
+commit 120234dd3cfe9567eef09c8681b4855119d9dd90
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 15:38:28 2023 +0000
+
+    bumped changelog version
+
+commit d8c20cabb38a124ba9e9171c7d897bc2993f0a87
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 14:52:04 2023 +0000
+
+    update copyright year
+
+commit 6b2d75e98af072c68981a677bf66320dafca79fc
+Merge: 38eefc5 af2ddc3
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Wed Nov 16 21:02:23 2022 -0800
+
+    Merge pull request #44 from GerHobbelt/master
+    
+    README fixes: broken link to paper fixed + 1 language typo
+
+commit af2ddc31b008ac0042b5cfdcc53cce72dec9cbf3
+Author: Ger Hobbelt <ger@hobbelt.com>
+Date:   Tue Nov 15 19:58:29 2022 +0100
+
+    updated link to stylometry techniques paper.
+
+commit 53ada224cd9323916f515d5f791050b18ae20639
+Author: Ger Hobbelt <ger@hobbelt.com>
+Date:   Tue Nov 15 19:57:22 2022 +0100
+
+    language fix in README
+
+commit ad1cb08250b6b052c7232d5d2614606dccb6bd54
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 25 06:07:59 2022 -0400
+
+    bumped changelog version
+
+commit a7ce4f5d43e7d90f1add743e7bd602b6be3e825b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 20 15:27:14 2022 -0400
+
+    readme
+
+commit c2752726f56fefa3a51adb234747d53d21851e42
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 20 14:46:43 2022 -0400
+
+    copyright
+
+commit 22a0d992b64a9026a6bf01b0e48a8914f34698c6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Apr 10 12:40:20 2022 -0400
+
+    readme
+
+commit 38eefc52728e31e89646dd61bb15ecbbb49c0871
+Merge: aaf1de4 6cce482
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Tue Jan 11 10:37:41 2022 -0800
+
+    Merge pull request #40 from hardcore-sushi/systemd-fix
+    
+    Add some system calls to the systemd whitelist to prevent crashes
+
+commit 6cce4829066bac632e1730b8f379e3c45ac15a02
+Author: Hardcore Sushi <hardcore.sushi@disroot.org>
+Date:   Fri Jan 7 17:24:39 2022 +0100
+
+    Add some system calls to the systemd whitelist to prevent crashes
+
+commit 64aef6d208f37fde04c4f12d84f16c214ed58087
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 9 14:32:31 2021 -0500
+
+    readme
+
+commit d11ed97e3c26318ca96a07806d492597950f36bb
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:22:59 2021 -0700
+
+    fixed typo
+
+commit edf0a41c9ad05e901d6726804112308dc098965f
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:21:07 2021 -0700
+
+    fixed apparmor profile: added r to /sys/devices/virtual/input
+
+commit 5870a8d3c79567333fbb720d2ea1af43ceee2aea
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:15:49 2021 -0700
+
+    fixed apparmor profile: added w to /dev/uinput
+
+commit 1e16893c10fbfcac899fe341cae87022a295e626
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Tue Sep 28 15:14:00 2021 -0700
+
+    fixed apparmor profile: added r to /dev/uinput
+
+commit 2edb4b2bc4c72d6ca457afb4f8265f5ea69e0da9
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:33:44 2021 -0700
+
+    formatted main.c
+
+commit 1db17e2ac3113cc5253330d5d459fd64dba93164
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:11:05 2021 -0700
+
+    added pkg-config to build depends
+
+commit c2142bf9eafbc4ed8360e1e8a286fbabc68a74d2
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Thu Sep 23 16:10:00 2021 -0700
+
+    added libsodium init
+
+commit 12f16aac4f8e207a3a23ea9e843e219332a1cd94
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 21:32:52 2021 -0700
+
+    typo
+
+commit 4f271826d6c1621ad8e4a85046da12525698e88f
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 21:32:07 2021 -0700
+
+    added deb dependencies
+
+commit 5fca94d9e7c27a0b3d9dd8332371987fef6047ec
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 11:30:55 2021 -0700
+
+    fixed verbose output format
+
+commit ca5510586597ebd6287afa9c878c2bfc3bbf2b9b
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 20 11:20:52 2021 -0700
+
+    added build flags to makefile
+
+commit ea6f6be0a33f19038b42aff42aacfd09020b3041
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:27:14 2021 -0700
+
+    use libsodium for prng
+
+commit 5dc5412f78b7111c42818b973a7a25248b5d49ca
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:02:39 2021 -0700
+
+    added support for multiple input devices
+
+commit 36f83eb631be27e325d9209e956e04f37fbe470c
+Merge: 59c47d8 aaf1de4
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Fri Sep 17 15:01:55 2021 -0700
+
+    Merge branch 'master' of github.com:vmonaco/kloak into mouse
+
+commit aaf1de40cbe9679af908063b75da3e87081714e4
+Merge: 7fb3f9e 88477f6
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Fri Sep 17 15:01:42 2021 -0700
+
+    Merge pull request #36 from Whonix/master
+    
+    port packaging to Debian bullseye
+
+commit 59c47d88e4b579e93a85209484681f536035e8d6
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 14:34:16 2021 -0700
+
+    removed restrictions on event types
+
+commit 99d2af051dccbee7f2cd3f35fbc2d7ae64af00c7
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 11:51:38 2021 -0700
+
+    fixed typo
+
+commit 7b94b28e472cef7e3c52960986a3bc7dfa651f94
+Author: Vinnie Monaco <contact@vmonaco.com>
+Date:   Mon Sep 13 11:45:23 2021 -0700
+
+    started support for EV_REL events
+
+commit 88477f678878d2405b85839c8a9029dc0c9b697a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Sep 12 11:42:44 2021 -0400
+
+    bumped changelog version
+
 commit 28d3eef79cfe70828bfe1bbe44bfcf79c5f4c593
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Sep 11 16:33:51 2021 -0400
@@ -117,6 +520,15 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Dec 3 11:21:18 2020 -0500
 
     comment
+
+commit 7fb3f9e9885977cac856ded31d80f6c737780518
+Merge: e1eec9d 00c3495
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Thu Oct 8 13:32:15 2020 -0700
+
+    Merge pull request #32 from madaidan/apparmor
+    
+    Fix AppArmor and seccomp
 
 commit 3e61d1a6b5ac92ebbfbb8e55c5e85c79973e5bbc
 Author: Patrick Schleizer <adrelanos@riseup.net>
