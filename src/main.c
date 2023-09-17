@@ -336,6 +336,8 @@ void main_loop() {
                         }
                 }
         }
+        
+        free(pfds);
 }
 
 void usage() {
