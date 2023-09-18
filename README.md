@@ -23,7 +23,8 @@ Fedora:
 
 Debian:
 
-    $ sudo apt install make pkg-config libsodium23 libsodium-dev libevdev2 libevdev-dev
+    $ sudo apt install devscripts
+    $ sudo mk-build-deps --remove --install
 
 First, compile `kloak` and the event capture tool `eventcap`:
 
