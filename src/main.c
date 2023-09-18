@@ -62,12 +62,6 @@ static struct option long_options[] = {
 
 TAILQ_HEAD(tailhead, entry) head;
 
-// struct entry {
-//         struct input_event iev;
-//         long time;
-//         TAILQ_ENTRY(entry) entries;
-//         int device_index;
-// };
 
 void sleep_ms(long milliseconds) {
         struct timespec ts;
