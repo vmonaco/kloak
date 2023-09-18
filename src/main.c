@@ -11,6 +11,7 @@
 #include <libevdev/libevdev-uinput.h>
 
 #include "keycodes.h"
+#include "kloak.h"
 
 #define BUFSIZE 256  // for device names and rescue key sequence
 #define MAX_INPUTS 16  // number of devices to try autodetection
@@ -61,12 +62,12 @@ static struct option long_options[] = {
 
 TAILQ_HEAD(tailhead, entry) head;
 
-struct entry {
-        struct input_event iev;
-        long time;
-        TAILQ_ENTRY(entry) entries;
-        int device_index;
-};
+// struct entry {
+//         struct input_event iev;
+//         long time;
+//         TAILQ_ENTRY(entry) entries;
+//         int device_index;
+// };
 
 void sleep_ms(long milliseconds) {
         struct timespec ts;
