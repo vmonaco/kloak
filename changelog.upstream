@@ -1,3 +1,33 @@
+commit c107815a062251cef694a84cf0710a73168e2bcf
+Merge: ca5cf50 af79b08
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 19 08:23:59 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit af79b08ea3dd83b70c5099391ef3e1233b102511
+Merge: 8fb85a0 68c3c70
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 18 08:43:25 2023 -0700
+
+    Merge pull request #53 from adrelanos/indentation-style
+    
+    improve indentation style
+
+commit 68c3c7063d51afee6bee63c15ab2465d83591442
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Sep 18 08:04:34 2023 -0400
+
+    improve indentation style
+    
+    fixes https://github.com/vmonaco/kloak/issues/52
+
+commit ca5cf502265f24bfd871547739d8b86449d00bc1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Sep 18 07:23:20 2023 -0400
+
+    bumped changelog version
+
 commit f49d6b8d4575f1694fe5038a6639e04dca9d4bfb
 Merge: 537dec7 8fb85a0
 Author: Patrick Schleizer <adrelanos@whonix.org>
