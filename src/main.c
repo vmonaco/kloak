@@ -91,6 +91,9 @@ long random_between(long lower, long upper) {
 
 void set_rescue_keys(const char* rescue_keys_str) {
     char* _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
+    if(_rescue_keys_str == NULL) {
+        panic("Failed to allocate memory for _rescue_keys_str");
+    }
     strncpy(_rescue_keys_str, rescue_keys_str, strlen(rescue_keys_str));
     _rescue_keys_str[strlen(rescue_keys_str)] = '\0';
 
