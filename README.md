@@ -15,6 +15,17 @@ There are two ways to run kloak:
 
 ### As an application
 
+Install dependencies:
+
+Fedora:
+
+    $ sudo dnf install make pkgconf-pkg-config libsodium libsodium-devel libevdev libevdev-devel
+
+Debian:
+
+    $ sudo apt install devscripts
+    $ sudo mk-build-deps --remove --install
+
 First, compile `kloak` and the event capture tool `eventcap`:
 
     $ make all
