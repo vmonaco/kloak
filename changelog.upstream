@@ -1,9 +1,55 @@
+commit 196343c1c614c9d35264c43e502c83477d7107e0
+Merge: 61c0b09 9cbdf44
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Sep 25 11:56:55 2023 -0400
+
+    Merge remote-tracking branch 'vmonaco/master'
+
+commit 9cbdf4484da19eb09653356e59ce42c37cecb523
+Merge: 130d81b 2ed1b1f
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Sep 24 21:49:52 2023 -0700
+
+    Merge pull request #62 from skyzzuu/check_rescue_key_str_not_null
+    
+    ensure _rescue_keys_str is not null before passing to strncpy to avoid potential null pointer dereference
+
+commit 130d81b6e5f2c892fbd7596eaf1ad1f10911426e
+Merge: af79b08 efa47d1
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Sun Sep 24 21:47:27 2023 -0700
+
+    Merge pull request #63 from vmonaco/dev
+    
+    update readme
+
+commit 61c0b09452ded9bcbd8476ee3aa103f116bc5330
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Sep 24 11:22:09 2023 -0400
+
+    bumped changelog version
+
+commit 2ed1b1f4e1613d5add68e051fcd1d58fd1ef97e4
+Author: Everett Gally <egally@protonmail.com>
+Date:   Sat Sep 23 11:25:33 2023 -0400
+
+    ensure _rescue_keys_str is not null before passing to strncpy to avoid potential null pointer dereference
+
 commit c107815a062251cef694a84cf0710a73168e2bcf
 Merge: ca5cf50 af79b08
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Sep 19 08:23:59 2023 -0400
 
     Merge remote-tracking branch 'vmonaco/master'
+
+commit efa47d1e0fa7b3cea17491a9520276e408d07569
+Merge: f171889 c928a7c
+Author: Vinnie Monaco <vinmonaco@gmail.com>
+Date:   Mon Sep 18 08:43:59 2023 -0700
+
+    Merge pull request #55 from skyzzuu/readme_changes
+    
+    add dependency installation information into readme
 
 commit af79b08ea3dd83b70c5099391ef3e1233b102511
 Merge: 8fb85a0 68c3c70
@@ -35,6 +81,12 @@ Date:   Mon Sep 18 07:22:36 2023 -0400
 
     Merge remote-tracking branch 'vmonaco/master'
 
+commit c928a7c52e2fa0b4f2b7e7cf49c94197555fb288
+Author: Everett Gally <egally@protonmail.com>
+Date:   Mon Sep 18 07:16:55 2023 -0400
+
+    update debian dependency installation information to install devscripts and then use sudo mk-build-deps --remove --install instead of hardcoding dependencies
+
 commit 8fb85a065a809be2b504075c500cbd1d12c4ecd9
 Merge: d343f5e f55cecc
 Author: Vinnie Monaco <vinmonaco@gmail.com>
@@ -49,6 +101,12 @@ Author: Everett Gally <egally@protonmail.com>
 Date:   Sun Sep 17 19:42:08 2023 -0400
 
     free pfds after while loop in main_loop exits to avoid memory leak after kloak ends
+
+commit b2f3a2aae1b85e22f40868266927773307131d0d
+Author: Everett Gally <egally@protonmail.com>
+Date:   Sun Sep 10 17:13:52 2023 -0400
+
+    add dependency installation information into readme
 
 commit 537dec7423af4635f3fa15a730844a57538a8947
 Author: Patrick Schleizer <adrelanos@whonix.org>
