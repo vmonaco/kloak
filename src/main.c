@@ -72,7 +72,8 @@ void sleep_ms(long milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    if (nanosleep(&ts, NULL) == -1)
+        panic("nanosleep failed: %s", strerror(errno));
 }
 
 long current_time_ms(void) {
@@ -117,7 +118,8 @@ void set_rescue_keys(const char* rescue_keys_str) {
 int supports_event_type(int device_fd, int event_type) {
     unsigned long evbit = 0;
     // Get the bit field of available event types.
-    ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
+    if (ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit) == -1)
+        panic("ioctl EVIOCGBIT failed: %s", strerror(errno));
     return evbit & (1 << event_type);
 }
 
@@ -125,7 +127,8 @@ int supports_specific_key(int device_fd, unsigned int key) {
     size_t nchar = KEY_MAX/8 + 1;
     unsigned char bits[nchar];
     // Get the bit fields of available keys.
-    ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
+    if (ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits) == -1)
+        panic("ioctl EVIOCGBIT for EV_KEY failed: %s", strerror(errno));
     return bits[key/8] & (1 << (key % 8));
 }
 
@@ -155,7 +158,7 @@ void detect_devices() {
     char device[256];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
-        sprintf(device, "/dev/input/event%d", i);
+        snprintf(device, sizeof(device), "/dev/input/event%d", i);
 
         if ((fd = open(device, O_RDONLY)) < 0) {
             continue;
@@ -163,15 +166,18 @@ void detect_devices() {
 
         if (is_keyboard(fd)) {
             strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            named_inputs[device_count - 1][BUFSIZE - 1] = '\0';
             if (verbose)
                 printf("Found keyboard at: %s\n", device);
         } else if (is_mouse(fd)) {
             strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            named_inputs[device_count - 1][BUFSIZE - 1] = '\0';
             if (verbose)
                 printf("Found mouse at: %s\n", device);
         }
 
-        close(fd);
+        if (close(fd) == -1)
+            panic("close failed on device: %s, error: %s", device, strerror(errno));
 
         if (device_count >= MAX_INPUTS) {
             if (verbose)
@@ -393,6 +399,7 @@ int main(int argc, char **argv) {
             if (device_count >= MAX_INPUTS)
                 panic("Too many -r options: can read from at most %d devices\n", MAX_INPUTS);
             strncpy(named_inputs[device_count++], optarg, BUFSIZE-1);
+            named_inputs[device_count][BUFSIZE-1] = '\0';
             break;
 
         case 'd':
@@ -407,6 +414,7 @@ int main(int argc, char **argv) {
 
         case 'k':
             strncpy(rescue_keys_str, optarg, BUFSIZE-1);
+            rescue_keys_str[BUFSIZE-1] = '\0';
             break;
 
         case 'v':
