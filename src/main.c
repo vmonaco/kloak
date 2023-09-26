@@ -72,7 +72,8 @@ void sleep_ms(long milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    if (nanosleep(&ts, NULL) == -1)
+        panic("nanosleep failed: %s", strerror(errno));
 }
 
 long current_time_ms(void) {
@@ -117,7 +118,8 @@ void set_rescue_keys(const char* rescue_keys_str) {
 int supports_event_type(int device_fd, int event_type) {
     unsigned long evbit = 0;
     // Get the bit field of available event types.
-    ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
+    if (ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit) == -1)
+        panic("ioctl EVIOCGBIT failed: %s", strerror(errno));
     return evbit & (1 << event_type);
 }
 
@@ -125,7 +127,8 @@ int supports_specific_key(int device_fd, unsigned int key) {
     size_t nchar = KEY_MAX/8 + 1;
     unsigned char bits[nchar];
     // Get the bit fields of available keys.
-    ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
+    if (ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits) == -1)
+        panic("ioctl EVIOCGBIT for EV_KEY failed: %s", strerror(errno));
     return bits[key/8] & (1 << (key % 8));
 }
 
@@ -173,7 +176,8 @@ void detect_devices() {
                 printf("Found mouse at: %s\n", device);
         }
 
-        close(fd);
+        if (close(fd) == -1)
+            panic("close failed on device: %s, error: %s", device, strerror(errno));
 
         if (device_count >= MAX_INPUTS) {
             if (verbose)
