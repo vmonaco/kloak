@@ -399,6 +399,7 @@ int main(int argc, char **argv) {
             if (device_count >= MAX_INPUTS)
                 panic("Too many -r options: can read from at most %d devices\n", MAX_INPUTS);
             strncpy(named_inputs[device_count++], optarg, BUFSIZE-1);
+            named_inputs[device_count][BUFSIZE-1] = '\0';
             break;
 
         case 'd':
@@ -413,6 +414,7 @@ int main(int argc, char **argv) {
 
         case 'k':
             strncpy(rescue_keys_str, optarg, BUFSIZE-1);
+            rescue_keys_str[BUFSIZE-1] = '\0';
             break;
 
         case 'v':
