@@ -155,7 +155,7 @@ void detect_devices() {
     char device[256];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
-        sprintf(device, "/dev/input/event%d", i);
+        snprintf(device, sizeof(device), "/dev/input/event%d", i);
 
         if ((fd = open(device, O_RDONLY)) < 0) {
             continue;
@@ -163,10 +163,12 @@ void detect_devices() {
 
         if (is_keyboard(fd)) {
             strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            named_inputs[device_count - 1][BUFSIZE - 1] = '\0';
             if (verbose)
                 printf("Found keyboard at: %s\n", device);
         } else if (is_mouse(fd)) {
             strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            named_inputs[device_count - 1][BUFSIZE - 1] = '\0';
             if (verbose)
                 printf("Found mouse at: %s\n", device);
         }
