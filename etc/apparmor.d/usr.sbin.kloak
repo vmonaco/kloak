@@ -15,12 +15,15 @@ include <tunables/global>
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
   signal receive set=term peer=unconfined,
+  signal receive set=hup peer=unconfined,
+  signal receive set=int peer=unconfined,
   
   # if one of the kloak processes receives rescue key sequence, needed to receive SIGTERM from it
   signal receive set=cont peer=/usr/sbin/kloak,
   signal receive set=hup peer=/usr/sbin/kloak,
   signal receive set=int peer=/usr/sbin/kloak,
   signal receive set=kill peer=/usr/sbin/kloak,
+  signal receive set=term peer=/usr/sbin/kloak,
 
   # needed to signal the other kloak processes when rescue key sequence is received
   signal send peer=/usr/sbin/kloak,
