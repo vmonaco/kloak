@@ -35,17 +35,17 @@ include <tunables/global>
   owner /dev/uinput rw,
   owner /sys/devices/virtual/input/** r,
 
-  # triggers when using pkill to send SIGTERM to other kloak processes, not actually needed though. Denied so they stop logging
-  deny owner /proc/tty/drivers r,
-  deny owner /proc/uptime r,
-  deny owner /proc/stat r,
-  deny owner /sys/devices/system/cpu/possible r,
-  deny owner /sys/devices/system/node/ r,
-  deny owner /sys/devices/system/node/node0/meminfo r,
-  deny /proc/*/cmdline r,
-  deny /proc/*/cgroup r,
-  deny /proc/*/status r,
-  deny /proc/*/stat r,
+  # triggers when using pkill to send SIGTERM to other kloak processes
+  owner /proc/tty/drivers r,
+  owner /proc/uptime r,
+  owner /proc/stat r,
+  owner /sys/devices/system/cpu/possible r,
+  owner /sys/devices/system/node/ r,
+  owner /sys/devices/system/node/node0/meminfo r,
+  /proc/*/cmdline r,
+  /proc/*/cgroup r,
+  /proc/*/status r,
+  /proc/*/stat r,
   
   
   # needed by pkill to find other kloak processes
