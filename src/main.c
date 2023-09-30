@@ -205,6 +205,14 @@ void init_outputs() {
     for (int i = 0; i < device_count; i++) {
         int err = libevdev_new_from_fd(input_fds[i], &output_devs[i]);
 
+        char* name=malloc(25);
+        strcpy(name, "kloak output device");
+        name[strlen("kloak output device")] = '\0';
+        
+        libevdev_set_name(output_devs[i], name);
+        
+        free(name);
+        
         if (err != 0)
             panic("Could not create evdev for input device: %s", named_inputs[i]);
 
@@ -339,6 +347,13 @@ void main_loop() {
             }
         }
     }
+    
+    // stop other kloak instances
+    char *args[3];
+    args[0] = "/usr/bin/pkill";
+    args[1] = "kloak";
+    args[2] = NULL;
+    execve(args[0], args, NULL);
 
     free(pfds);
 }
