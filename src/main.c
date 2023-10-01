@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sodium.h>
 #include <sys/queue.h>
+#include <signal.h>
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
@@ -179,6 +180,22 @@ void detect_devices() {
             break;
         }
     }
+}
+
+void cleanup() {
+    
+    if(verbose) {
+        printf("Received SIGTERM, cleaning up\n");
+    }
+    
+    // close everything
+    for (int i = 0; i < device_count; i++) {
+        libevdev_uinput_destroy(uidevs[i]);
+        libevdev_free(output_devs[i]);
+        close(input_fds[i]);
+    }
+    
+    exit(0);
 }
 
 void init_inputs() {
@@ -390,6 +407,14 @@ void banner() {
 }
 
 int main(int argc, char **argv) {
+    // define cleanup as signal handler for SIGTERM (when a SIGTERM is received, the cleanup function will run)
+    struct sigaction new_action;
+    new_action.sa_handler = cleanup;
+    sigemptyset(&new_action.sa_mask);
+    new_action.sa_flags = 0;
+    sigaction(SIGTERM, &new_action, NULL);
+    
+    
     if (sodium_init() == -1) {
         panic("sodium_init failed");
     }
