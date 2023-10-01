@@ -7,6 +7,7 @@ Documentation=https://github.com/vmonaco/kloak
 ConditionPathExists=!/run/qubes/this-is-templatevm
 Before=graphical.target
 Before=getty.target
+JoinsNamespaceOf=kloak@.service
 
 [Service]
 Type=simple
@@ -29,9 +30,9 @@ Type=simple
 ## https://github.com/QubesOS/qubes-issues/issues/1850
 ## https://forums.whonix.org/t/current-state-of-kloak/5605/6
 
-ExecStart=/usr/sbin/kloak
+ExecStart=/usr/sbin/kloak -r /dev/input/%i
 
-Restart=always
+Restart=no
 
 ## Kloak doesn't require any capabilities. This is
 ## likely because the things it needs are already
@@ -55,7 +56,7 @@ NoNewPrivileges=true
 RestrictRealtime=true
 RestrictNamespaces=true
 SystemCallArchitectures=native
-SystemCallFilter=ioctl nanosleep select write read openat close brk fstat lseek mmap mprotect munmap rt_sigaction rt_sigprocmask access execve getuid arch_prctl set_tid_address set_robust_list prlimit64 pread64 getrandom newfstatat clock_nanosleep pselect6 poll shmctl openat getdents64
+SystemCallFilter=ioctl nanosleep select write read openat close brk fstat lseek mmap mprotect munmap rt_sigaction rt_sigprocmask access execve getuid arch_prctl set_tid_address set_robust_list prlimit64 pread64 getrandom newfstatat clock_nanosleep pselect6 poll shmctl openat getdents64 kill execve prctl epoll_create get_mempolicy set_mempolicy readlink
 
 [Install]
 WantedBy=multi-user.target

@@ -15,7 +15,19 @@ include <tunables/global>
   signal receive set=exists peer=unconfined,
   signal receive set=kill peer=unconfined,
   signal receive set=term peer=unconfined,
+  signal receive set=hup peer=unconfined,
+  signal receive set=int peer=unconfined,
+  
+  # if one of the kloak processes receives rescue key sequence, needed to receive SIGTERM from it
+  signal receive set=cont peer=/usr/sbin/kloak,
+  signal receive set=hup peer=/usr/sbin/kloak,
+  signal receive set=int peer=/usr/sbin/kloak,
+  signal receive set=kill peer=/usr/sbin/kloak,
+  signal receive set=term peer=/usr/sbin/kloak,
 
+  # needed to signal the other kloak processes when rescue key sequence is received
+  signal send peer=/usr/sbin/kloak,
+  
   ptrace readby,
 
   /etc/ld.so.cache r,
@@ -26,6 +38,24 @@ include <tunables/global>
   owner /dev/uinput rw,
   owner /sys/devices/virtual/input/** r,
 
+  # triggers when using pkill to send SIGTERM to other kloak processes
+  owner /proc/tty/drivers r,
+  owner /proc/uptime r,
+  owner /proc/stat r,
+  owner /sys/devices/system/cpu/possible r,
+  owner /sys/devices/system/node/ r,
+  owner /sys/devices/system/node/node0/meminfo r,
+  /proc/*/cmdline r,
+  /proc/*/cgroup r,
+  /proc/*/status r,
+  /proc/*/stat r,
+  
+  
+  # needed by pkill to find other kloak processes
+  /usr/bin/pgrep mrix,
+  owner /proc/ r,
+  /proc/*/stat r,
+  
   # Site-specific additions and overrides. See local/README for details.
   #include <local/usr.sbin.kloak>
 }
