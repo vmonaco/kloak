@@ -10,6 +10,7 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
+#include "kloak.h"
 #include "keycodes.h"
 
 #define BUFSIZE 256                  // for device names and rescue key sequence
@@ -61,12 +62,6 @@ static struct option long_options[] = {
 
 TAILQ_HEAD(tailhead, entry) head;
 
-struct entry {
-    struct input_event iev;
-    long time;
-    TAILQ_ENTRY(entry) entries;
-    int device_index;
-};
 
 void sleep_ms(long milliseconds) {
     struct timespec ts;
