@@ -60,24 +60,24 @@ Notice that the lower bound on the random delay has to be raised when keys are p
 
 How to install `kloak` using apt-get
 
-1\. Download [Whonix's Signing Key]().
+1\. Download the APT Signing Key.
 
 ```
-wget https://www.whonix.org/patrick.asc
+wget https://www.whonix.org/keys/derivative.asc
 ```
 
-Users can [check Whonix Signing Key](https://www.whonix.org/wiki/Whonix_Signing_Key) for better security.
+Users can [check the Signing Key](https://www.whonix.org/wiki/Signing_Key) for better security.
 
-2\. Add Whonix's signing key.
-
-```
-sudo apt-key --keyring /etc/apt/trusted.gpg.d/whonix.gpg add ~/patrick.asc
-```
-
-3\. Add Whonix's APT repository.
+2\. Add the APT Signing Key.
 
 ```
-echo "deb https://deb.whonix.org bullseye main contrib non-free" | sudo tee /etc/apt/sources.list.d/whonix.list
+sudo cp ~/derivative.asc /usr/share/keyrings/derivative.asc
+```
+
+3\. Add the derivative repository.
+
+```
+echo "deb [signed-by=/usr/share/keyrings/derivative.asc] https://deb.whonix.org bookworm main contrib non-free" | sudo tee /etc/apt/sources.list.d/derivative.list
 ```
 
 4\. Update your package lists.
@@ -104,7 +104,6 @@ Replace `apparmor-profile-torbrowser` with the actual name of this package with 
 ### Donate
 
 `kloak` requires [donations](https://www.whonix.org/wiki/Donate) to stay alive!
-
 
 ### Troubleshooting
 
