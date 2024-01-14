@@ -11,7 +11,6 @@
 #include <libevdev/libevdev-uinput.h>
 #include <X11/XKBlib.h>
 
-
 #include "keycodes.h"
 
 #define BUFSIZE 256                  // for device names and rescue key sequence
@@ -135,7 +134,6 @@ void parse_layout_and_model(const char *input, char **layout, char **model) {
     const char *firstPlus = strchr(input, '+');
     if (!firstPlus) return;
 
-    // Extract model (before the first '+')
     *model = strndup(input, firstPlus - input);
     if (!*model) return;
 
