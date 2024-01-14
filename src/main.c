@@ -307,10 +307,9 @@ void main_loop() {
     struct entry *n1, *np;
 
     Display *display = NULL;
-    char *originalLayout = NULL;
-    char *currentLayout = NULL;
-    char *layout = NULL;
-    char *model = NULL;
+    char *rawLayoutString = NULL;
+    char *parsedLayout = NULL;
+    char *parsedModel = NULL;
 
     // initialize the rescue state
     int rescue_state[MAX_RESCUE_KEYS];
@@ -334,13 +333,13 @@ void main_loop() {
         // exit(1); TODO: should program exit if not running on X11?
     }
 
-    originalLayout = get_current_layout(display);
+    rawLayoutString = get_current_layout(display);
     
-    parse_layout_and_model(originalLayout, &layout, &model);
+    parse_layout_and_model(rawLayoutString, &parsedLayout, &parsedModel);
     if (verbose) {
-        if (layout && model) {
-            printf("Layout: %s\n", layout);
-            printf("Model: %s\n", model);
+        if (parsedLayout && parsedModel) {
+            printf("Layout: %s\n", parsedLayout);
+            printf("Model: %s\n", parsedModel);
         } else {
             printf("Failed to parse keyboard layout string.\n");
         }
@@ -375,7 +374,7 @@ void main_loop() {
         current_time = current_time_ms();
         
         if (isFirstKeypress == 0) {
-            set_keyboard_layout(layout, model); 
+            set_keyboard_layout(parsedLayout, parsedModel); 
             isFirstKeypress = 1; 
         }
 
@@ -437,9 +436,9 @@ void main_loop() {
 
     free(pfds);
     XCloseDisplay(display);
-    free(currentLayout);
-    free(layout);
-    free(model);
+    free(rawLayoutString);
+    free(parsedLayout);
+    free(parsedModel);
 }
 
 void usage() {
