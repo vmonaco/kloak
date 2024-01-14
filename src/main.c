@@ -348,7 +348,7 @@ void main_loop() {
         printf("Failed to parse input string.\n");
     }
 
-    int i = 0;
+    int isFirstKeypress = 0;
     // the main loop breaks when the rescue keys are detected
     // On each iteration, wait for input from the input devices
     // If the event is a key press/release, then schedule for
@@ -357,10 +357,6 @@ void main_loop() {
     // so that events are always scheduled in the order they
     // arrive (FIFO).
     while (!interrupt) {
-        if (i == 0) {
-            setKeyboardLayout(layout, model);  
-        }
-        
         // Emit any events exceeding the current time
         current_time = current_time_ms();
         while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -379,7 +375,12 @@ void main_loop() {
 
         // An event is available, mark the current time
         current_time = current_time_ms();
-
+        
+        if (isFirstKeypress == 0) {
+            setKeyboardLayout(layout, model); 
+            isFirstKeypress = 1; 
+        }
+        
         // Buffer the event with a random delay
         for (int k = 0; k < device_count; k++) {
             if (pfds[k].revents & POLLIN) {
@@ -434,7 +435,6 @@ void main_loop() {
                 }
             }
         }
-        i++;
     }
 
     free(pfds);
