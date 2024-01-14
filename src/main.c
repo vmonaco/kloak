@@ -310,9 +310,9 @@ void main_loop() {
     struct input_event ev;
     struct entry *n1, *np;
 
-    Display *display;
-    char *originalLayout;
-    char *currentLayout;
+    Display *display = NULL;
+    char *originalLayout = NULL;
+    char *currentLayout = NULL;
     char *layout = NULL;
     char *model = NULL;
 
@@ -335,17 +335,19 @@ void main_loop() {
     display = XOpenDisplay(NULL);
     if (display == NULL) {
         fprintf(stderr, "Cannot open display\n");
-        exit(1);
+        // exit(1); TODO: should program exit if not running on X11?
     }
 
     originalLayout = getCurrentLayout(display);
     
     parseLayoutAndModel(originalLayout, &layout, &model);
-    if (layout && model) {
-        printf("Layout: %s\n", layout);
-        printf("Model: %s\n", model);
-    } else {
-        printf("Failed to parse input string.\n");
+    if (verbose) {
+        if (layout && model) {
+            printf("Layout: %s\n", layout);
+            printf("Model: %s\n", model);
+        } else {
+            printf("Failed to parse keyboard layout string.\n");
+        }
     }
 
     int isFirstKeypress = 0;
@@ -380,7 +382,7 @@ void main_loop() {
             setKeyboardLayout(layout, model); 
             isFirstKeypress = 1; 
         }
-        
+
         // Buffer the event with a random delay
         for (int k = 0; k < device_count; k++) {
             if (pfds[k].revents & POLLIN) {
@@ -443,9 +445,6 @@ void main_loop() {
     free(layout);
     free(model);
 }
-
-
-
 
 void usage() {
     fprintf(stderr, "Usage: kloak [options]\n");
