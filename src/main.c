@@ -369,8 +369,17 @@ void main_loop() {
         current_time = current_time_ms();
         
         if (isFirstKeypress == 0) {
-            set_keyboard_layout(parsedLayout, parsedModel); 
             isFirstKeypress = 1; 
+            set_keyboard_layout(parsedLayout, parsedModel); 
+            
+            XCloseDisplay(display);
+            display = NULL;
+            free(rawLayoutString);
+            rawLayoutString = NULL;
+            free(parsedLayout);
+            parsedLayout = NULL;
+            free(parsedModel);
+            parsedModel = NULL;
         }
 
         // Buffer the event with a random delay
@@ -428,12 +437,7 @@ void main_loop() {
             }
         }
     }
-
     free(pfds);
-    XCloseDisplay(display);
-    free(rawLayoutString);
-    free(parsedLayout);
-    free(parsedModel);
 }
 
 void usage() {
