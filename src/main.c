@@ -9,6 +9,12 @@
 #include <sys/queue.h>
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
+#include <X11/XKBlib.h>
+#include <X11/Xlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 
 #include "keycodes.h"
 
@@ -87,6 +93,44 @@ long random_between(long lower, long upper) {
         return upper;
 
     return lower + randombytes_uniform(upper - lower + 1);
+}
+
+char* getCurrentLayout(Display *display) {
+    XkbDescPtr keyboardDesc = XkbAllocKeyboard();
+    if (keyboardDesc == NULL) {
+        return NULL;
+    }
+
+    if (XkbGetControls(display, XkbAllControlsMask, keyboardDesc) != Success) {
+        XkbFreeKeyboard(keyboardDesc, 0, True);
+        return NULL;
+    }
+
+    if (XkbGetNames(display, XkbSymbolsNameMask, keyboardDesc) != Success) {
+        XkbFreeKeyboard(keyboardDesc, 0, True);
+        return NULL;
+    }
+
+    char *layout = NULL;
+    if (keyboardDesc->names && keyboardDesc->names->symbols) {
+        layout = strdup(XGetAtomName(display, keyboardDesc->names->symbols));
+        if (layout) {
+            fprintf(stderr, "Current layout string: %s\n", layout);
+        } else {
+            fprintf(stderr, "Failed to strdup layout name\n");
+        }
+    } else {
+        fprintf(stderr, "No symbols name available in keyboard description\n");
+    }
+
+    XkbFreeKeyboard(keyboardDesc, 0, True);
+    return layout;
+}
+
+int setKeyboardLayout(const char *layout, const char *model) {
+    char command[256];
+    snprintf(command, sizeof(command), "setxkbmap %s -model %s", layout, model);
+    return system(command);
 }
 
 void set_rescue_keys(const char* rescue_keys_str) {
@@ -241,6 +285,12 @@ void main_loop() {
     struct input_event ev;
     struct entry *n1, *np;
 
+    Display *display;
+    char *originalLayout;
+    char *currentLayout;
+    char *layout = NULL;
+    char *model = NULL;
+
     // initialize the rescue state
     int rescue_state[MAX_RESCUE_KEYS];
     for (int i = 0; i < rescue_len; i++) {
@@ -257,6 +307,23 @@ void main_loop() {
         pfds[j].events = POLLIN;
     }
 
+    display = XOpenDisplay(NULL);
+    if (display == NULL) {
+        fprintf(stderr, "Cannot open display\n");
+        exit(1);
+    }
+
+    originalLayout = getCurrentLayout(display);
+    
+    parseLayoutAndModel(originalLayout, &layout, &model);
+    if (layout && model) {
+        printf("Layout: %s\n", layout);
+        printf("Model: %s\n", model);
+    } else {
+        printf("Failed to parse input string.\n");
+    }
+
+    int i = 0;
     // the main loop breaks when the rescue keys are detected
     // On each iteration, wait for input from the input devices
     // If the event is a key press/release, then schedule for
@@ -265,6 +332,10 @@ void main_loop() {
     // so that events are always scheduled in the order they
     // arrive (FIFO).
     while (!interrupt) {
+        if (i == 0) {
+            setKeyboardLayout(layout, model);  
+        }
+        
         // Emit any events exceeding the current time
         current_time = current_time_ms();
         while ((np = TAILQ_FIRST(&head)) && (current_time >= np->time)) {
@@ -338,10 +409,18 @@ void main_loop() {
                 }
             }
         }
+        i++;
     }
 
     free(pfds);
+    XCloseDisplay(display);
+    free(currentLayout);
+    free(layout);
+    free(model);
 }
+
+
+
 
 void usage() {
     fprintf(stderr, "Usage: kloak [options]\n");
@@ -372,6 +451,31 @@ void banner() {
 
     printf("\n");
     printf("********************************************************************************\n");
+}
+
+void parseLayoutAndModel(const char *input, char **layout, char **model) {
+    if (!input || !layout || !model) return;
+
+    const char *firstPlus = strchr(input, '+');
+    if (!firstPlus) return; // No '+' found, invalid format
+
+    // Extract model (before the first '+')
+    *model = strndup(input, firstPlus - input);
+    if (!*model) return; // Memory allocation failure
+
+    // Move to the next character after '+'
+    firstPlus++;
+
+    // Find the next '+' if it exists
+    const char *secondPlus = strchr(firstPlus, '+');
+    int length = secondPlus ? secondPlus - firstPlus : strlen(firstPlus);
+
+    // Extract layout (between the first and second '+' or end of string)
+    *layout = strndup(firstPlus, length);
+    if (!*layout) {
+        free(*model); // Clean up model allocation before returning
+        return; // Memory allocation failure
+    }
 }
 
 int main(int argc, char **argv) {
