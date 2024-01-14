@@ -133,6 +133,31 @@ int setKeyboardLayout(const char *layout, const char *model) {
     return system(command);
 }
 
+void parseLayoutAndModel(const char *input, char **layout, char **model) {
+    if (!input || !layout || !model) return;
+
+    const char *firstPlus = strchr(input, '+');
+    if (!firstPlus) return; // No '+' found, invalid format
+
+    // Extract model (before the first '+')
+    *model = strndup(input, firstPlus - input);
+    if (!*model) return; // Memory allocation failure
+
+    // Move to the next character after '+'
+    firstPlus++;
+
+    // Find the next '+' if it exists
+    const char *secondPlus = strchr(firstPlus, '+');
+    int length = secondPlus ? secondPlus - firstPlus : strlen(firstPlus);
+
+    // Extract layout (between the first and second '+' or end of string)
+    *layout = strndup(firstPlus, length);
+    if (!*layout) {
+        free(*model); // Clean up model allocation before returning
+        return; // Memory allocation failure
+    }
+}
+
 void set_rescue_keys(const char* rescue_keys_str) {
     char* _rescue_keys_str = malloc(strlen(rescue_keys_str) + 1);
     if(_rescue_keys_str == NULL) {
@@ -451,31 +476,6 @@ void banner() {
 
     printf("\n");
     printf("********************************************************************************\n");
-}
-
-void parseLayoutAndModel(const char *input, char **layout, char **model) {
-    if (!input || !layout || !model) return;
-
-    const char *firstPlus = strchr(input, '+');
-    if (!firstPlus) return; // No '+' found, invalid format
-
-    // Extract model (before the first '+')
-    *model = strndup(input, firstPlus - input);
-    if (!*model) return; // Memory allocation failure
-
-    // Move to the next character after '+'
-    firstPlus++;
-
-    // Find the next '+' if it exists
-    const char *secondPlus = strchr(firstPlus, '+');
-    int length = secondPlus ? secondPlus - firstPlus : strlen(firstPlus);
-
-    // Extract layout (between the first and second '+' or end of string)
-    *layout = strndup(firstPlus, length);
-    if (!*layout) {
-        free(*model); // Clean up model allocation before returning
-        return; // Memory allocation failure
-    }
 }
 
 int main(int argc, char **argv) {
