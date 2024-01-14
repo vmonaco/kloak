@@ -329,8 +329,8 @@ void main_loop() {
 
     display = XOpenDisplay(NULL);
     if (display == NULL) {
-        fprintf(stderr, "Cannot open display\n");
-        // exit(1); TODO: should program exit if not running on X11?
+        // TODO: should program exit if not running on X11?
+        panic("Not running on X11. Exiting.\n");
     }
 
     rawLayoutString = get_current_layout(display);
