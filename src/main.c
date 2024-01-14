@@ -10,10 +10,6 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 #include <X11/XKBlib.h>
-#include <X11/Xlib.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 
 #include "keycodes.h"
@@ -95,7 +91,7 @@ long random_between(long lower, long upper) {
     return lower + randombytes_uniform(upper - lower + 1);
 }
 
-char* getCurrentLayout(Display *display) {
+char* get_current_layout(Display *display) {
     XkbDescPtr keyboardDesc = XkbAllocKeyboard();
     if (keyboardDesc == NULL) {
         return NULL;
@@ -127,13 +123,13 @@ char* getCurrentLayout(Display *display) {
     return layout;
 }
 
-int setKeyboardLayout(const char *layout, const char *model) {
+int set_keyboard_layout(const char *layout, const char *model) {
     char command[256];
     snprintf(command, sizeof(command), "setxkbmap %s -model %s", layout, model);
     return system(command);
 }
 
-void parseLayoutAndModel(const char *input, char **layout, char **model) {
+void parse_layout_and_model(const char *input, char **layout, char **model) {
     if (!input || !layout || !model) return;
 
     const char *firstPlus = strchr(input, '+');
@@ -338,9 +334,9 @@ void main_loop() {
         // exit(1); TODO: should program exit if not running on X11?
     }
 
-    originalLayout = getCurrentLayout(display);
+    originalLayout = get_current_layout(display);
     
-    parseLayoutAndModel(originalLayout, &layout, &model);
+    parse_layout_and_model(originalLayout, &layout, &model);
     if (verbose) {
         if (layout && model) {
             printf("Layout: %s\n", layout);
@@ -379,7 +375,7 @@ void main_loop() {
         current_time = current_time_ms();
         
         if (isFirstKeypress == 0) {
-            setKeyboardLayout(layout, model); 
+            set_keyboard_layout(layout, model); 
             isFirstKeypress = 1; 
         }
 
