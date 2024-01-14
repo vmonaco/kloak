@@ -133,24 +133,21 @@ void parse_layout_and_model(const char *input, char **layout, char **model) {
     if (!input || !layout || !model) return;
 
     const char *firstPlus = strchr(input, '+');
-    if (!firstPlus) return; // No '+' found, invalid format
+    if (!firstPlus) return;
 
     // Extract model (before the first '+')
     *model = strndup(input, firstPlus - input);
-    if (!*model) return; // Memory allocation failure
+    if (!*model) return;
 
-    // Move to the next character after '+'
     firstPlus++;
 
-    // Find the next '+' if it exists
     const char *secondPlus = strchr(firstPlus, '+');
     int length = secondPlus ? secondPlus - firstPlus : strlen(firstPlus);
 
-    // Extract layout (between the first and second '+' or end of string)
     *layout = strndup(firstPlus, length);
     if (!*layout) {
-        free(*model); // Clean up model allocation before returning
-        return; // Memory allocation failure
+        free(*model);
+        return;
     }
 }
 
