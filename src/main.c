@@ -9,6 +9,7 @@
 #include <sys/queue.h>
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
+#include <X11/XKBlib.h>
 
 #include "keycodes.h"
 
@@ -87,6 +88,65 @@ long random_between(long lower, long upper) {
         return upper;
 
     return lower + randombytes_uniform(upper - lower + 1);
+}
+
+char* get_current_layout(Display *display) {
+    XkbDescPtr keyboardDesc = XkbAllocKeyboard();
+    if (keyboardDesc == NULL) {
+        return NULL;
+    }
+
+    if (XkbGetControls(display, XkbAllControlsMask, keyboardDesc) != Success) {
+        XkbFreeKeyboard(keyboardDesc, 0, True);
+        return NULL;
+    }
+
+    if (XkbGetNames(display, XkbSymbolsNameMask, keyboardDesc) != Success) {
+        XkbFreeKeyboard(keyboardDesc, 0, True);
+        return NULL;
+    }
+
+    char *layout = NULL;
+    if (keyboardDesc->names && keyboardDesc->names->symbols) {
+        layout = strdup(XGetAtomName(display, keyboardDesc->names->symbols));
+        if (layout) {
+            fprintf(stderr, "Current layout string: %s\n", layout);
+        } else {
+            fprintf(stderr, "Failed to strdup layout name\n");
+        }
+    } else {
+        fprintf(stderr, "No symbols name available in keyboard description\n");
+    }
+
+    XkbFreeKeyboard(keyboardDesc, 0, True);
+    return layout;
+}
+
+int set_keyboard_layout(const char *layout, const char *model) {
+    char command[256];
+    snprintf(command, sizeof(command), "setxkbmap %s -model %s", layout, model);
+    return system(command);
+}
+
+void parse_layout_and_model(const char *input, char **layout, char **model) {
+    if (!input || !layout || !model) return;
+
+    const char *firstPlus = strchr(input, '+');
+    if (!firstPlus) return;
+
+    *model = strndup(input, firstPlus - input);
+    if (!*model) return;
+
+    firstPlus++;
+
+    const char *secondPlus = strchr(firstPlus, '+');
+    int length = secondPlus ? secondPlus - firstPlus : strlen(firstPlus);
+
+    *layout = strndup(firstPlus, length);
+    if (!*layout) {
+        free(*model);
+        return;
+    }
 }
 
 void set_rescue_keys(const char* rescue_keys_str) {
@@ -241,6 +301,11 @@ void main_loop() {
     struct input_event ev;
     struct entry *n1, *np;
 
+    Display *display = NULL;
+    char *rawLayoutString = NULL;
+    char *parsedLayout = NULL;
+    char *parsedModel = NULL;
+
     // initialize the rescue state
     int rescue_state[MAX_RESCUE_KEYS];
     for (int i = 0; i < rescue_len; i++) {
@@ -257,6 +322,25 @@ void main_loop() {
         pfds[j].events = POLLIN;
     }
 
+    display = XOpenDisplay(NULL);
+    if (display == NULL) {
+        // TODO: should program exit if not running on X11?
+        panic("Not running on X11. Exiting.\n");
+    }
+
+    rawLayoutString = get_current_layout(display);
+    
+    parse_layout_and_model(rawLayoutString, &parsedLayout, &parsedModel);
+    if (verbose) {
+        if (parsedLayout && parsedModel) {
+            printf("Layout: %s\n", parsedLayout);
+            printf("Model: %s\n", parsedModel);
+        } else {
+            printf("Failed to parse keyboard layout string.\n");
+        }
+    }
+
+    int isFirstKeypress = 0;
     // the main loop breaks when the rescue keys are detected
     // On each iteration, wait for input from the input devices
     // If the event is a key press/release, then schedule for
@@ -283,6 +367,20 @@ void main_loop() {
 
         // An event is available, mark the current time
         current_time = current_time_ms();
+        
+        if (isFirstKeypress == 0) {
+            isFirstKeypress = 1; 
+            set_keyboard_layout(parsedLayout, parsedModel); 
+            
+            XCloseDisplay(display);
+            display = NULL;
+            free(rawLayoutString);
+            rawLayoutString = NULL;
+            free(parsedLayout);
+            parsedLayout = NULL;
+            free(parsedModel);
+            parsedModel = NULL;
+        }
 
         // Buffer the event with a random delay
         for (int k = 0; k < device_count; k++) {
@@ -339,7 +437,6 @@ void main_loop() {
             }
         }
     }
-
     free(pfds);
 }
 

@@ -19,11 +19,11 @@ Install dependencies:
 
 Fedora:
 
-    $ sudo dnf install make pkgconf-pkg-config libsodium libsodium-devel libevdev libevdev-devel
+    $ sudo dnf install make pkgconf-pkg-config libsodium libsodium-devel libevdev libevdev-devel libx11-devel
 
 Debian:
 
-    $ sudo apt install devscripts
+    $ sudo apt install devscripts libx11-dev
     $ sudo mk-build-deps --remove --install
 
 First, compile `kloak` and the event capture tool `eventcap`:
