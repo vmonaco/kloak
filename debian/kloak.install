@@ -3,7 +3,8 @@
 
 ## Manually maintained file. nogenmkfile
 
-etc/*
-lib/*
 eventcap usr/sbin/
 kloak usr/sbin/
+
+etc/*
+usr/*
