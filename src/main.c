@@ -77,7 +77,7 @@ void sleep_ms(long milliseconds) {
 
 long current_time_ms(void) {
     struct timespec spec;
-    clock_gettime(CLOCK_REALTIME, &spec);
+    clock_gettime(CLOCK_MONOTONIC, &spec);
     return (spec.tv_sec) * 1000 + (spec.tv_nsec) / 1000000;
 }
 
