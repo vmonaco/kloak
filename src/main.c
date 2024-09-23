@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <poll.h>
 #include <string.h>
 #include <errno.h>
@@ -5,6 +6,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <time.h>
+#include <stdbool.h>
 #include <sodium.h>
 #include <sys/queue.h>
 #include <libevdev/libevdev.h>
@@ -67,6 +69,27 @@ struct entry {
     TAILQ_ENTRY(entry) entries;
     int device_index;
 };
+
+// From string_copying manpage
+ssize_t strtcpy(char *restrict dst, const char *restrict src, size_t dsize)
+{
+    bool trunc;
+    size_t dlen, slen;
+
+    if (dsize == 0) {
+        errno = ENOBUFS;
+        return -1;
+    }
+
+    slen = strnlen(src, dsize);
+    trunc = (slen == dsize);
+    dlen = slen - trunc;
+
+    stpcpy(mempcpy(dst, src, dlen), "");
+    if (trunc)
+        errno = E2BIG;
+    return trunc ? -1 : (ssize_t)slen;
+}
 
 void sleep_ms(long milliseconds) {
     struct timespec ts;
@@ -161,7 +184,6 @@ int is_mouse(int fd) {
 
 void detect_devices() {
     int fd;
-    unsigned int device_idx;
     char device[BUFSIZE];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
@@ -172,15 +194,11 @@ void detect_devices() {
         }
 
         if (is_keyboard(fd)) {
-            device_idx = device_count++;
-            strncpy(named_inputs[device_idx], device, BUFSIZE);
-            named_inputs[device_idx][BUFSIZE-1] = 0;
+            strtcpy(named_inputs[device_count++], device, BUFSIZE);
             if (verbose)
                 printf("Found keyboard at: %s\n", device);
         } else if (is_mouse(fd)) {
-            device_idx = device_count++;
-            strncpy(named_inputs[device_idx], device, BUFSIZE);
-            named_inputs[device_idx][BUFSIZE-1] = 0;
+            strtcpy(named_inputs[device_count++], device, BUFSIZE);
             if (verbose)
                 printf("Found mouse at: %s\n", device);
         }
