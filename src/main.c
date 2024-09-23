@@ -24,7 +24,7 @@
 #define DEFAULT_MAX_DELAY_MS 20      // upper bound on event delay
 #define DEFAULT_STARTUP_DELAY_MS 500 // wait before grabbing the input device
 
-#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); } while (0)
+#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); fflush(stderr); cleanup(); exit(EXIT_FAILURE); } while (0)
 
 #ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
@@ -83,6 +83,14 @@ ssize_t strtcpy(char *restrict dst, const char *restrict src, size_t dsize)
     if (trunc)
         errno = E2BIG;
     return trunc ? -1 : (ssize_t)slen;
+}
+
+void cleanup() {
+    for (int i = 0; i < device_count; i++) {
+        libevdev_uinput_destroy(uidevs[i]);
+        libevdev_free(output_devs[i]);
+        close(input_fds[i]);
+    }
 }
 
 void sleep_ms(long milliseconds) {
@@ -483,11 +491,7 @@ int main(int argc, char **argv) {
     main_loop();
 
     // close everything
-    for (int i = 0; i < device_count; i++) {
-        libevdev_uinput_destroy(uidevs[i]);
-        libevdev_free(output_devs[i]);
-        close(input_fds[i]);
-    }
+    cleanup();
 
     exit(EXIT_SUCCESS);
 }
