@@ -55,7 +55,7 @@ NoNewPrivileges=true
 RestrictRealtime=true
 RestrictNamespaces=true
 SystemCallArchitectures=native
-SystemCallFilter=brk clock_nanosleep close execve faccessat getdents64 getpid getrandom getuid ioctl madvise mmap mprotect munmap newfstatat openat ppoll prlimit64 read readlinkat rseq rt_sigaction set_robust_list set_tid_address sigaltstack write rt_sigprocmask sysinfo uname getcwd
+SystemCallFilter=brk clock_nanosleep close execve faccessat getdents64 getpid getrandom getuid ioctl madvise mmap mprotect munmap newfstatat openat ppoll prlimit64 read readlinkat rseq rt_sigaction set_robust_list set_tid_address sigaltstack write rt_sigprocmask sysinfo uname getcwd access fstat pread64 poll
 
 [Install]
 WantedBy=multi-user.target
