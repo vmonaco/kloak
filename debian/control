@@ -5,7 +5,7 @@ Source: kloak
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@whonix.org>
-Build-Depends: debhelper (>= 13.11.6), debhelper-compat (= 13), dh-apparmor, libevdev2, libevdev-dev, libsodium23, libsodium-dev, pkg-config
+Build-Depends: debhelper (>= 13.11.4), debhelper-compat (= 13), dh-apparmor, libevdev2, libevdev-dev, libsodium23, libsodium-dev, pkg-config
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git

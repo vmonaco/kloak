@@ -16,8 +16,8 @@
 #include "keycodes.h"
 
 #define BUFSIZE 256                  // for device names and rescue key sequence
-#define MAX_INPUTS 16                // number of devices to try autodetection
-#define MAX_DEVICES 16               // max number of devices to read events from
+#define MAX_INPUTS 48                // number of devices to try autodetection
+#define MAX_DEVICES 48               // max number of devices to read events from
 #define MAX_RESCUE_KEYS 10           // max number of rescue keys to exit in case of emergency
 #define MIN_KEYBOARD_KEYS 20         // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1            // timeout to check for new events
