@@ -42,7 +42,7 @@ static int rescue_len = 0;      // Number of rescue keys, set during initializat
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
 
-static int device_count = 0;
+static unsigned int device_count = 0;
 static char named_inputs[MAX_INPUTS][BUFSIZE];
 
 static int input_fds[MAX_INPUTS];
@@ -82,11 +82,18 @@ long current_time_ms(void) {
 }
 
 long random_between(long lower, long upper) {
+    long maxval;
+    long randval;
     // default to max if the interval is not valid
     if (lower >= upper)
         return upper;
 
-    return lower + randombytes_uniform(upper - lower + 1);
+    maxval = upper - lower + 1;
+    if (maxval > UINT32_MAX)
+        return UINT32_MAX;
+
+    randval = randombytes_uniform((uint32_t)maxval);
+    return lower + randval;
 }
 
 void set_rescue_keys(const char* rescue_keys_str) {
@@ -118,7 +125,9 @@ int supports_event_type(int device_fd, int event_type) {
     unsigned long evbit = 0;
     // Get the bit field of available event types.
     ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
-    return evbit & (1 << event_type);
+    // NOTE: EVIOCGBIT ioctl returns an int, see handle_eviocgbit function in
+    // linux/drivers/input/evdev.c, thus this cast is safe
+    return (int)evbit & (1 << event_type);
 }
 
 int supports_specific_key(int device_fd, unsigned int key) {
@@ -130,7 +139,7 @@ int supports_specific_key(int device_fd, unsigned int key) {
 }
 
 int is_keyboard(int fd) {
-    int key;
+    unsigned int key;
     int num_supported_keys = 0;
 
     // Only check devices that support EV_KEY events
@@ -152,7 +161,8 @@ int is_mouse(int fd) {
 
 void detect_devices() {
     int fd;
-    char device[256];
+    unsigned int device_idx;
+    char device[BUFSIZE];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
         sprintf(device, "/dev/input/event%d", i);
@@ -162,11 +172,15 @@ void detect_devices() {
         }
 
         if (is_keyboard(fd)) {
-            strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            device_idx = device_count++;
+            strncpy(named_inputs[device_idx], device, BUFSIZE);
+            named_inputs[device_idx][BUFSIZE-1] = 0;
             if (verbose)
                 printf("Found keyboard at: %s\n", device);
         } else if (is_mouse(fd)) {
-            strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            device_idx = device_count++;
+            strncpy(named_inputs[device_idx], device, BUFSIZE);
+            named_inputs[device_idx][BUFSIZE-1] = 0;
             if (verbose)
                 printf("Found mouse at: %s\n", device);
         }
@@ -233,7 +247,7 @@ void emit_event(struct entry *e) {
 }
 
 void main_loop() {
-    int err;
+    long int err;
     long prev_release_time = 0;
     long current_time = 0;
     long lower_bound = 0;
