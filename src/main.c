@@ -232,11 +232,14 @@ void init_inputs() {
 }
 
 void init_outputs() {
+    const char *name = "kloak output device";
     for (int i = 0; i < device_count; i++) {
         int err = libevdev_new_from_fd(input_fds[i], &output_devs[i]);
 
         if (err != 0)
             panic("Could not create evdev for input device: %s", named_inputs[i]);
+
+        libevdev_set_name(output_devs[i], name);
 
         err = libevdev_uinput_create_from_device(output_devs[i], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[i]);
 
