@@ -192,7 +192,7 @@ void detect_devices() {
     char device[BUFSIZE];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
-        sprintf(device, "/dev/input/event%d", i);
+        snprintf(device, sizeof(device), "/dev/input/event%d", i);
 
         if ((fd = open(device, O_RDONLY)) < 0) {
             continue;
