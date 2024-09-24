@@ -8,3 +8,4 @@ kloak usr/sbin/
 
 etc/*
 usr/*
+lib/*

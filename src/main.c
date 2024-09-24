@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <poll.h>
 #include <string.h>
 #include <errno.h>
@@ -5,23 +6,25 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <time.h>
+#include <stdbool.h>
 #include <sodium.h>
 #include <sys/queue.h>
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
+#include "kloak.h"
 #include "keycodes.h"
 
 #define BUFSIZE 256                  // for device names and rescue key sequence
-#define MAX_INPUTS 16                // number of devices to try autodetection
-#define MAX_DEVICES 16               // max number of devices to read events from
+#define MAX_INPUTS 48                // number of devices to try autodetection
+#define MAX_DEVICES 48               // max number of devices to read events from
 #define MAX_RESCUE_KEYS 10           // max number of rescue keys to exit in case of emergency
 #define MIN_KEYBOARD_KEYS 20         // need at least this many keys to be a keyboard
 #define POLL_TIMEOUT_MS 1            // timeout to check for new events
 #define DEFAULT_MAX_DELAY_MS 20      // upper bound on event delay
 #define DEFAULT_STARTUP_DELAY_MS 500 // wait before grabbing the input device
 
-#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); } while (0)
+#define panic(format, ...) do { fprintf(stderr, format "\n", ## __VA_ARGS__); fflush(stderr); cleanup(); exit(EXIT_FAILURE); } while (0)
 
 #ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
@@ -42,7 +45,7 @@ static int rescue_len = 0;      // Number of rescue keys, set during initializat
 static int max_delay = DEFAULT_MAX_DELAY_MS;  // lag will never exceed this upper bound
 static int startup_timeout = DEFAULT_STARTUP_DELAY_MS;
 
-static int device_count = 0;
+static unsigned int device_count = 0;
 static char named_inputs[MAX_INPUTS][BUFSIZE];
 
 static int input_fds[MAX_INPUTS];
@@ -61,32 +64,62 @@ static struct option long_options[] = {
 
 TAILQ_HEAD(tailhead, entry) head;
 
-struct entry {
-    struct input_event iev;
-    long time;
-    TAILQ_ENTRY(entry) entries;
-    int device_index;
-};
+// From string_copying manpage
+ssize_t strtcpy(char *restrict dst, const char *restrict src, size_t dsize)
+{
+    bool trunc;
+    size_t dlen, slen;
+
+    if (dsize == 0) {
+        errno = ENOBUFS;
+        return -1;
+    }
+
+    slen = strnlen(src, dsize);
+    trunc = (slen == dsize);
+    dlen = slen - trunc;
+
+    stpcpy(mempcpy(dst, src, dlen), "");
+    if (trunc)
+        errno = E2BIG;
+    return trunc ? -1 : (ssize_t)slen;
+}
+
+void cleanup() {
+    for (int i = 0; i < device_count; i++) {
+        libevdev_uinput_destroy(uidevs[i]);
+        libevdev_free(output_devs[i]);
+        close(input_fds[i]);
+    }
+}
 
 void sleep_ms(long milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    if (nanosleep(&ts, NULL) == -1)
+      panic("nanosleep failed: %s", strerror(errno));
 }
 
 long current_time_ms(void) {
     struct timespec spec;
-    clock_gettime(CLOCK_REALTIME, &spec);
+    clock_gettime(CLOCK_MONOTONIC, &spec);
     return (spec.tv_sec) * 1000 + (spec.tv_nsec) / 1000000;
 }
 
 long random_between(long lower, long upper) {
+    long maxval;
+    long randval;
     // default to max if the interval is not valid
     if (lower >= upper)
         return upper;
 
-    return lower + randombytes_uniform(upper - lower + 1);
+    maxval = upper - lower + 1;
+    if (maxval > UINT32_MAX)
+        return UINT32_MAX;
+
+    randval = randombytes_uniform((uint32_t)maxval);
+    return lower + randval;
 }
 
 void set_rescue_keys(const char* rescue_keys_str) {
@@ -117,20 +150,24 @@ void set_rescue_keys(const char* rescue_keys_str) {
 int supports_event_type(int device_fd, int event_type) {
     unsigned long evbit = 0;
     // Get the bit field of available event types.
-    ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
-    return evbit & (1 << event_type);
+    if (ioctl(device_fd, EVIOCGBIT(0, sizeof(evbit)), &evbit) == -1)
+      panic("ioctl EVIOCGBIT failed: %s", strerror(errno));
+    // NOTE: EVIOCGBIT ioctl returns an int, see handle_eviocgbit function in
+    // linux/drivers/input/evdev.c, thus this cast is safe
+    return (int)evbit & (1 << event_type);
 }
 
 int supports_specific_key(int device_fd, unsigned int key) {
     size_t nchar = KEY_MAX/8 + 1;
     unsigned char bits[nchar];
     // Get the bit fields of available keys.
-    ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits);
+    if (ioctl(device_fd, EVIOCGBIT(EV_KEY, sizeof(bits)), &bits) == -1)
+      panic("ioctl EVIOCGBIT for EV_KEY failed: %s", strerror(errno));
     return bits[key/8] & (1 << (key % 8));
 }
 
 int is_keyboard(int fd) {
-    int key;
+    unsigned int key;
     int num_supported_keys = 0;
 
     // Only check devices that support EV_KEY events
@@ -152,26 +189,27 @@ int is_mouse(int fd) {
 
 void detect_devices() {
     int fd;
-    char device[256];
+    char device[BUFSIZE];
 
     for (int i = 0; i < MAX_DEVICES; i++) {
-        sprintf(device, "/dev/input/event%d", i);
+        snprintf(device, sizeof(device), "/dev/input/event%d", i);
 
         if ((fd = open(device, O_RDONLY)) < 0) {
             continue;
         }
 
         if (is_keyboard(fd)) {
-            strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            strtcpy(named_inputs[device_count++], device, BUFSIZE);
             if (verbose)
                 printf("Found keyboard at: %s\n", device);
         } else if (is_mouse(fd)) {
-            strncpy(named_inputs[device_count++], device, BUFSIZE-1);
+            strtcpy(named_inputs[device_count++], device, BUFSIZE);
             if (verbose)
                 printf("Found mouse at: %s\n", device);
         }
 
-        close(fd);
+        if (close(fd) == -1)
+          panic("close failed on device: %s, error: %s", device, strerror(errno));
 
         if (device_count >= MAX_INPUTS) {
             if (verbose)
@@ -202,11 +240,14 @@ void init_inputs() {
 }
 
 void init_outputs() {
+    const char *name = "kloak output device";
     for (int i = 0; i < device_count; i++) {
         int err = libevdev_new_from_fd(input_fds[i], &output_devs[i]);
 
         if (err != 0)
             panic("Could not create evdev for input device: %s", named_inputs[i]);
+
+        libevdev_set_name(output_devs[i], name);
 
         err = libevdev_uinput_create_from_device(output_devs[i], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[i]);
 
@@ -233,7 +274,7 @@ void emit_event(struct entry *e) {
 }
 
 void main_loop() {
-    int err;
+    long int err;
     long prev_release_time = 0;
     long current_time = 0;
     long lower_bound = 0;
@@ -392,7 +433,7 @@ int main(int argc, char **argv) {
         case 'r':
             if (device_count >= MAX_INPUTS)
                 panic("Too many -r options: can read from at most %d devices\n", MAX_INPUTS);
-            strncpy(named_inputs[device_count++], optarg, BUFSIZE-1);
+            strtcpy(named_inputs[device_count++], optarg, BUFSIZE);
             break;
 
         case 'd':
@@ -406,7 +447,7 @@ int main(int argc, char **argv) {
             break;
 
         case 'k':
-            strncpy(rescue_keys_str, optarg, BUFSIZE-1);
+            strtcpy(rescue_keys_str, optarg, BUFSIZE);
             break;
 
         case 'v':
@@ -450,11 +491,7 @@ int main(int argc, char **argv) {
     main_loop();
 
     // close everything
-    for (int i = 0; i < device_count; i++) {
-        libevdev_uinput_destroy(uidevs[i]);
-        libevdev_free(output_devs[i]);
-        close(input_fds[i]);
-    }
+    cleanup();
 
     exit(EXIT_SUCCESS);
 }

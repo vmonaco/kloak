@@ -5,7 +5,7 @@ Source: kloak
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@whonix.org>
-Build-Depends: debhelper (>= 13.11.6), debhelper-compat (= 13), dh-apparmor, libevdev2, libevdev-dev, libsodium23, libsodium-dev, pkg-config
+Build-Depends: debhelper (>= 13.11.4), debhelper-compat (= 13), dh-apparmor, libevdev2, libevdev-dev, libsodium23, libsodium-dev, pkg-config
 Homepage: https://github.com/vmonaco/kloak
 Vcs-Browser: https://github.com/vmonaco/kloak
 Vcs-Git: https://github.com/vmonaco/kloak.git
@@ -29,7 +29,7 @@ Package: kloak
 ## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60269d8c
 ## qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6000178c
 ## Update: Same as above.
-Architecture: amd64
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libevdev2, libsodium23
 Description: anti keystroke deanonymization tool
  A keystroke-level online anonymization kernel.
