@@ -1,3 +1,97 @@
+commit 81a5ef129afff70ca3683ac393031ed51170378c
+Merge: e937174 e1e03d7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 00:55:31 2024 -0400
+
+    Merge remote-tracking branch 'github-whonix/master'
+
+commit e1e03d786078dd8b0e2bddb4a982afd76b864797
+Merge: e937174 bb4a714
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 00:52:03 2024 -0400
+
+    Merge pull request #1 from ArrayBolt3/arraybolt3
+    
+    Harden and enhance Kloak
+
+commit bb4a7143877eb12904e797224c2b0afc05463713
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 18:41:47 2024 -0500
+
+    Add a useful change from https://github.com/vmonaco/kloak/pull/65 that got missed
+
+commit ba5df2543f247ed5592690d97019e0444e79b749
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 18:33:55 2024 -0500
+
+    Do resource cleanup on panic
+
+commit 7fa9500c32f6560bf6ee7fe55438e27869601a0e
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 18:15:42 2024 -0500
+
+    Add some missing syscalls for x86_64
+
+commit d7f386dcdd25263eb9e7a7031b171fdec3d0d4d3
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 17:59:36 2024 -0500
+
+    Enable use on non-Intel architectures, fix syscall whitelist
+
+commit 5beda6da49cf1ef9ef09767e35a5660015160ee8
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 15:52:53 2024 -0500
+
+    Add address and undefined behavior sanitization
+
+commit e9284abf22adb36968011fb9ab47cc1357b58e9b
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 15:31:49 2024 -0500
+
+    Fix build failure, adjust number of supported devices to account for systems with many input devices
+
+commit 0d91a09a76ffa21b2782d673fcb91b16574b58d6
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 14:27:59 2024 -0500
+
+    Add support for new devices attached after kloak starts (adapted from https://github.com/vmonaco/kloak/pull/67)
+
+commit 7f9bc1bcfd08e8b3554e135a4c4d59a0a09b26d8
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 13:39:55 2024 -0500
+
+    Harden code based on advice from ChatGPT3 (adapted from https://github.com/vmonaco/kloak/pull/65)
+
+commit b0f0c926d84a6d60363c89c11b8f36cc55b57459
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 13:24:20 2024 -0500
+
+    Add a header file to make future development easier (adapted from https://github.com/vmonaco/kloak/pull/61)
+
+commit dd255ad28bd404f3aad6012949d4fb4e04330db9
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 13:08:09 2024 -0500
+
+    Use strtcpy rather than strncpy
+
+commit c9c5a9876bd7fba17ec638efd065cc0836329766
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 12:36:13 2024 -0500
+
+    Add compiler hardening flags, fix all GCC warnings
+
+commit 36385d7b0050601e6f255b168c297dab8d8fb027
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Mon Sep 23 11:16:50 2024 -0500
+
+    Use monotonic time for delay tracking
+
+commit e937174bb71313d943d8fb8965ae339343d0337f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Feb 2 12:46:17 2024 +0000
+
+    bumped changelog version
+
 commit de06819bf221b994e00a0e8ccd93c64f66b20dec
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Feb 2 07:33:00 2024 -0500
