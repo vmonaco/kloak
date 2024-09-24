@@ -1,3 +1,19 @@
+commit 0f3ae73fc107e4103f2e9933960bdedce63df7cf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 01:02:28 2024 -0400
+
+    fork of kloak from upstream
+    
+    from now, doing normal version bump with reach rebuild
+    
+    since version numbers are now managed by Whonix
+
+commit 98febd4ffde18ff2d37f6882cf0e1f6d03bfc53a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 05:00:47 2024 +0000
+
+    bumped changelog version
+
 commit 81a5ef129afff70ca3683ac393031ed51170378c
 Merge: e937174 e1e03d7
 Author: Patrick Schleizer <adrelanos@whonix.org>
