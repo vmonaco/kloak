@@ -1,4 +1,4 @@
-# Last Modified: Sun Jul  9 12:23:04 2023
+# Last Modified: Wed Sep 25 04:21:21 2024
 include <tunables/global>
 
 ## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
@@ -24,6 +24,9 @@ include <tunables/global>
   /{,usr/}lib{,32,64}/** mr,
   owner /dev/input/event* r,
   owner /dev/uinput rw,
+  owner /proc/*/cmdline r,
+  owner /proc/*/environ r,
+  owner /proc/*/maps r,
   owner /sys/devices/virtual/input/** r,
 
   # Site-specific additions and overrides. See local/README for details.
