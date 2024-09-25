@@ -36,6 +36,8 @@
 
 static int interrupt = 0;       // flag to interrupt the main loop and exit
 static int verbose = 0;         // flag for verbose output
+static int persistent = 0;      // flag for persistent mode (diables rescue key sequence)
+static int custom_rescue = 0;   // flag for setting a custom rescue key sequence
 
 static char rescue_key_seps[] = ", ";  // delims to strtok
 static char rescue_keys_str[BUFSIZE] = "KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC";
@@ -332,15 +334,17 @@ void main_loop() {
                     panic("read() failed: %s", strerror(errno));
 
                 // check for the rescue sequence.
-                if (ev.type == EV_KEY) {
-                    int all = 1;
-                    for (int j = 0; j < rescue_len; j++) {
-                        if (rescue_keys[j] == ev.code)
-                            rescue_state[j] = (ev.value == 0 ? 0 : 1);
-                        all = all && rescue_state[j];
+                if (!persistent) {
+                    if (ev.type == EV_KEY) {
+                        int all = 1;
+                        for (int j = 0; j < rescue_len; j++) {
+                            if (rescue_keys[j] == ev.code)
+                                rescue_state[j] = (ev.value == 0 ? 0 : 1);
+                            all = all && rescue_state[j];
+                        }
+                        if (all)
+                            interrupt = 1;
                     }
-                    if (all)
-                        interrupt = 1;
                 }
 
                 // schedule the keyboard event to be released sometime in the future.
@@ -392,6 +396,7 @@ void usage() {
     fprintf(stderr, "  -s startup_timeout: time to wait (milliseconds) before startup. Default 100.\n");
     fprintf(stderr, "  -k csv_string: csv list of rescue key names to exit kloak in case the\n"
             "     keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.\n");
+    fprintf(stderr, "  -p: persistent mode (disable rescue key sequence)\n");
     fprintf(stderr, "  -v: verbose mode\n");
 }
 
@@ -405,10 +410,13 @@ void banner() {
     for (int i = 1; i < device_count; i++) {
         printf("*                 %s\n", named_inputs[i]);
     }
-
-    printf("* Rescue keys   : %s", lookup_keyname(rescue_keys[0]));
-    for (int i = 1; i < rescue_len; i++) {
-        printf(" + %s", lookup_keyname(rescue_keys[i]));
+    if (persistent) {
+        printf("* Persistent mode, rescue keys disabled");
+    } else {
+        printf("* Rescue keys   : %s", lookup_keyname(rescue_keys[0]));
+        for (int i = 1; i < rescue_len; i++) {
+            printf(" + %s", lookup_keyname(rescue_keys[i]));
+        }
     }
 
     printf("\n");
@@ -424,7 +432,7 @@ int main(int argc, char **argv) {
         printf("You are not root! This may not work...\n");
 
     while (1) {
-        int c = getopt_long(argc, argv, "r:d:s:k:vh", long_options, NULL);
+        int c = getopt_long(argc, argv, "r:d:s:k:vph", long_options, NULL);
 
         if (c < 0)
             break;
@@ -447,11 +455,22 @@ int main(int argc, char **argv) {
             break;
 
         case 'k':
+            if (persistent) {
+                panic("-k and -p options are mutually exclusive, try -h for help\n");
+            }
             strtcpy(rescue_keys_str, optarg, BUFSIZE);
+            custom_rescue = 1;
             break;
 
         case 'v':
             verbose = 1;
+            break;
+
+        case 'p':
+            if (custom_rescue) {
+                panic("-k and -p options are mutually exclusive, try -h for help\n");
+            }
+            persistent = 1;
             break;
 
         case 'h':

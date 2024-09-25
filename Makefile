@@ -24,10 +24,14 @@ CFLAGS = -O2 -Wall -Wformat -Wformat=2 -Wconversion -Wimplicit-fallthrough \
 	-fsanitize=address,undefined
 
 ifeq ($(TARGETARCH), x86_64-linux-gnu)
-	CFLAGS += -fcf-protection=full # only supported on x86_64
+CFLAGS += -fcf-protection=full # only supported on x86_64
 endif
 ifeq ($(TARGETARCH), aarch64-linux-gnu)
-  CFLAGS += -mbranch-protection=standard # only supported on aarch64
+CFLAGS += -mbranch-protection=standard # only supported on aarch64
+endif
+
+ifeq (, $(shell which pkg-config))
+$(error pkg-config not installed!)
 endif
 
 all : kloak eventcap
