@@ -1,4 +1,4 @@
-# anti keystroke deanonymization tool #
+# anti keystroke deanonymization tool
 
 kloak: *Keystroke-level online anonymization kernel*
 
@@ -23,8 +23,7 @@ Fedora:
 
 Debian:
 
-    $ sudo apt install devscripts
-    $ sudo mk-build-deps --remove --install
+    $ sudo apt install make pkg-config libsodium-dev libevdev-dev
 
 First, compile `kloak` and the event capture tool `eventcap`:
 
@@ -94,7 +93,7 @@ sudo apt-get install kloak
 
 ### How to build deb package
 
-Replace `apparmor-profile-torbrowser` with the actual name of this package with `kloak` and see [instructions](https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser).
+See the [Whonix package build documentation](https://www.whonix.org/wiki/Dev/Build_Documentation/security-misc). Replace the sample package name `security-misc` with `kloak` to download, build, and install kloak.
 
 ### Whonix contact and support
 
@@ -106,27 +105,6 @@ Replace `apparmor-profile-torbrowser` with the actual name of this package with 
 `kloak` requires [donations](https://www.whonix.org/wiki/Donate) to stay alive!
 
 ### Troubleshooting
-
-#### Can't open input/output device
-
-`kloak` will attempt to find your keyboard device to read events from and the location of `uinput` to write events to. If `kloak` cannot find either the input device or output device, these must be specified with the `-r` and `-w` options, respectively.
-
-To find the keyboard device for reading events: determine which device file corresponds to the physical keyboard. Use `eventcap` (or some other event capture tool) and look for the device that generates events when keys are pressed. This will typically be one of `/dev/input/event[0-7]`. In this example, it's `/dev/input/event4`:
-
-    $ sudo ./eventcap /dev/input/event4
-    Reading From : /dev/input/event4 (AT Translated Set 2 keyboard)
-    Type:   4    Code:   4    Value:  15
-    Type:   1    Code:  15    Value:   0
-    Type:   0    Code:   0    Value:   0
-    Type:   4    Code:   4    Value:  56
-    Type:   1    Code:  56    Value:   0
-    Type:   0    Code:   0    Value:   0
-
-`uinput` is the [kernel module](http://thiemonge.org/getting-started-with-uinput) that allows user-land applications to create input devices. This is typically located at either `/dev/uinput` or `/dev/input/uinput`.
-
-Start `kloak` by specifying the input and output device files:
-
-    $ sudo ./kloak -r /dev/input/event4 -w /dev/uinput
 
 #### My keyboard seems very slow
 
@@ -149,38 +127,17 @@ The full usage and options are:
       -s startup_timeout: time to wait (milliseconds) before startup. Default 100.
       -k csv_string: csv list of rescue key names to exit kloak in case the
          keyboard becomes unresponsive. Default is 'KEY_LEFTSHIFT,KEY_RIGHTSHIFT,KEY_ESC'.
+      -p: persistent mode (disable rescue key sequence)
       -v: verbose mode
 
 ## Try it out
 
-Consider these three different scenarios:
-* Train normal, test normal
-* Train normal, test kloak
-* Train `kloak`, test `kloak`
-
-*Train normal* means to train with normal typing behavior, i.e., without `kloak` running. At the enrollment page on the KeyTrac demo (demo no longer available), enter a username and password without `kloak` running, and then on the authenticate page, try authenticating. For example, the train normal/test normal result is:
-
-<div align="center">
-  <img src="figures/train-normal_test-normal.png"><br><br>
-</div>
-
-Start `kloak` and then try authenticating again. These results were obtained using a maximum delay of 200 ms (`-d 200`). The train normal/test `kloak` result is:
-
-<div align="center">
-  <img src="figures/train-normal_test-kloak.png"><br><br>
-</div>
-
-Enroll With `kloak` running and then try authenticating with `kloak` still running. Again, this is with a 200 ms maximum delay. The train `kloak`/test `kloak` result is:
-
-<div align="center">
-  <img src="figures/train-kloak_test-kloak.png"><br><br>
-</div>
-
-Your results may differ, especially in the train `kloak`/test `kloak` scenario. The train `kloak`/test `kloak` scenario is more difficult to anonymize than the train normal/test `kloak` scenario. This is because *kloak obfuscates your typing behavior, but does not make your typing behavior similar to other users*. This dilemma relates to the problem of user cooperation. It's easy to make your typing behavior look like something that it's not, but what should that be? If it's too unique, then the change does more harm then good, allowing you to be easily identified. Without the cooperation of other users, it's difficult to choose a behavior that's hard to distinguish.
+See the [kloak defense testing](https://www.whonix.org/wiki/Keystroke_Deanonymization#Kloak) instructions.
 
 ## Background
 
 `kloak` has two goals in mind:
+
 * Make it difficult for an adversary to identify a user
 * Make it difficult for an adversary to replicate a user's typing behavior
 
