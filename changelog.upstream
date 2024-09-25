@@ -1,3 +1,21 @@
+commit db54b34d50df8ffd0b9c6c55338aecea07de6928
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 00:23:29 2024 -0400
+
+    apparmor
+
+commit cec549dbfa81a927775a0f7b1d7c9a8116a45694
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 00:19:52 2024 -0400
+
+    add open syscall (required in VirtualBox)
+
+commit b7831111dfc305ed7fbaa60f69163df38746af51
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 04:16:46 2024 +0000
+
+    bumped changelog version
+
 commit aad35c7038ae645e27af125f5c0b1adf59d0f063
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Sep 25 00:16:22 2024 -0400
