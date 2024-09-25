@@ -1,3 +1,28 @@
+commit 47e67bad20c321a8556e4256ad473e0a97ef3971
+Merge: b085979 a290f5f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 20:59:42 2024 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/master'
+
+commit a290f5f0fd864ea459e1c3e75a424fe7dd33cca8
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Sep 24 15:25:56 2024 -0500
+
+    Fix minor bug in makefile, add check for pkg-config
+
+commit ac9d1fc2712966a5ae834a690a885db9f10b2b0b
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Sep 24 13:41:35 2024 -0500
+
+    Add -p option for disabling rescue key sequence
+
+commit b08597935959a9a37d96ec49f372d08084e6a82a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 24 05:03:38 2024 +0000
+
+    bumped changelog version
+
 commit 0f3ae73fc107e4103f2e9933960bdedce63df7cf
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Sep 24 01:02:28 2024 -0400
