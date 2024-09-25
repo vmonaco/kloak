@@ -1,3 +1,15 @@
+commit aad35c7038ae645e27af125f5c0b1adf59d0f063
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 00:16:22 2024 -0400
+
+    add readlink syscall (required in VirtualBox)
+
+commit fb6cff17fe950846a1af6c3e4edc323c0bfb56fe
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 01:04:05 2024 +0000
+
+    bumped changelog version
+
 commit 47e67bad20c321a8556e4256ad473e0a97ef3971
 Merge: b085979 a290f5f
 Author: Patrick Schleizer <adrelanos@whonix.org>
