@@ -21,7 +21,7 @@ CFLAGS = -O2 -Wall -Wformat -Wformat=2 -Wconversion -Wimplicit-fallthrough \
 	-Wbidi-chars=any -fPIE -pie -Werror=implicit \
 	-Werror=incompatible-pointer-types -Werror=int-conversion \
 	-fno-delete-null-pointer-checks -fno-strict-overflow -fno-strict-aliasing \
-	-fsanitize=address,undefined
+	-fsanitize=undefined
 
 ifeq ($(TARGETARCH), x86_64-linux-gnu)
 CFLAGS += -fcf-protection=full # only supported on x86_64
