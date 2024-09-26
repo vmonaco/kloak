@@ -34,6 +34,9 @@
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
+const char *qubes_detect_file = "/usr/share/qubes/marker-vm";
+static bool is_qubes_vm = false;
+
 static int interrupt = 0;       // flag to interrupt the main loop and exit
 static int verbose = 0;         // flag for verbose output
 static int persistent = 0;      // flag for persistent mode (diables rescue key sequence)
@@ -249,7 +252,14 @@ void init_outputs() {
         if (err != 0)
             panic("Could not create evdev for input device: %s", named_inputs[i]);
 
-        libevdev_set_name(output_devs[i], name);
+        // Setting the device name under Qubes is pointless, as a Qubes VM
+        // will never have a dynamically changing number of input devices like
+        // a normal VM or a physical system. Furthermore, setting the device
+        // name causes an alarming "Denied qubes.InputKeyboard from vm to
+        // dom0" notification.
+        if (!is_qubes_vm) {
+            libevdev_set_name(output_devs[i], name);
+        }
 
         err = libevdev_uinput_create_from_device(output_devs[i], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[i]);
 
@@ -430,6 +440,10 @@ int main(int argc, char **argv) {
 
     if ((getuid()) != 0)
         printf("You are not root! This may not work...\n");
+
+    if (access(qubes_detect_file, F_OK) == 0) {
+        is_qubes_vm = true;
+    }
 
     while (1) {
         int c = getopt_long(argc, argv, "r:d:s:k:vph", long_options, NULL);
