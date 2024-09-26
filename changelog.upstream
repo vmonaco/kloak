@@ -1,3 +1,34 @@
+commit 9b96a2330e5dd9d2829bb662f0f01ff9c1e5b505
+Merge: 3cbe8b2 4bbdf38
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 26 06:53:11 2024 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/master'
+
+commit 4bbdf38cc6c6f9162348d9b23deef3169f8465b8
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Wed Sep 25 15:17:27 2024 -0500
+
+    Update README.md
+
+commit c3500fc38cea3d69c96765f6691688e4079ecd67
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Wed Sep 25 13:43:06 2024 -0500
+
+    Don't use AddressSanitizer, incompatible with Whonix's vm.mmap_rnd_bits setting
+
+commit 38604467ed76f6d236e5c207913d9533bdab05ab
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Wed Sep 25 12:41:58 2024 -0500
+
+    Don't set the output device name under Qubes OS, it causes a scary notification to appear
+
+commit 3cbe8b2ba4d50f6d23823736a90109e89a5c07c4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 25 04:23:39 2024 +0000
+
+    bumped changelog version
+
 commit db54b34d50df8ffd0b9c6c55338aecea07de6928
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Sep 25 00:23:29 2024 -0400
