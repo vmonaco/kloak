@@ -1,3 +1,22 @@
+commit 222994ec63c36898b8a89fca2f0210384da2a0c3
+Merge: f5ee77e 29477f9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 26 20:47:43 2024 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/master'
+
+commit 29477f98d1192ced4fb0e630c07dbd8b97942d22
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Thu Sep 26 14:08:48 2024 -0500
+
+    Generate debugging info
+
+commit f5ee77ee73f90c02fede10cdc510a1a6417dd74f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 26 11:07:01 2024 +0000
+
+    bumped changelog version
+
 commit 9b96a2330e5dd9d2829bb662f0f01ff9c1e5b505
 Merge: 3cbe8b2 4bbdf38
 Author: Patrick Schleizer <adrelanos@whonix.org>
