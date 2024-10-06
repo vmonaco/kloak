@@ -2,7 +2,7 @@ SUBSYSTEM!="input", GOTO="end"
 
 
 # do not run kloak on devices created by kloak
-KERNEL=="event*", ATTRS{name}=="kloak*", GOTO="end"
+KERNEL=="event*", ATTRS{name}=="*kloak", GOTO="end"
 
 # new keyboard or mouse attached, start kloak@event[0-9].service
 KERNEL=="event*", ACTION=="add", ENV{ID_INPUT_KEYBOARD}=="1", RUN+="/usr/bin/systemctl restart kloak.service"

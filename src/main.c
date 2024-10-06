@@ -245,7 +245,8 @@ void init_inputs() {
 }
 
 void init_outputs() {
-    const char *name = "kloak output device";
+    char *name;
+    const char *suffix = " kloak";
     for (int i = 0; i < device_count; i++) {
         int err = libevdev_new_from_fd(input_fds[i], &output_devs[i]);
 
@@ -258,7 +259,17 @@ void init_outputs() {
         // name causes an alarming "Denied qubes.InputKeyboard from vm to
         // dom0" notification.
         if (!is_qubes_vm) {
+            const char *tmp_name = libevdev_get_name(output_devs[i]);
+            name = malloc(strlen(tmp_name) + strlen(suffix) + 1);
+            if (name == NULL)
+                panic("Could not allocate memory for device name: %s", tmp_name);
+
+            strcpy(name, tmp_name);
+            strcat(name, suffix);
+
             libevdev_set_name(output_devs[i], name);
+
+            free(name);
         }
 
         err = libevdev_uinput_create_from_device(output_devs[i], LIBEVDEV_UINPUT_OPEN_MANAGED, &uidevs[i]);
