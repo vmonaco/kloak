@@ -1,3 +1,5 @@
+**Important**: I'm not actively maintaining this repository. Please refer to the [Whonix/kloak](https://github.com/Whonix/kloak) fork which is supported by the Whonix team!
+
 # anti keystroke deanonymization tool #
 
 kloak: *Keystroke-level online anonymization kernel*
